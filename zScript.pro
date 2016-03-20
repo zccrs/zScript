@@ -3,4 +3,5 @@ TARGET = zScript
 TEMPLATE = subdirs
 
 SUBDIRS += \
-        preproccess
+        preproccess \
+        lexical

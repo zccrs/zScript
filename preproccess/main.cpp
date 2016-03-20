@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <QCoreApplication>
 #include <QTextStream>
 #include <QFile>
@@ -105,10 +107,10 @@ int main(int argc, char *argv[])
             zErrorQuit;
         }
 
-        zPrint << preproccess(readFile(info.absoluteFilePath()));
+        zStandardPrint << preproccess(readFile(info.absoluteFilePath())).constData();
     } else {
         QTextStream input_stream(stdin);
 
-        zPrint << preproccess(input_stream.readAll().toLocal8Bit());
+        zStandardPrint << preproccess(input_stream.readAll().toLocal8Bit()).constData();
     }
 }

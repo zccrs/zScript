@@ -5,7 +5,8 @@
 #define zError qCritical().noquote() << "[Error]:"
 #define zInfo qInfo().noquote() << "[Info]:"
 #define zWarning qWarning().noquote() << "[Warning]:"
-#define zPrint qDebug().noquote()
+#define zPrint qDebug()
+#define zStandardPrint std::cout
 #define zExit(code) exit(code)
 #define zErrorQuit zExit(-1)
 #define zQuit zExit(0)

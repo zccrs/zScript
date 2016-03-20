@@ -3,14 +3,18 @@ QT -= gui
 
 CONFIG += c++11
 
-TARGET = preproccess
+TARGET = lexical
 CONFIG += console
 CONFIG -= app_bundle
 
 TEMPLATE = app
 
-SOURCES += $$PWD/main.cpp
+LIBS += -lfl
 
-include(../common.pri)
+SOURCES += $$PWD/lex.yy.c
+
+OTHER_FILES += zScript.lt
+
+system(flex $$PWD/zScript.lt)
 
 DESTDIR = $$shadowed($$PWD/../bin)
