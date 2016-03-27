@@ -518,8 +518,10 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "/home/zhang/projects/zScript/lexical/zScript.lt"
-#line 523 "lex.yy.c"
+#line 1 "/home/zhang/projects/zScript/lexical/zScript.l"
+#line 2 "/home/zhang/projects/zScript/lexical/zScript.l"
+#include "../syntax/zScript.tab.h"
+#line 525 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -737,9 +739,9 @@ YY_DECL
 		}
 
 	{
-#line 9 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 13 "/home/zhang/projects/zScript/lexical/zScript.l"
 
-#line 743 "lex.yy.c"
+#line 745 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -798,107 +800,108 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 10 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 14 "/home/zhang/projects/zScript/lexical/zScript.l"
 {
-	printf("note: \"%s\"\n", yytext);
+    printf("note: \"%s\"\n", yytext);
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 13 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 17 "/home/zhang/projects/zScript/lexical/zScript.l"
 {
-	printf("string: \"%s\"\n", yytext);
+    printf("string: \"%s\"\n", yytext);
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 16 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 20 "/home/zhang/projects/zScript/lexical/zScript.l"
 {
-	printf("keyword: \"%s\"\n", yytext);
+    printf("keyword: \"%s\"\n", yytext);
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 19 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 23 "/home/zhang/projects/zScript/lexical/zScript.l"
 {
-	printf("terminal；%s\n", yytext);
+    printf("terminal；%s\n", yytext);
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 22 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 26 "/home/zhang/projects/zScript/lexical/zScript.l"
 {
-	printf("operator: %s\n", yytext);
+    printf("operator: %s\n", yytext);
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 25 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 29 "/home/zhang/projects/zScript/lexical/zScript.l"
 {
-	printf("%s\n", yytext);
+    printf("%s\n", yytext);
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 28 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 32 "/home/zhang/projects/zScript/lexical/zScript.l"
 {
-	printf("%s\n", yytext);
+    printf("%s\n", yytext);
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 31 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 35 "/home/zhang/projects/zScript/lexical/zScript.l"
 {
-	printf("%s\n", yytext);
+    printf("%s\n", yytext);
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 34 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 38 "/home/zhang/projects/zScript/lexical/zScript.l"
 {
-	printf("%s\n", yytext);
+    printf("%s\n", yytext);
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 37 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 41 "/home/zhang/projects/zScript/lexical/zScript.l"
 {
-	printf("%s\n", yytext);
+    printf("%s\n", yytext);
 }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 40 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 44 "/home/zhang/projects/zScript/lexical/zScript.l"
 {
-	printf("%s\n", yytext);
+    printf("%s\n", yytext);
 }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 43 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 47 "/home/zhang/projects/zScript/lexical/zScript.l"
 {
-	printf("identifier: \"%s\"\n", yytext);
+    printf("identifier: \"%s\"\n", yytext);
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 46 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 50 "/home/zhang/projects/zScript/lexical/zScript.l"
 {
-	printf("number: %s\n", yytext);
+    printf("number: %s\n", yytext);
+    return NUMBER;
 }
 	YY_BREAK
 case 14:
 /* rule 14 can match eol */
 YY_RULE_SETUP
-#line 49 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 54 "/home/zhang/projects/zScript/lexical/zScript.l"
 
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 50 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 55 "/home/zhang/projects/zScript/lexical/zScript.l"
 ECHO;
 	YY_BREAK
-#line 902 "lex.yy.c"
+#line 905 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1899,6 +1902,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 50 "/home/zhang/projects/zScript/lexical/zScript.lt"
+#line 55 "/home/zhang/projects/zScript/lexical/zScript.l"
+
 
 

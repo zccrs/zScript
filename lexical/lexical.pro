@@ -13,8 +13,8 @@ LIBS += -lfl
 
 SOURCES += $$PWD/lex.yy.c
 
-OTHER_FILES += zScript.lt
+OTHER_FILES += zScript.l
 
-system(flex $$PWD/zScript.lt)
+system(flex $$PWD/zScript.l)
 
 DESTDIR = $$shadowed($$PWD/../bin)
