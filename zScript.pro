@@ -4,5 +4,4 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
         preproccess \
-        lexical \
-        syntax
+        core

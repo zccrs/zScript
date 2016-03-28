@@ -1,0 +1,194 @@
+Terminals unused in grammar
+
+   FUNCTION
+   NEW
+   DELETE
+   THROW
+   IF
+   ELSE
+   WHILE
+   STRING
+   ASSIGN
+   PLUS
+   SUB
+   MUL
+   DIV
+   LPAREN
+   RPAREN
+   SEMI
+   LBRACE
+   RBRACE
+   LBRACKET
+   RBRACKET
+   COMMA
+
+
+语法
+
+    0 $accept: start $end
+
+    1 start: %empty
+    2      | start statement ';'
+
+    3 statement: VAR IDENTIFIER '=' expression
+
+    4 expression: expression '+' NUMBER
+    5           | expression '-' NUMBER
+    6           | NUMBER
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'+' (43) 4
+'-' (45) 5
+';' (59) 2
+'=' (61) 3
+error (256)
+VAR (258) 3
+FUNCTION (259)
+NEW (260)
+DELETE (261)
+THROW (262)
+IF (263)
+ELSE (264)
+WHILE (265)
+NUMBER (266) 4 5 6
+STRING (267)
+IDENTIFIER (268) 3
+ASSIGN (269)
+PLUS (270)
+SUB (271)
+MUL (272)
+DIV (273)
+LPAREN (274)
+RPAREN (275)
+SEMI (276)
+LBRACE (277)
+RBRACE (278)
+LBRACKET (279)
+RBRACKET (280)
+COMMA (281)
+
+
+Nonterminals, with rules where they appear
+
+$accept (31)
+    on left: 0
+start (32)
+    on left: 1 2, on right: 0 2
+statement (33)
+    on left: 3, on right: 2
+expression (34)
+    on left: 4 5 6, on right: 3 4 5
+
+
+State 0
+
+    0 $accept: . start $end
+
+    $default  reduce using rule 1 (start)
+
+    start  转到状态 1
+
+
+State 1
+
+    0 $accept: start . $end
+    2 start: start . statement ';'
+
+    $end  shift, and go to state 2
+    VAR   shift, and go to state 3
+
+    statement  转到状态 4
+
+
+State 2
+
+    0 $accept: start $end .
+
+    $default  接受
+
+
+State 3
+
+    3 statement: VAR . IDENTIFIER '=' expression
+
+    IDENTIFIER  shift, and go to state 5
+
+
+State 4
+
+    2 start: start statement . ';'
+
+    ';'  shift, and go to state 6
+
+
+State 5
+
+    3 statement: VAR IDENTIFIER . '=' expression
+
+    '='  shift, and go to state 7
+
+
+State 6
+
+    2 start: start statement ';' .
+
+    $default  reduce using rule 2 (start)
+
+
+State 7
+
+    3 statement: VAR IDENTIFIER '=' . expression
+
+    NUMBER  shift, and go to state 8
+
+    expression  转到状态 9
+
+
+State 8
+
+    6 expression: NUMBER .
+
+    $default  reduce using rule 6 (expression)
+
+
+State 9
+
+    3 statement: VAR IDENTIFIER '=' expression .
+    4 expression: expression . '+' NUMBER
+    5           | expression . '-' NUMBER
+
+    '+'  shift, and go to state 10
+    '-'  shift, and go to state 11
+
+    $default  reduce using rule 3 (statement)
+
+
+State 10
+
+    4 expression: expression '+' . NUMBER
+
+    NUMBER  shift, and go to state 12
+
+
+State 11
+
+    5 expression: expression '-' . NUMBER
+
+    NUMBER  shift, and go to state 13
+
+
+State 12
+
+    4 expression: expression '+' NUMBER .
+
+    $default  reduce using rule 4 (expression)
+
+
+State 13
+
+    5 expression: expression '-' NUMBER .
+
+    $default  reduce using rule 5 (expression)

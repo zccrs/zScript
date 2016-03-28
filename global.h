@@ -11,4 +11,10 @@
 #define zErrorQuit zExit(-1)
 #define zQuit zExit(0)
 
+typedef struct treeNode
+{
+    int value;
+    char *name;
+} TreeNode;
+
 #endif // GLOBAL_H
