@@ -1,7 +1,7 @@
-SOURCES += $$PWD/lex.yy.c
+SOURCES += $$PWD/lex.yy.cpp
 
-OTHER_FILES += $$PWD/zScript.l
+OTHER_FILES += $$PWD/zScript.ll
 
-system(flex $$PWD/zScript.l)
+system(flex -+ -o lex.yy.cpp $$PWD/zScript.ll)
 
 INCLUDEPATH += $$PWD

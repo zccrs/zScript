@@ -1,11 +1,11 @@
 HEADERS += \
-        $$PWD/zScript.tab.h
+        $$PWD/zScript.tab.hpp
 
 SOURCES += \
-        $$PWD/zScript.tab.c
+        $$PWD/zScript.tab.cpp
 
-OTHER_FILES += $$PWD/zScript.y
+OTHER_FILES += $$PWD/zScript.yy
 
-system(bison -d -v $$PWD/zScript.y)
+system(bison -d -v -L c++ -o zScript.tab.cpp $$PWD/zScript.yy)
 
 INCLUDEPATH += $$PWD
