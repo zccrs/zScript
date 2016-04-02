@@ -38,7 +38,6 @@ ignore [ \t\r\n]
 
 {identifier} {
     yylval->name = QByteArray(yytext);
-    //printf("identifier: \"%s\"\n", yytext);
     yylval->value = -1;
 
     return TOKEN_PREFIX::IDENTIFIER;
@@ -49,7 +48,6 @@ ignore [ \t\r\n]
 }
 
 {number} {
-    //printf("number: %s\n", yytext);
     yylval->value = atoi(yytext);
 
     return TOKEN_PREFIX::NUMBER;

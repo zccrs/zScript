@@ -1,6 +1,4 @@
 %{
-#include <stdio.h>
-#include <ctype.h>
 #include "global.h"
 
 #define YYSTYPE TreeNode
@@ -38,7 +36,7 @@ statement:  VAR IDENTIFIER '=' expression {
                 $2.value = $4.value;
                 $$ = $2;
 
-                zStandardPrint << $$.name.toStdString() << "=" << $$.value << std::endl;
+                zInfo << $$.name << "=" << $$.value;
             }
             ;
 

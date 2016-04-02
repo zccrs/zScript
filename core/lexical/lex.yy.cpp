@@ -735,7 +735,6 @@ YY_RULE_SETUP
 #line 39 "/home/zhang/projects/zScript/core/lexical/zScript.ll"
 {
     yylval->name = QByteArray(yytext);
-    //printf("identifier: \"%s\"\n", yytext);
     yylval->value = -1;
 
     return TOKEN_PREFIX::IDENTIFIER;
@@ -743,16 +742,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 47 "/home/zhang/projects/zScript/core/lexical/zScript.ll"
+#line 46 "/home/zhang/projects/zScript/core/lexical/zScript.ll"
 {
     return TOKEN_PREFIX::STRING;
 }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 51 "/home/zhang/projects/zScript/core/lexical/zScript.ll"
+#line 50 "/home/zhang/projects/zScript/core/lexical/zScript.ll"
 {
-    //printf("number: %s\n", yytext);
     yylval->value = atoi(yytext);
 
     return TOKEN_PREFIX::NUMBER;
@@ -760,10 +758,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 57 "/home/zhang/projects/zScript/core/lexical/zScript.ll"
+#line 55 "/home/zhang/projects/zScript/core/lexical/zScript.ll"
 ECHO;
 	YY_BREAK
-#line 767 "lex.yy.cpp"
+#line 765 "lex.yy.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1718,7 +1716,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 57 "/home/zhang/projects/zScript/core/lexical/zScript.ll"
+#line 55 "/home/zhang/projects/zScript/core/lexical/zScript.ll"
 
 
 

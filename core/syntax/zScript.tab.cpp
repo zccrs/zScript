@@ -34,8 +34,6 @@
 // First part of user declarations.
 #line 1 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:404
 
-#include <stdio.h>
-#include <ctype.h>
 #include "global.h"
 
 #define YYSTYPE TreeNode
@@ -44,7 +42,7 @@ int yylex(TreeNode *lval);
 
 #include "lex.yy.cpp"
 
-#line 48 "zScript.tab.cpp" // lalr1.cc:404
+#line 46 "zScript.tab.cpp" // lalr1.cc:404
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -58,7 +56,7 @@ int yylex(TreeNode *lval);
 
 // User implementation prologue.
 
-#line 62 "zScript.tab.cpp" // lalr1.cc:412
+#line 60 "zScript.tab.cpp" // lalr1.cc:412
 
 
 #ifndef YY_
@@ -125,7 +123,7 @@ int yylex(TreeNode *lval);
 
 
 namespace yy {
-#line 129 "zScript.tab.cpp" // lalr1.cc:479
+#line 127 "zScript.tab.cpp" // lalr1.cc:479
 
   /// Build a parser object.
   parser::parser ()
@@ -548,36 +546,36 @@ namespace yy {
           switch (yyn)
             {
   case 5:
-#line 37 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:859
+#line 35 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yystack_[2].value).value = (yystack_[0].value).value;
                 (yylhs.value) = (yystack_[2].value);
 
-                zStandardPrint << (yylhs.value).name.toStdString() << "=" << (yylhs.value).value << std::endl;
+                zInfo << (yylhs.value).name << "=" << (yylhs.value).value;
             }
-#line 559 "zScript.tab.cpp" // lalr1.cc:859
+#line 557 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 6:
-#line 45 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:859
+#line 43 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yystack_[2].value).value = (yystack_[2].value).value + (yystack_[0].value).value;
                 (yylhs.value) = (yystack_[2].value);
             }
-#line 568 "zScript.tab.cpp" // lalr1.cc:859
+#line 566 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 7:
-#line 49 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:859
+#line 47 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yystack_[2].value).value = (yystack_[2].value).value - (yystack_[0].value).value;
                 (yylhs.value) = (yystack_[2].value);
             }
-#line 577 "zScript.tab.cpp" // lalr1.cc:859
+#line 575 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
 
-#line 581 "zScript.tab.cpp" // lalr1.cc:859
+#line 579 "zScript.tab.cpp" // lalr1.cc:859
             default:
               break;
             }
@@ -821,7 +819,7 @@ namespace yy {
   const unsigned char
   parser::yyrline_[] =
   {
-       0,    32,    32,    33,    34,    37,    45,    49,    53
+       0,    30,    30,    31,    32,    35,    43,    47,    51
   };
 
   // Print the state stack on the debug stream.
@@ -905,8 +903,8 @@ namespace yy {
 
 
 } // yy
-#line 909 "zScript.tab.cpp" // lalr1.cc:1167
-#line 56 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:1168
+#line 907 "zScript.tab.cpp" // lalr1.cc:1167
+#line 54 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:1168
 
 
 yyFlexLexer flexLexer;
