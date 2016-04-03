@@ -146,22 +146,21 @@ namespace yy {
         IF = 263,
         ELSE = 264,
         WHILE = 265,
-        NUMBER = 266,
-        STRING = 267,
-        IDENTIFIER = 268,
-        ASSIGN = 269,
-        PLUS = 270,
-        SUB = 271,
-        MUL = 272,
-        DIV = 273,
-        LPAREN = 274,
-        RPAREN = 275,
-        SEMI = 276,
-        LBRACE = 277,
-        RBRACE = 278,
-        LBRACKET = 279,
-        RBRACKET = 280,
-        COMMA = 281
+        VARIANT = 266,
+        IDENTIFIER = 267,
+        ASSIGN = 268,
+        PLUS = 269,
+        SUB = 270,
+        MUL = 271,
+        DIV = 272,
+        LPAREN = 273,
+        RPAREN = 274,
+        SEMI = 275,
+        LBRACE = 276,
+        RBRACE = 277,
+        LBRACKET = 278,
+        RBRACKET = 279,
+        COMMA = 280
       };
     };
 
@@ -460,12 +459,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 27,     ///< Last index in yytable_.
+      yylast_ = 26,     ///< Last index in yytable_.
       yynnts_ = 4,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 31  ///< Number of tokens.
+      yyntokens_ = 32  ///< Number of tokens.
     };
 
 
@@ -474,7 +473,7 @@ namespace yy {
 
 
 } // yy
-#line 478 "zScript.tab.hpp" // lalr1.cc:377
+#line 477 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

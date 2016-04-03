@@ -14,4 +14,4 @@ include($$PWD/lexical/lexical.pri)
 include($$PWD/syntax/syntax.pri)
 include($$PWD/common.pri)
 
-DESTDIR = $$shadowed($$PWD/../bin)
+#DESTDIR = $$shadowed($$PWD/../bin)

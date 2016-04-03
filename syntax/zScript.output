@@ -7,7 +7,6 @@ Terminals unused in grammar
    IF
    ELSE
    WHILE
-   STRING
    ASSIGN
    PLUS
    SUB
@@ -23,7 +22,7 @@ Terminals unused in grammar
    COMMA
 
 
-Grammar
+语法
 
     0 $accept: start $end
 
@@ -33,16 +32,20 @@ Grammar
 
     4 statement: VAR IDENTIFIER '=' expression
 
-    5 expression: expression '+' NUMBER
-    6           | expression '-' NUMBER
-    7           | NUMBER
+    5 expression: expression '+' VARIANT
+    6           | expression '-' VARIANT
+    7           | expression '*' VARIANT
+    8           | expression '/' VARIANT
+    9           | VARIANT
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
+'*' (42) 7
 '+' (43) 5
 '-' (45) 6
+'/' (47) 8
 ';' (59) 2 3
 '=' (61) 4
 error (256)
@@ -54,34 +57,33 @@ THROW (262)
 IF (263)
 ELSE (264)
 WHILE (265)
-NUMBER (266) 5 6 7
-STRING (267)
-IDENTIFIER (268) 4
-ASSIGN (269)
-PLUS (270)
-SUB (271)
-MUL (272)
-DIV (273)
-LPAREN (274)
-RPAREN (275)
-SEMI (276)
-LBRACE (277)
-RBRACE (278)
-LBRACKET (279)
-RBRACKET (280)
-COMMA (281)
+VARIANT (266) 5 6 7 8 9
+IDENTIFIER (267) 4
+ASSIGN (268)
+PLUS (269)
+SUB (270)
+MUL (271)
+DIV (272)
+LPAREN (273)
+RPAREN (274)
+SEMI (275)
+LBRACE (276)
+RBRACE (277)
+LBRACKET (278)
+RBRACKET (279)
+COMMA (280)
 
 
 Nonterminals, with rules where they appear
 
-$accept (31)
+$accept (32)
     on left: 0
-start (32)
+start (33)
     on left: 1 2 3, on right: 0 2 3
-statement (33)
+statement (34)
     on left: 4, on right: 3
-expression (34)
-    on left: 5 6 7, on right: 4 5 6
+expression (35)
+    on left: 5 6 7 8 9, on right: 4 5 6 7 8
 
 
 State 0
@@ -90,7 +92,7 @@ State 0
 
     $default  reduce using rule 1 (start)
 
-    start  go to state 1
+    start  转到状态 1
 
 
 State 1
@@ -103,14 +105,14 @@ State 1
     VAR   shift, and go to state 3
     ';'   shift, and go to state 4
 
-    statement  go to state 5
+    statement  转到状态 5
 
 
 State 2
 
     0 $accept: start $end .
 
-    $default  accept
+    $default  接受
 
 
 State 3
@@ -152,53 +154,85 @@ State 8
 
     4 statement: VAR IDENTIFIER '=' . expression
 
-    NUMBER  shift, and go to state 9
+    VARIANT  shift, and go to state 9
 
-    expression  go to state 10
+    expression  转到状态 10
 
 
 State 9
 
-    7 expression: NUMBER .
+    9 expression: VARIANT .
 
-    $default  reduce using rule 7 (expression)
+    $default  reduce using rule 9 (expression)
 
 
 State 10
 
     4 statement: VAR IDENTIFIER '=' expression .
-    5 expression: expression . '+' NUMBER
-    6           | expression . '-' NUMBER
+    5 expression: expression . '+' VARIANT
+    6           | expression . '-' VARIANT
+    7           | expression . '*' VARIANT
+    8           | expression . '/' VARIANT
 
     '+'  shift, and go to state 11
     '-'  shift, and go to state 12
+    '*'  shift, and go to state 13
+    '/'  shift, and go to state 14
 
     $default  reduce using rule 4 (statement)
 
 
 State 11
 
-    5 expression: expression '+' . NUMBER
+    5 expression: expression '+' . VARIANT
 
-    NUMBER  shift, and go to state 13
+    VARIANT  shift, and go to state 15
 
 
 State 12
 
-    6 expression: expression '-' . NUMBER
+    6 expression: expression '-' . VARIANT
 
-    NUMBER  shift, and go to state 14
+    VARIANT  shift, and go to state 16
 
 
 State 13
 
-    5 expression: expression '+' NUMBER .
+    7 expression: expression '*' . VARIANT
 
-    $default  reduce using rule 5 (expression)
+    VARIANT  shift, and go to state 17
 
 
 State 14
 
-    6 expression: expression '-' NUMBER .
+    8 expression: expression '/' . VARIANT
+
+    VARIANT  shift, and go to state 18
+
+
+State 15
+
+    5 expression: expression '+' VARIANT .
+
+    $default  reduce using rule 5 (expression)
+
+
+State 16
+
+    6 expression: expression '-' VARIANT .
 
     $default  reduce using rule 6 (expression)
+
+
+State 17
+
+    7 expression: expression '*' VARIANT .
+
+    $default  reduce using rule 7 (expression)
+
+
+State 18
+
+    8 expression: expression '/' VARIANT .
+
+    $default  reduce using rule 8 (expression)

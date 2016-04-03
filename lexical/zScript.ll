@@ -12,6 +12,7 @@ YYSTYPE *yylval = Q_NULLPTR;
 identifier [a-zA-Z_][a-zA-Z0-9_]*
 string (\'(.|\\\\.)*\'|\"(.|\\\\.)*\")
 number [1-9][0-9]*
+real ({number}|0)\.[0-9]*[1-9]
 operator ([-+*/=!<>,;{}\(\)\[\]]|!=|!==|==|===|<=|>=|&&|\|\|)
 note \/\/.*
 ignore [ \t\r\n]
@@ -32,24 +33,43 @@ ignore [ \t\r\n]
 "else"      { return TOKEN_PREFIX::ELSE;}
 "while"     { return TOKEN_PREFIX::WHILE;}
 
+"true" {
+    yylval->value = true;
+
+    return TOKEN_PREFIX::VARIANT;
+}
+
+"false" {
+    yylval->value = false;
+
+    return TOKEN_PREFIX::VARIANT;
+}
+
 {operator} {
     return yytext[0];
 }
 
 {identifier} {
     yylval->name = QByteArray(yytext);
-    yylval->value = -1;
 
     return TOKEN_PREFIX::IDENTIFIER;
 }
 
 {string} {
-    return TOKEN_PREFIX::STRING;
+    yylval->value = QString(yytext);
+
+    return TOKEN_PREFIX::VARIANT;
 }
 
 {number} {
     yylval->value = atoi(yytext);
 
-    return TOKEN_PREFIX::NUMBER;
+    return TOKEN_PREFIX::VARIANT;
+}
+
+{real} {
+    yylval->value = atof(yytext);
+
+    return TOKEN_PREFIX::VARIANT;
 }
 %%

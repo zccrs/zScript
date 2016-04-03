@@ -11,364 +11,141 @@
 #define zErrorQuit zExit(-1)
 #define zQuit zExit(0)
 
-#include <QVariant>
+#include <QSharedDataPointer>
 #include <QDebug>
 
-Q_CORE_EXPORT QDebug operator<<(QDebug deg, const QVariant &var)
+QT_BEGIN_NAMESPACE
+class QObject;
+QT_END_NAMESPACE
+
+class Variant
 {
-    deg.nospace() << "Variant(" << var.typeName() << "," << var.toString() << ")";
+public:
+    enum Type {
+        Int = QMetaType::Int,
+        Double = QMetaType::Double,
+        Bool = QMetaType::Bool,
+        String = QMetaType::QString,
+        List = QMetaType::QVariantList,
+        Object = QMetaType::PointerToQObject,
+        Undefined = QMetaType::UnknownType,
+        NaN = QMetaType::User + 1,
+        Null = QMetaType::User + 2
+    };
 
-    return deg;
-}
+    Variant(Type type = Undefined);
+    Variant(int val);
+    Variant(double val);
+    Variant(bool val);
+    Variant(const char *val);
+    Variant(const Variant &other);
+    Variant(const QString &val);
+    Variant(QLatin1String val);
+    template <typename T>
+    Variant(const QList<T> &val);
+    Variant(const QList<Variant> &val);
+    Variant(QObject * const object);
+    ~Variant();
 
-QVariant operator +(const int var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 + var2.toInt();
-    case QVariant::Double:
-        return var1 + var2.toDouble();
-    case QVariant::ByteArray:
-        return QByteArray::number(var1) + var2.toByteArray();
-    case QVariant::Bool:
-        return var1 + var2.toBool();
-    default: break;
-    }
+    Type type() const;
+    const char *typeName() const;
 
-    return QVariant::Invalid;
-}
+    int toInt(bool *ok = 0) const;
+    double toDouble(bool *ok = 0) const;
+    bool toBool() const;
+    QString toString() const;
+    QList<Variant> toList() const;
+    QObject *toObject() const;
 
-QVariant operator -(const int var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 - var2.toInt();
-    case QVariant::Double:
-        return var1 - var2.toDouble();
-    case QVariant::Bool:
-        return var1 - var2.toBool();
-    default: break;
-    }
+private:
+    class VariantData : public QSharedData
+    {
+        QVariant variant;
+        Variant::Type type;
 
-    return QVariant::Invalid;
-}
+        friend class Variant;
+    };
 
-QVariant operator *(const int var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 * var2.toInt();
-    case QVariant::Double:
-        return var1 * var2.toDouble();
-    case QVariant::Bool:
-        return var1 * var2.toBool();
-    default: break;
-    }
+    QSharedDataPointer<VariantData> data;
+};
 
-    return QVariant::Invalid;
-}
+Q_DECLARE_METATYPE(Variant)
 
-QVariant operator /(const int var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 / var2.toInt();
-    case QVariant::Double:
-        return var1 / var2.toDouble();
-    case QVariant::Bool:
-        return var1 / var2.toBool();
-    default: break;
-    }
+Q_CORE_EXPORT QDebug operator<<(QDebug deg, const Variant &var);
 
-    return QVariant::Invalid;
-}
+/// int
+Variant operator +(const int var1, const Variant &var2);
+Variant operator -(const int var1, const Variant &var2);
+Variant operator *(const int var1, const Variant &var2);
+Variant operator /(const int var1, const Variant &var2);
+Variant operator &&(const int var1, const Variant &var2);
+Variant operator ||(const int var1, const Variant &var2);
+Variant operator &(const int var1, const Variant &var2);
+Variant operator |(const int var1, const Variant &var2);
+Variant operator ^(const int var1, const Variant &var2);
 
-QVariant operator &&(const int var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 && var2.toInt();
-    case QVariant::Double:
-        return var1 && var2.toDouble();
-    case QVariant::Bool:
-        return var1 && var2.toBool();
-    default: break;
-    }
+/// double
+Variant operator +(const double &var1, const Variant &var2);
+Variant operator -(const double &var1, const Variant &var2);
+Variant operator *(const double &var1, const Variant &var2);
+Variant operator /(const double &var1, const Variant &var2);
 
-    return QVariant::Invalid;
-}
+inline Variant operator &&(const double &var1, const Variant &var2)
+{return (int)var1 && var2;}
 
-QVariant operator ||(const int var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 || var2.toInt();
-    case QVariant::Double:
-        return var1 || var2.toDouble();
-    case QVariant::Bool:
-        return var1 || var2.toBool();
-    default: break;
-    }
+inline Variant operator ||(const double &var1, const Variant &var2)
+{return (int)var1 || var2;}
 
-    return QVariant::Invalid;
-}
+inline Variant operator &(const double &var1, const Variant &var2)
+{return (int)var1 & var2;}
 
-QVariant operator &(const int var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 & var2.toInt();
-    case QVariant::Double:
-        return var1 & (int)var2.toDouble();
-    case QVariant::Bool:
-        return var1 & var2.toBool();
-    default: break;
-    }
+inline Variant operator |(const double &var1, const Variant &var2)
+{return (int)var1 | var2;}
 
-    return QVariant::Invalid;
-}
+inline Variant operator ^(const double &var1, const Variant &var2)
+{return (int)var1 ^ var2;}
 
-QVariant operator |(const int var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 | var2.toInt();
-    case QVariant::Double:
-        return var1 | (int)var2.toDouble();
-    case QVariant::Bool:
-        return var1 | var2.toBool();
-    default: break;
-    }
+/// string
+Variant operator +(const QString &var1, const Variant &var2);
+Variant operator -(const QString &var1, const Variant &var2);
+Variant operator *(const QString &var1, const Variant &var2);
+Variant operator /(const QString &var1, const Variant &var2);
 
-    return QVariant::Invalid;
-}
+inline Variant operator &&(const QString &/*var1*/, const Variant &/*var2*/)
+{return Variant::NaN;}
 
-QVariant operator ^(const int var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 ^ var2.toInt();
-    case QVariant::Double:
-        return var1 ^ (int)var2.toDouble();
-    case QVariant::Bool:
-        return var1 ^ var2.toBool();
-    default: break;
-    }
+inline Variant operator ||(const QString &/*var1*/, const Variant &/*var2*/)
+{return Variant::NaN;}
 
-    return QVariant::Invalid;
-}
+inline Variant operator &(const QString &/*var1*/, const Variant &/*var2*/)
+{return Variant::NaN;}
 
-QVariant operator +(const double &var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 + var2.toInt();
-    case QVariant::Double:
-        return var1 + var2.toDouble();
-    case QVariant::ByteArray:
-        return QByteArray::number(var1) + var2.toByteArray();
-    case QVariant::Bool:
-        return var1 + var2.toBool();
-    default: break;
-    }
+inline Variant operator |(const QString &/*var1*/, const Variant &/*var2*/)
+{return Variant::NaN;}
 
-    return QVariant::Invalid;
-}
-
-QVariant operator -(const double &var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 - var2.toInt();
-    case QVariant::Double:
-        return var1 - var2.toDouble();
-    case QVariant::Bool:
-        return var1 - var2.toBool();
-    default: break;
-    }
-
-    return QVariant::Invalid;
-}
-
-QVariant operator *(const double &var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 * var2.toInt();
-    case QVariant::Double:
-        return var1 * var2.toDouble();
-    case QVariant::Bool:
-        return var1 * var2.toBool();
-    default: break;
-    }
-
-    return QVariant::Invalid;
-}
-
-QVariant operator /(const double &var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 / var2.toInt();
-    case QVariant::Double:
-        return var1 / var2.toDouble();
-    case QVariant::Bool:
-        return var1 / var2.toBool();
-    default: break;
-    }
-
-    return QVariant::Invalid;
-}
-
-QVariant operator &&(const double &var1, const QVariant &var2)
-{
-    return (int)var1 && var2;
-}
-
-QVariant operator ||(const double &var1, const QVariant &var2)
-{
-    return (int)var1 || var2;
-}
-
-QVariant operator &(const double &var1, const QVariant &var2)
-{
-    return (int)var1 & var2;
-}
-
-QVariant operator |(const double &var1, const QVariant &var2)
-{
-    return (int)var1 | var2;
-}
-
-QVariant operator ^(const double &var1, const QVariant &var2)
-{
-    return (int)var1 ^ var2;
-}
-
-QVariant operator +(const bool var1, const QVariant &var2)
-{
-    return (int)var1 + var2;
-}
-
-QVariant operator -(const bool var1, const QVariant &var2)
-{
-    return (int)var1 - var2;
-}
-
-QVariant operator *(const bool var1, const QVariant &var2)
-{
-    return (int)var1 * var2;
-}
-
-QVariant operator /(const bool var1, const QVariant &var2)
-{
-    return (int)var1 / var2;
-}
-
-QVariant operator &&(const bool var1, const QVariant &var2)
-{
-    return (int)var1 && var2;
-}
-
-QVariant operator ||(const bool var1, const QVariant &var2)
-{
-    return (int)var1 || var2;
-}
-
-QVariant operator &(const bool var1, const QVariant &var2)
-{
-    return (int)var1 & var2;
-}
-
-QVariant operator |(const bool var1, const QVariant &var2)
-{
-    return (int)var1 | var2;
-}
-
-QVariant operator ^(const bool var1, const QVariant &var2)
-{
-    return (int)var1 ^ var2;
-}
-
-QVariant operator +(const QByteArray &var1, const QVariant &var2)
-{
-    switch(var2.type()) {
-    case QVariant::Int:
-        return var1 + QByteArray::number(var2.toInt());
-    case QVariant::Double:
-        return var1 + QByteArray::number(var2.toDouble());
-    case QVariant::ByteArray:
-        return var1 + var2.toByteArray();
-    case QVariant::Bool:
-        return var1 + (var2.toBool() ? "true" : "false");
-    default: break;
-    }
-
-    return QVariant::Invalid;
-}
-
-QVariant operator -(const QByteArray &/*var1*/, const QVariant &/*var2*/)
-{
-    return QVariant::Invalid;
-}
-
-QVariant operator *(const QByteArray &/*var1*/, const QVariant &/*var2*/)
-{
-    return QVariant::Invalid;
-}
-
-QVariant operator /(const QByteArray &/*var1*/, const QVariant &/*var2*/)
-{
-    return QVariant::Invalid;
-}
-
-QVariant operator &&(const QByteArray &/*var1*/, const QVariant &/*var2*/)
-{
-    return QVariant::Invalid;
-}
-
-QVariant operator ||(const QByteArray &/*var1*/, const QVariant &/*var2*/)
-{
-    return QVariant::Invalid;
-}
-
-QVariant operator &(const QByteArray &/*var1*/, const QVariant &/*var2*/)
-{
-    return QVariant::Invalid;
-}
-
-QVariant operator |(const QByteArray &/*var1*/, const QVariant &/*var2*/)
-{
-    return QVariant::Invalid;
-}
-
-QVariant operator ^(const QByteArray &/*var1*/, const QVariant &/*var2*/)
-{
-    return QVariant::Invalid;
-}
+inline Variant operator ^(const QString &/*var1*/, const Variant &/*var2*/)
+{return Variant::NaN;}
 
 #define OPERATOR(OP) \
-    QVariant operator OP (const QVariant &var1, const QVariant &var2)\
+    inline Variant operator OP (const Variant &var1, const Variant &var2)\
     {\
         switch(var1.type()) {\
-        case QVariant::Int:\
+        case Variant::Int:\
             return var1.toInt() OP var2;\
-        case QVariant::Double:\
+        case Variant::Double:\
             return var1.toDouble() OP var2;\
-        case QVariant::ByteArray:\
-            return var1 OP var2;\
-        case QVariant::Bool:\
-            return var1 OP var2;\
+        case Variant::String:\
+            return var1.toString() OP var2;\
+        case Variant::Bool:\
+            return (int)var1.toBool() OP var2;\
         default: break;\
         }\
-        return QVariant::Invalid;\
+        return Variant::NaN;\
     }
 
 #define OPERATOR_ASS(OP) \
-    QVariant &operator OP##=(QVariant &var1, const QVariant &var2)\
-    {\
-        return var1 = var1 OP var2;\
-    }
+    inline Variant &operator OP##=(Variant &var1, const Variant &var2)\
+    {return var1 = var1 OP var2;}
 
 OPERATOR(+)
 OPERATOR(-)
@@ -388,44 +165,25 @@ OPERATOR_ASS(&)
 OPERATOR_ASS(|)
 OPERATOR_ASS(^)
 
-QVariant &operator ++(QVariant &var, int)
-{
-    return var = 1 + var;
-}
+inline Variant &operator ++(Variant &var, int)
+{return var = 1 + var;}
 
-QVariant &operator --(QVariant &var, int)
-{
-    return var = 1 - var;
-}
+inline Variant &operator --(Variant &var, int)
+{return var = 1 - var;}
 
-QVariant &operator ++(QVariant &var)
-{
-    return var = 1 + var;
-}
+inline Variant &operator ++(Variant &var)
+{return var = 1 + var;}
 
-QVariant &operator --(QVariant &var)
-{
-    return var = 1 - var;
-}
+inline Variant &operator --(Variant &var)
+{return var = 1 - var;}
 
-QVariant operator !(const QVariant &var)
-{
-    switch(var.type()) {
-    case QVariant::Int:
-        return !var.toInt();
-    case QVariant::Double:
-        return !var.toDouble();
-    case QVariant::Bool:
-        return !var.toBool();
-    default: break;
-    }
+Variant operator !(const Variant &var);
 
-    return QVariant::Invalid;
-}
+QByteArray readFile(const QString &fileName);
 
 struct TreeNode
 {
-    QVariant value;
+    Variant value;
     QByteArray name;
 };
 

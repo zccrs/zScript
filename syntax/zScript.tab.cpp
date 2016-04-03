@@ -545,37 +545,63 @@ namespace yy {
         {
           switch (yyn)
             {
+  case 4:
+#line 32 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                zInfo << (yystack_[1].value).value;
+            }
+#line 554 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
   case 5:
-#line 35 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 37 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yystack_[2].value).value = (yystack_[0].value).value;
                 (yylhs.value) = (yystack_[2].value);
 
                 zInfo << (yylhs.value).name << "=" << (yylhs.value).value;
             }
-#line 557 "zScript.tab.cpp" // lalr1.cc:859
+#line 565 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 6:
-#line 43 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 45 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yystack_[2].value).value = (yystack_[2].value).value + (yystack_[0].value).value;
                 (yylhs.value) = (yystack_[2].value);
             }
-#line 566 "zScript.tab.cpp" // lalr1.cc:859
+#line 574 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 7:
-#line 47 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 49 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yystack_[2].value).value = (yystack_[2].value).value - (yystack_[0].value).value;
                 (yylhs.value) = (yystack_[2].value);
             }
-#line 575 "zScript.tab.cpp" // lalr1.cc:859
+#line 583 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 8:
+#line 53 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yystack_[2].value).value = (yystack_[2].value).value * (yystack_[0].value).value;
+                (yylhs.value) = (yystack_[2].value);
+            }
+#line 592 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 9:
+#line 57 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yystack_[2].value).value = (yystack_[2].value).value / (yystack_[0].value).value;
+                (yylhs.value) = (yystack_[2].value);
+            }
+#line 601 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
 
-#line 579 "zScript.tab.cpp" // lalr1.cc:859
+#line 605 "zScript.tab.cpp" // lalr1.cc:859
             default:
               break;
             }
@@ -736,28 +762,28 @@ namespace yy {
   }
 
 
-  const signed char parser::yypact_ninf_ = -29;
+  const signed char parser::yypact_ninf_ = -26;
 
   const signed char parser::yytable_ninf_ = -1;
 
   const signed char
   parser::yypact_[] =
   {
-     -29,     0,   -29,    -9,   -29,   -22,   -21,   -29,    -5,   -29,
-     -28,    -3,    -2,   -29,   -29
+     -26,     0,   -26,   -11,   -26,   -18,   -25,   -26,    -2,   -26,
+     -24,    -1,     1,     2,     3,   -26,   -26,   -26,   -26
   };
 
   const unsigned char
   parser::yydefact_[] =
   {
-       2,     0,     1,     0,     3,     0,     0,     4,     0,     8,
-       5,     0,     0,     6,     7
+       2,     0,     1,     0,     3,     0,     0,     4,     0,    10,
+       5,     0,     0,     0,     0,     6,     7,     8,     9
   };
 
   const signed char
   parser::yypgoto_[] =
   {
-     -29,   -29,   -29,   -29
+     -26,   -26,   -26,   -26
   };
 
   const signed char
@@ -769,36 +795,38 @@ namespace yy {
   const unsigned char
   parser::yytable_[] =
   {
-       2,    11,    12,     3,     6,     7,     9,     8,    13,    14,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     4
+       2,     6,     8,     3,    11,    12,    13,    14,     7,     9,
+      15,     0,    16,    17,    18,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     4
   };
 
   const signed char
   parser::yycheck_[] =
   {
-       0,    29,    30,     3,    13,    27,    11,    28,    11,    11,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    27
+       0,    12,    27,     3,    28,    29,    30,    31,    26,    11,
+      11,    -1,    11,    11,    11,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    26
   };
 
   const unsigned char
   parser::yystos_[] =
   {
-       0,    32,     0,     3,    27,    33,    13,    27,    28,    11,
-      34,    29,    30,    11,    11
+       0,    33,     0,     3,    26,    34,    12,    26,    27,    11,
+      35,    28,    29,    30,    31,    11,    11,    11,    11
   };
 
   const unsigned char
   parser::yyr1_[] =
   {
-       0,    31,    32,    32,    32,    33,    34,    34,    34
+       0,    32,    33,    33,    33,    34,    35,    35,    35,    35,
+      35
   };
 
   const unsigned char
   parser::yyr2_[] =
   {
-       0,     2,     0,     2,     3,     4,     3,     3,     1
+       0,     2,     0,     2,     3,     4,     3,     3,     3,     3,
+       1
   };
 
 
@@ -809,17 +837,18 @@ namespace yy {
   const parser::yytname_[] =
   {
   "$end", "error", "$undefined", "VAR", "FUNCTION", "NEW", "DELETE",
-  "THROW", "IF", "ELSE", "WHILE", "NUMBER", "STRING", "IDENTIFIER",
-  "ASSIGN", "PLUS", "SUB", "MUL", "DIV", "LPAREN", "RPAREN", "SEMI",
-  "LBRACE", "RBRACE", "LBRACKET", "RBRACKET", "COMMA", "';'", "'='", "'+'",
-  "'-'", "$accept", "start", "statement", "expression", YY_NULLPTR
+  "THROW", "IF", "ELSE", "WHILE", "VARIANT", "IDENTIFIER", "ASSIGN",
+  "PLUS", "SUB", "MUL", "DIV", "LPAREN", "RPAREN", "SEMI", "LBRACE",
+  "RBRACE", "LBRACKET", "RBRACKET", "COMMA", "';'", "'='", "'+'", "'-'",
+  "'*'", "'/'", "$accept", "start", "statement", "expression", YY_NULLPTR
   };
 
 
   const unsigned char
   parser::yyrline_[] =
   {
-       0,    30,    30,    31,    32,    35,    43,    47,    51
+       0,    30,    30,    31,    32,    37,    45,    49,    53,    57,
+      61
   };
 
   // Print the state stack on the debug stream.
@@ -864,9 +893,9 @@ namespace yy {
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    29,     2,    30,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    27,
-       2,    28,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,    30,    28,     2,    29,     2,    31,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    26,
+       2,    27,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -888,9 +917,9 @@ namespace yy {
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26
+      25
     };
-    const unsigned int user_token_number_max_ = 281;
+    const unsigned int user_token_number_max_ = 280;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -903,8 +932,8 @@ namespace yy {
 
 
 } // yy
-#line 907 "zScript.tab.cpp" // lalr1.cc:1167
-#line 54 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
+#line 936 "zScript.tab.cpp" // lalr1.cc:1167
+#line 64 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
 
 
 yyFlexLexer flexLexer;

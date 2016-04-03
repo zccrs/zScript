@@ -12,7 +12,7 @@ int yylex(TreeNode *lval);
 %token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE
 
 /// data type
-%token NUMBER STRING
+%token VARIANT
 
 /// identifier
 %token IDENTIFIER
@@ -29,7 +29,9 @@ int yylex(TreeNode *lval);
 
 start:
             | start ';'
-            | start statement ';'
+            | start statement ';' {
+                zInfo << $2.value;
+            }
             ;
 
 statement:  VAR IDENTIFIER '=' expression {
@@ -40,16 +42,24 @@ statement:  VAR IDENTIFIER '=' expression {
             }
             ;
 
-expression: expression '+' NUMBER {
+expression: expression '+' VARIANT {
                 $1.value = $1.value + $3.value;
                 $$ = $1;
             }
-          | expression '-' NUMBER {
+            | expression '-' VARIANT {
                 $1.value = $1.value - $3.value;
                 $$ = $1;
             }
-          | NUMBER
-          ;
+            | expression '*' VARIANT {
+                $1.value = $1.value * $3.value;
+                $$ = $1;
+            }
+            | expression '/' VARIANT {
+                $1.value = $1.value / $3.value;
+                $$ = $1;
+            }
+            | VARIANT
+            ;
 
 %%
 
