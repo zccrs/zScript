@@ -12,13 +12,12 @@
 #define zQuit zExit(0)
 
 #include <QSharedDataPointer>
+#include <QObject>
 #include <QDebug>
 
-QT_BEGIN_NAMESPACE
-class QObject;
-QT_END_NAMESPACE
+class ZObject;
 
-class Variant
+class ZVariant
 {
 public:
     enum Type {
@@ -33,19 +32,20 @@ public:
         Null = QMetaType::User + 2
     };
 
-    Variant(Type type = Undefined);
-    Variant(int val);
-    Variant(double val);
-    Variant(bool val);
-    Variant(const char *val);
-    Variant(const Variant &other);
-    Variant(const QString &val);
-    Variant(QLatin1String val);
+    ZVariant(Type type = Undefined);
+    ZVariant(int val);
+    ZVariant(double val);
+    ZVariant(bool val);
+    ZVariant(const char *val);
+    ZVariant(const ZVariant &other);
+    ZVariant(const QString &val);
+    ZVariant(QLatin1String val);
     template <typename T>
-    Variant(const QList<T> &val);
-    Variant(const QList<Variant> &val);
-    Variant(QObject * const object);
-    ~Variant();
+    ZVariant(const QList<T> &val);
+    ZVariant(const QList<ZVariant> &val);
+    ZVariant(ZObject * const object);
+    ZVariant(const QVariant &val);
+    ~ZVariant();
 
     Type type() const;
     const char *typeName() const;
@@ -54,108 +54,124 @@ public:
     double toDouble(bool *ok = 0) const;
     bool toBool() const;
     QString toString() const;
-    QList<Variant> toList() const;
-    QObject *toObject() const;
+    QList<ZVariant> toList() const;
+    ZObject *toObject() const;
+    QVariant toQVariant() const;
+
+    inline bool operator==(const ZVariant &v) const
+    { return data->variant == v.data->variant; }
+    inline bool operator!=(const ZVariant &v) const
+    { return data->variant != v.data->variant; }
+    inline bool operator<(const ZVariant &v) const
+    { return data->variant < v.data->variant; }
+    inline bool operator<=(const ZVariant &v) const
+    { return data->variant <= v.data->variant; }
+    inline bool operator>(const ZVariant &v) const
+    { return data->variant > v.data->variant; }
+    inline bool operator>=(const ZVariant &v) const
+    { return data->variant >= v.data->variant; }
+    inline bool operator&&(const ZVariant &v) const
+    { return toBool() && v.toBool();}
+    inline bool operator||(const ZVariant &v) const
+    { return toBool() || v.toBool();}
+    inline bool operator!() const
+    { return !toBool();}
 
 private:
     class VariantData : public QSharedData
     {
         QVariant variant;
-        Variant::Type type;
+        ZVariant::Type type;
 
-        friend class Variant;
+        friend class ZVariant;
     };
 
     QSharedDataPointer<VariantData> data;
 };
 
-Q_DECLARE_METATYPE(Variant)
+Q_DECLARE_METATYPE(ZVariant)
+Q_CORE_EXPORT QDebug operator<<(QDebug deg, const ZVariant &var);
 
-Q_CORE_EXPORT QDebug operator<<(QDebug deg, const Variant &var);
+class ZObject : public QObject
+{
+    Q_OBJECT
+
+public:
+    explicit ZObject(ZObject *parent = 0);
+
+    ZVariant property(const char *name) const;
+
+public slots:
+    void setProperty(const char *name, const ZVariant &value);
+};
 
 /// int
-Variant operator +(const int var1, const Variant &var2);
-Variant operator -(const int var1, const Variant &var2);
-Variant operator *(const int var1, const Variant &var2);
-Variant operator /(const int var1, const Variant &var2);
-Variant operator &&(const int var1, const Variant &var2);
-Variant operator ||(const int var1, const Variant &var2);
-Variant operator &(const int var1, const Variant &var2);
-Variant operator |(const int var1, const Variant &var2);
-Variant operator ^(const int var1, const Variant &var2);
+ZVariant operator +(const int var1, const ZVariant &var2);
+ZVariant operator -(const int var1, const ZVariant &var2);
+ZVariant operator *(const int var1, const ZVariant &var2);
+ZVariant operator /(const int var1, const ZVariant &var2);
+ZVariant operator &(const int var1, const ZVariant &var2);
+ZVariant operator |(const int var1, const ZVariant &var2);
+ZVariant operator ^(const int var1, const ZVariant &var2);
+ZVariant operator %(const int var1, const ZVariant &var2);
 
 /// double
-Variant operator +(const double &var1, const Variant &var2);
-Variant operator -(const double &var1, const Variant &var2);
-Variant operator *(const double &var1, const Variant &var2);
-Variant operator /(const double &var1, const Variant &var2);
+ZVariant operator +(const double &var1, const ZVariant &var2);
+ZVariant operator -(const double &var1, const ZVariant &var2);
+ZVariant operator *(const double &var1, const ZVariant &var2);
+ZVariant operator /(const double &var1, const ZVariant &var2);
 
-inline Variant operator &&(const double &var1, const Variant &var2)
-{return (int)var1 && var2;}
-
-inline Variant operator ||(const double &var1, const Variant &var2)
-{return (int)var1 || var2;}
-
-inline Variant operator &(const double &var1, const Variant &var2)
+inline ZVariant operator &(const double &var1, const ZVariant &var2)
 {return (int)var1 & var2;}
 
-inline Variant operator |(const double &var1, const Variant &var2)
+inline ZVariant operator |(const double &var1, const ZVariant &var2)
 {return (int)var1 | var2;}
 
-inline Variant operator ^(const double &var1, const Variant &var2)
+inline ZVariant operator ^(const double &var1, const ZVariant &var2)
+{return (int)var1 ^ var2;}
+
+inline ZVariant operator %(const double &var1, const ZVariant &var2)
 {return (int)var1 ^ var2;}
 
 /// string
-Variant operator +(const QString &var1, const Variant &var2);
-Variant operator -(const QString &var1, const Variant &var2);
-Variant operator *(const QString &var1, const Variant &var2);
-Variant operator /(const QString &var1, const Variant &var2);
-
-inline Variant operator &&(const QString &/*var1*/, const Variant &/*var2*/)
-{return Variant::NaN;}
-
-inline Variant operator ||(const QString &/*var1*/, const Variant &/*var2*/)
-{return Variant::NaN;}
-
-inline Variant operator &(const QString &/*var1*/, const Variant &/*var2*/)
-{return Variant::NaN;}
-
-inline Variant operator |(const QString &/*var1*/, const Variant &/*var2*/)
-{return Variant::NaN;}
-
-inline Variant operator ^(const QString &/*var1*/, const Variant &/*var2*/)
-{return Variant::NaN;}
+ZVariant operator +(const QString &var1, const ZVariant &var2);
+ZVariant operator -(const QString &var1, const ZVariant &var2);
+ZVariant operator *(const QString &var1, const ZVariant &var2);
+ZVariant operator /(const QString &var1, const ZVariant &var2);
+ZVariant operator &(const QString &var1, const ZVariant &var2);
+ZVariant operator |(const QString &var1, const ZVariant &var2);
+ZVariant operator ^(const QString &var1, const ZVariant &var2);
+ZVariant operator %(const QString &var1, const ZVariant &var2);
 
 #define OPERATOR(OP) \
-    inline Variant operator OP (const Variant &var1, const Variant &var2)\
+    inline ZVariant operator OP (const ZVariant &var1, const ZVariant &var2)\
     {\
         switch(var1.type()) {\
-        case Variant::Int:\
+        case ZVariant::Int:\
             return var1.toInt() OP var2;\
-        case Variant::Double:\
+        case ZVariant::Double:\
             return var1.toDouble() OP var2;\
-        case Variant::String:\
+        case ZVariant::String:\
             return var1.toString() OP var2;\
-        case Variant::Bool:\
+        case ZVariant::Bool:\
             return (int)var1.toBool() OP var2;\
         default: break;\
         }\
-        return Variant::NaN;\
+        return ZVariant::NaN;\
     }
 
 #define OPERATOR_ASS(OP) \
-    inline Variant &operator OP##=(Variant &var1, const Variant &var2)\
+    inline ZVariant &operator OP##=(ZVariant &var1, const ZVariant &var2)\
     {return var1 = var1 OP var2;}
 
 OPERATOR(+)
 OPERATOR(-)
 OPERATOR(*)
 OPERATOR(/)
-OPERATOR(&&)
-OPERATOR(||)
 OPERATOR(&)
 OPERATOR(|)
 OPERATOR(^)
+OPERATOR(%)
 
 OPERATOR_ASS(+)
 OPERATOR_ASS(-)
@@ -164,26 +180,27 @@ OPERATOR_ASS(/)
 OPERATOR_ASS(&)
 OPERATOR_ASS(|)
 OPERATOR_ASS(^)
+OPERATOR_ASS(%)
 
-inline Variant &operator ++(Variant &var, int)
+inline ZVariant &operator ++(ZVariant &var, int)
 {return var = 1 + var;}
 
-inline Variant &operator --(Variant &var, int)
+inline ZVariant &operator --(ZVariant &var, int)
 {return var = 1 - var;}
 
-inline Variant &operator ++(Variant &var)
+inline ZVariant &operator ++(ZVariant &var)
 {return var = 1 + var;}
 
-inline Variant &operator --(Variant &var)
+inline ZVariant &operator --(ZVariant &var)
 {return var = 1 - var;}
 
-Variant operator !(const Variant &var);
+ZVariant operator ~(const ZVariant &var);
 
 QByteArray readFile(const QString &fileName);
 
 struct TreeNode
 {
-    Variant value;
+    ZVariant value;
     QByteArray name;
 };
 

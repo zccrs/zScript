@@ -17,20 +17,29 @@ int yylex(TreeNode *lval);
 /// identifier
 %token IDENTIFIER
 
-%right ASSIGN
-%left PLUS SUB
-%left MUL DIV
+///   ==/=== !=/!==   <= >= &&  ||   ++      --
+%token  EQ     NEQ    LE GE AND OR ADDSELF SUBSELF
+///     /=  *=  +=  -=   %=    &=    |=   ^=
+%token  DEQ MEQ AEQ SEQ MODEQ ANDEQ OREQ XOREQ
 
-/// operator
-%token PLUS SUB MUL DIV ASSIGN
-%token LPAREN RPAREN SEMI LBRACE RBRACE LBRACKET RBRACKET COMMA
+%left ','
+%right '=' DEQ MEQ AEQ SEQ MODEQ ANDEQ OREQ XOREQ
+%left '?' ':'
+%left AND OR
+%left '&' '|' '^'
+%left EQ NEQ
+%left '>' '<' GE LE
+%left '-' '+'
+%left '*' '/' '%'
+%right UMINUS ADDSELF SUBSELF '!' '~'
+%left '(' ')'
 
 %%
 
 start:
             | start ';'
             | start statement ';' {
-                zInfo << $2.value;
+                //zInfo << $2.value;
             }
             ;
 
@@ -42,23 +51,88 @@ statement:  VAR IDENTIFIER '=' expression {
             }
             ;
 
-expression: expression '+' VARIANT {
-                $1.value = $1.value + $3.value;
-                $$ = $1;
+expression: VARIANT
+            | expression '+' expression {
+                $$.value = $1.value + $3.value;
             }
-            | expression '-' VARIANT {
-                $1.value = $1.value - $3.value;
-                $$ = $1;
+            | expression '-' expression {
+                $$.value = $1.value - $3.value;
             }
-            | expression '*' VARIANT {
-                $1.value = $1.value * $3.value;
-                $$ = $1;
+            | expression '*' expression {
+                $$.value = $1.value * $3.value;
             }
-            | expression '/' VARIANT {
-                $1.value = $1.value / $3.value;
-                $$ = $1;
+            | expression '/' expression {
+                $$.value = $1.value / $3.value;
             }
-            | VARIANT
+            | expression AEQ expression {
+                $$.value = $1.value += $3.value;
+            }
+            | expression SEQ expression {
+                $$.value = $1.value -= $3.value;
+            }
+            | expression MEQ expression {
+                $$.value = $1.value *= $3.value;
+            }
+            | expression DEQ expression {
+                $$.value = $1.value /= $3.value;
+            }
+            | expression '&' expression {
+                $$.value = $1.value & $3.value;
+            }
+            | expression '|' expression {
+                $$.value = $1.value | $3.value;
+            }
+            | expression '^' expression {
+                $$.value = $1.value ^ $3.value;
+            }
+            | expression '%' expression {
+                $$.value = $1.value % $3.value;
+            }
+            | expression ANDEQ expression {
+                $$.value = $1.value &= $3.value;
+            }
+            | expression OREQ expression {
+                $$.value = $1.value |= $3.value;
+            }
+            | expression XOREQ expression {
+                $$.value = $1.value ^= $3.value;
+            }
+            | expression MODEQ expression {
+                $$.value = $1.value %= $3.value;
+            }
+            | expression EQ expression {
+                $$.value = $1.value == $3.value;
+            }
+            | expression NEQ expression {
+                $$.value = $1.value != $3.value;
+            }
+            | expression LE expression {
+                $$.value = $1.value <= $3.value;
+            }
+            | expression GE expression {
+                $$.value = $1.value >= $3.value;
+            }
+            | expression AND expression {
+                $$.value = $1.value && $3.value;
+            }
+            | expression OR expression {
+                $$.value = $1.value || $3.value;
+            }
+            | ADDSELF expression {
+                $$.value = ++$2.value;
+            }
+            | expression ADDSELF {
+                $$.value = $1.value++;
+            }
+            | SUBSELF expression {
+                $$.value = --$2.value;
+            }
+            | expression SUBSELF {
+                $$.value = $1.value--;
+            }
+            | '-' expression %prec UMINUS {$$.value = 0 -$2.value;}
+            | '+' expression %prec UMINUS {$$.value = $2.value;}
+            | '(' expression ')' {$$.value = $2.value;}
             ;
 
 %%

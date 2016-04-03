@@ -148,19 +148,23 @@ namespace yy {
         WHILE = 265,
         VARIANT = 266,
         IDENTIFIER = 267,
-        ASSIGN = 268,
-        PLUS = 269,
-        SUB = 270,
-        MUL = 271,
-        DIV = 272,
-        LPAREN = 273,
-        RPAREN = 274,
-        SEMI = 275,
-        LBRACE = 276,
-        RBRACE = 277,
-        LBRACKET = 278,
-        RBRACKET = 279,
-        COMMA = 280
+        EQ = 268,
+        NEQ = 269,
+        LE = 270,
+        GE = 271,
+        AND = 272,
+        OR = 273,
+        ADDSELF = 274,
+        SUBSELF = 275,
+        DEQ = 276,
+        MEQ = 277,
+        AEQ = 278,
+        SEQ = 279,
+        MODEQ = 280,
+        ANDEQ = 281,
+        OREQ = 282,
+        XOREQ = 283,
+        UMINUS = 284
       };
     };
 
@@ -324,7 +328,7 @@ namespace yy {
     // Tables.
   // YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
   // STATE-NUM.
-  static const signed char yypact_[];
+  static const short int yypact_[];
 
   // YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
   // Performed when YYTABLE does not specify something else to do.  Zero
@@ -459,12 +463,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 26,     ///< Last index in yytable_.
+      yylast_ = 195,     ///< Last index in yytable_.
       yynnts_ = 4,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 32  ///< Number of tokens.
+      yyntokens_ = 49  ///< Number of tokens.
     };
 
 
@@ -473,7 +477,7 @@ namespace yy {
 
 
 } // yy
-#line 477 "zScript.tab.hpp" // lalr1.cc:377
+#line 481 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

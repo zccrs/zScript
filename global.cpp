@@ -3,165 +3,260 @@
 #include <QFile>
 #include <QVariant>
 
-Variant::Variant(Variant::Type type)
+/// ZVariant
+ZVariant::ZVariant(ZVariant::Type type)
     : data(new VariantData)
 {
-    qRegisterMetaType<Variant>("Variant");
+    qRegisterMetaType<ZVariant>("ZVariant");
 
     data->type = type;
 }
 
-Variant::Variant(int val)
+ZVariant::ZVariant(int val)
     : data(new VariantData)
 {
-    qRegisterMetaType<Variant>("Variant");
+    qRegisterMetaType<ZVariant>("ZVariant");
 
     data->variant = val;
     data->type = Int;
 }
 
-Variant::Variant(double val)
+ZVariant::ZVariant(double val)
     : data(new VariantData)
 {
-    qRegisterMetaType<Variant>("Variant");
+    qRegisterMetaType<ZVariant>("ZVariant");
 
     data->variant = val;
     data->type = Double;
 }
 
-Variant::Variant(bool val)
+ZVariant::ZVariant(bool val)
     : data(new VariantData)
 {
-    qRegisterMetaType<Variant>("Variant");
+    qRegisterMetaType<ZVariant>("ZVariant");
 
     data->variant = val;
     data->type = Bool;
 }
 
-Variant::Variant(const char *val)
+ZVariant::ZVariant(const char *val)
     : data(new VariantData)
 {
-    qRegisterMetaType<Variant>("Variant");
+    qRegisterMetaType<ZVariant>("ZVariant");
 
     data->variant = val;
     data->type = String;
 }
 
-Variant::Variant(const Variant &other)
+ZVariant::ZVariant(const ZVariant &other)
     : data(other.data)
 {
 
 }
 
-Variant::Variant(const QString &val)
+ZVariant::ZVariant(const QString &val)
     : data(new VariantData)
 {
-    qRegisterMetaType<Variant>("Variant");
+    qRegisterMetaType<ZVariant>("ZVariant");
 
     data->variant = val;
     data->type = String;
 }
 
-Variant::Variant(QLatin1String val)
+ZVariant::ZVariant(QLatin1String val)
     : data(new VariantData)
 {
-    qRegisterMetaType<Variant>("Variant");
+    qRegisterMetaType<ZVariant>("ZVariant");
 
     data->variant = val;
     data->type = String;
 }
 
-Variant::Variant(const QList<Variant> &val)
+ZVariant::ZVariant(const QList<ZVariant> &val)
     : data(new VariantData)
 {
-    qRegisterMetaType<Variant>("Variant");
+    qRegisterMetaType<ZVariant>("ZVariant");
 
     data->variant = QVariant::fromValue(val);
     data->type = List;
 }
 
 template <typename T>
-Variant::Variant(const QList<T> &val)
+ZVariant::ZVariant(const QList<T> &val)
     : data(new VariantData)
 {
-    qRegisterMetaType<Variant>("Variant");
+    qRegisterMetaType<ZVariant>("ZVariant");
 
-    QList<Variant> list;
+    QList<ZVariant> list;
 
     list.reserve(val.size());
 
     for(const T &v : val)
-        list << Variant(v);
+        list << ZVariant(v);
 
     data->variant = QVariant::fromValue(list);
     data->type = List;
 }
 
-Variant::Variant(QObject * const object)
+ZVariant::ZVariant(ZObject * const object)
     : data(new VariantData)
 {
-    qRegisterMetaType<Variant>("Variant");
+    qRegisterMetaType<ZVariant>("ZVariant");
 
     data->variant = QVariant::fromValue(object);
     data->type = object ? Object : Null;
 }
 
-Variant::~Variant()
+ZVariant::ZVariant(const QVariant &val)
+    : data(new VariantData)
+{
+    data->variant = val;
+
+    switch (val.type()) {
+    case QVariant::Int:
+        data->type = Int;
+        break;
+    case QVariant::Double:
+        data->type = Double;
+        break;
+    case QVariant::Bool:
+        data->type = Bool;
+        break;
+    case QVariant::ByteArray:
+    case QVariant::String:
+        data->type = String;
+        break;
+    case QVariant::List:
+        data->type = List;
+        break;
+    case QVariant::Invalid:
+        data->type = Undefined;
+        break;
+    case QMetaType::PointerToQObject:
+        data->type = Object;
+        break;
+    case QVariant::UserType:{
+        if(QString(val.typeName()) == "ZObject*") {
+            data->type = toObject() ? Object : Null;
+        } else if(QString(val.typeName()) == "ZVariant") {
+            data = qvariant_cast<ZVariant>(val).data;
+        } else {
+            zError << "Unknow Type:" << val.typeName();
+        }
+        break;
+    }
+    default:
+        data->type = NaN;
+        break;
+    }
+}
+
+ZVariant::~ZVariant()
 {
 
 }
 
-Variant::Type Variant::type() const
+ZVariant::Type ZVariant::type() const
 {
     return data->type;
 }
 
-const char *Variant::typeName() const
+const char *ZVariant::typeName() const
 {
+    if(data->type == NaN)
+        return "NaN";
+    else if(data->type == Undefined)
+        return "Undefined";
+
     return data->variant.typeName();
 }
 
-int Variant::toInt(bool *ok) const
+int ZVariant::toInt(bool *ok) const
 {
+    switch(data->type) {
+    case Int:
+        return data->variant.toInt();
+    case Double:
+        return (int)data->variant.toDouble();
+    case Bool:
+        return data->variant.toBool();
+    case String:
+    case Object:
+    case Null:
+    case Undefined:
+    case NaN:
+        if(ok)
+            *ok = false;
+        return 0;
+    default:break;
+    }
+
     return data->variant.toInt(ok);
 }
 
-double Variant::toDouble(bool *ok) const
+double ZVariant::toDouble(bool *ok) const
 {
     return data->variant.toDouble(ok);
 }
 
-bool Variant::toBool() const
+bool ZVariant::toBool() const
 {
+    switch(data->type) {
+    case Int:
+        return data->variant.toInt();
+    case Double:
+        return (int)data->variant.toDouble();
+    case Bool:
+        return data->variant.toBool();
+    case String:
+        return !data->variant.toString().isEmpty();
+    case Object:
+        return true;
+    case Null:
+    case Undefined:
+    case NaN:
+        return false;
+    default: break;
+    }
+
     return data->variant.toBool();
 }
 
-QString Variant::toString() const
+QString ZVariant::toString() const
 {
     return data->variant.toString();
 }
 
-QList<Variant> Variant::toList() const
+QList<ZVariant> ZVariant::toList() const
 {
-    return qvariant_cast<QList<Variant>>(data->variant);
+    return qvariant_cast<QList<ZVariant>>(data->variant);
 }
 
-QObject *Variant::toObject() const
+ZObject *ZVariant::toObject() const
 {
-    return qvariant_cast<QObject*>(data->variant);
+    return qvariant_cast<ZObject*>(data->variant);
 }
 
-QDebug operator<<(QDebug deg, const Variant &var)
+QVariant ZVariant::toQVariant() const
+{
+    return data->variant;
+}
+
+QDebug operator<<(QDebug deg, const ZVariant &var)
 {
     deg.nospace() << "Variant(" << var.typeName() << ",";
 
     switch(var.type()) {
-    case Variant::Object:
+    case ZVariant::Null:
+    case ZVariant::Object:
         deg.nospace() << var.toObject();
         break;
-    case Variant::List:
+    case ZVariant::List:
         deg.nospace() << var.toList();
         break;
+    case ZVariant::NaN:
+    case ZVariant::Undefined:
+        deg.nospace() << var.typeName();
     default:
         deg.nospace() << var.toString();
         break;
@@ -172,225 +267,228 @@ QDebug operator<<(QDebug deg, const Variant &var)
     return deg;
 }
 
-Variant operator +(const int var1, const Variant &var2)
+/// ZObject
+ZObject::ZObject(ZObject *parent)
+    : QObject(parent)
+{
+
+}
+
+ZVariant ZObject::property(const char *name) const
+{
+    return ZVariant(QObject::property(name));
+}
+
+void ZObject::setProperty(const char *name, const ZVariant &value)
+{
+    QObject::setProperty(name, value.toQVariant());
+}
+
+/// global
+ZVariant operator +(const int var1, const ZVariant &var2)
 {
     switch(var2.type()) {
-    case Variant::Int:
+    case ZVariant::Int:
         return var1 + var2.toInt();
-    case Variant::Double:
+    case ZVariant::Double:
         return var1 + var2.toDouble();
-    case Variant::String:
+    case ZVariant::String:
         return QString::number(var1) + var2.toString();
-    case Variant::Bool:
+    case ZVariant::Bool:
         return var1 + var2.toBool();
     default: break;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
-Variant operator -(const int var1, const Variant &var2)
+ZVariant operator -(const int var1, const ZVariant &var2)
 {
     switch(var2.type()) {
-    case Variant::Int:
+    case ZVariant::Int:
         return var1 - var2.toInt();
-    case Variant::Double:
+    case ZVariant::Double:
         return var1 - var2.toDouble();
-    case Variant::Bool:
+    case ZVariant::Bool:
         return var1 - var2.toBool();
     default: break;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
-Variant operator *(const int var1, const Variant &var2)
+ZVariant operator *(const int var1, const ZVariant &var2)
 {
     switch(var2.type()) {
-    case Variant::Int:
+    case ZVariant::Int:
         return var1 * var2.toInt();
-    case Variant::Double:
+    case ZVariant::Double:
         return var1 * var2.toDouble();
-    case Variant::Bool:
+    case ZVariant::Bool:
         return var1 * var2.toBool();
-    case Variant::String:
+    case ZVariant::String:
         return var2 * var1;
     default: break;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
-Variant operator /(const int var1, const Variant &var2)
+ZVariant operator /(const int var1, const ZVariant &var2)
 {
     switch(var2.type()) {
-    case Variant::Int:
+    case ZVariant::Int:
         return var1 / var2.toInt();
-    case Variant::Double:
+    case ZVariant::Double:
         return var1 / var2.toDouble();
-    case Variant::Bool:
+    case ZVariant::Bool:
         return var1 / var2.toBool();
     default: break;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
-Variant operator &&(const int var1, const Variant &var2)
+ZVariant operator &(const int var1, const ZVariant &var2)
 {
     switch(var2.type()) {
-    case Variant::Int:
-        return var1 && var2.toInt();
-    case Variant::Double:
-        return var1 && var2.toDouble();
-    case Variant::Bool:
-        return var1 && var2.toBool();
-    default: break;
-    }
-
-    return Variant::NaN;
-}
-
-Variant operator ||(const int var1, const Variant &var2)
-{
-    switch(var2.type()) {
-    case Variant::Int:
-        return var1 || var2.toInt();
-    case Variant::Double:
-        return var1 || var2.toDouble();
-    case Variant::Bool:
-        return var1 || var2.toBool();
-    default: break;
-    }
-
-    return Variant::NaN;
-}
-
-Variant operator &(const int var1, const Variant &var2)
-{
-    switch(var2.type()) {
-    case Variant::Int:
+    case ZVariant::Int:
         return var1 & var2.toInt();
-    case Variant::Double:
+    case ZVariant::Double:
         return var1 & (int)var2.toDouble();
-    case Variant::Bool:
+    case ZVariant::Bool:
         return var1 & var2.toBool();
     default: break;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
-Variant operator |(const int var1, const Variant &var2)
+ZVariant operator |(const int var1, const ZVariant &var2)
 {
     switch(var2.type()) {
-    case Variant::Int:
+    case ZVariant::Int:
         return var1 | var2.toInt();
-    case Variant::Double:
+    case ZVariant::Double:
         return var1 | (int)var2.toDouble();
-    case Variant::Bool:
+    case ZVariant::Bool:
         return var1 | var2.toBool();
     default: break;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
-Variant operator ^(const int var1, const Variant &var2)
+ZVariant operator ^(const int var1, const ZVariant &var2)
 {
     switch(var2.type()) {
-    case Variant::Int:
+    case ZVariant::Int:
         return var1 ^ var2.toInt();
-    case Variant::Double:
+    case ZVariant::Double:
         return var1 ^ (int)var2.toDouble();
-    case Variant::Bool:
+    case ZVariant::Bool:
         return var1 ^ var2.toBool();
     default: break;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
-Variant operator +(const double &var1, const Variant &var2)
+ZVariant operator %(const int var1, const ZVariant &var2)
 {
     switch(var2.type()) {
-    case Variant::Int:
+    case ZVariant::Int:
+        return var1 % var2.toInt();
+    case ZVariant::Double:
+        return var1 % (int)var2.toDouble();
+    case ZVariant::Bool:
+        return var1 % var2.toBool();
+    default: break;
+    }
+
+    return ZVariant::NaN;
+}
+
+ZVariant operator +(const double &var1, const ZVariant &var2)
+{
+    switch(var2.type()) {
+    case ZVariant::Int:
         return var1 + var2.toInt();
-    case Variant::Double:
+    case ZVariant::Double:
         return var1 + var2.toDouble();
-    case Variant::String:
+    case ZVariant::String:
         return QString::number(var1) + var2.toString();
-    case Variant::Bool:
+    case ZVariant::Bool:
         return var1 + var2.toBool();
     default: break;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
-Variant operator -(const double &var1, const Variant &var2)
+ZVariant operator -(const double &var1, const ZVariant &var2)
 {
     switch(var2.type()) {
-    case Variant::Int:
+    case ZVariant::Int:
         return var1 - var2.toInt();
-    case Variant::Double:
+    case ZVariant::Double:
         return var1 - var2.toDouble();
-    case Variant::Bool:
+    case ZVariant::Bool:
         return var1 - var2.toBool();
     default: break;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
-Variant operator *(const double &var1, const Variant &var2)
+ZVariant operator *(const double &var1, const ZVariant &var2)
 {
     switch(var2.type()) {
-    case Variant::Int:
+    case ZVariant::Int:
         return var1 * var2.toInt();
-    case Variant::Double:
+    case ZVariant::Double:
         return var1 * var2.toDouble();
-    case Variant::Bool:
+    case ZVariant::Bool:
         return var1 * var2.toBool();
     default: break;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
-Variant operator /(const double &var1, const Variant &var2)
+ZVariant operator /(const double &var1, const ZVariant &var2)
 {
     switch(var2.type()) {
-    case Variant::Int:
+    case ZVariant::Int:
         return var1 / var2.toInt();
-    case Variant::Double:
+    case ZVariant::Double:
         return var1 / var2.toDouble();
-    case Variant::Bool:
+    case ZVariant::Bool:
         return var1 / var2.toBool();
     default: break;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
-Variant operator +(const QString &var1, const Variant &var2)
+ZVariant operator +(const QString &var1, const ZVariant &var2)
 {
     switch(var2.type()) {
-    case Variant::Int:
+    case ZVariant::Int:
         return var1 + QString::number(var2.toInt());
-    case Variant::Double:
+    case ZVariant::Double:
         return var1 + QString::number(var2.toDouble());
-    case Variant::String:
+    case ZVariant::String:
         return var1 + var2.toString();
-    case Variant::Bool:
+    case ZVariant::Bool:
         return var1 + (var2.toBool() ? "true" : "false");
     default: break;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
-Variant operator -(const QString &var1, const Variant &var2)
+ZVariant operator -(const QString &var1, const ZVariant &var2)
 {
     const QString &str = var2.toString();
 
@@ -400,9 +498,9 @@ Variant operator -(const QString &var1, const Variant &var2)
     return var1;
 }
 
-Variant operator *(const QString &var1, const Variant &var2)
+ZVariant operator *(const QString &var1, const ZVariant &var2)
 {
-    if(var2.type() == Variant::Int) {
+    if(var2.type() == ZVariant::Int) {
         QString array;
         int count = var2.toInt();
 
@@ -414,10 +512,10 @@ Variant operator *(const QString &var1, const Variant &var2)
         return array;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
-Variant operator /(const QString &var1, const Variant &var2)
+ZVariant operator /(const QString &var1, const ZVariant &var2)
 {
     const QString &str = var2.toString();
 
@@ -427,19 +525,111 @@ Variant operator /(const QString &var1, const Variant &var2)
     return QString(var1).split(str);
 }
 
-Variant operator !(const Variant &var)
+ZVariant operator &(const QString &var1, const ZVariant &var2)
+{
+    const QString var2Str = var2.toString();
+
+    if(var2Str.isEmpty())
+        return var1;
+
+    QString str;
+
+    int max_size = qMax(var1.size(), var2Str.size());
+
+    str.reserve(max_size);
+
+    for(int i = 0; i < max_size; ++i) {
+        str[i] = var1.at(i % var1.size()).unicode() & var2Str.at(i % var2Str.size()).unicode();
+    }
+
+    return str;
+}
+
+ZVariant operator |(const QString &var1, const ZVariant &var2)
+{
+    const QString var2Str = var2.toString();
+
+    if(var2Str.isEmpty())
+        return var1;
+
+    QString str;
+
+    int max_size = qMax(var1.size(), var2Str.size());
+
+    str.reserve(max_size);
+
+    for(int i = 0; i < max_size; ++i) {
+        str[i] = var1.at(i % var1.size()).unicode() | var2Str.at(i % var2Str.size()).unicode();
+    }
+
+    return str;
+}
+
+ZVariant operator ^(const QString &var1, const ZVariant &var2)
+{
+    const QString var2Str = var2.toString();
+
+    if(var2Str.isEmpty())
+        return var1;
+
+    QString str;
+
+    int max_size = qMax(var1.size(), var2Str.size());
+
+    str.reserve(max_size);
+
+    for(int i = 0; i < max_size; ++i) {
+        str[i] = var1.at(i % var1.size()).unicode() ^ var2Str.at(i % var2Str.size()).unicode();
+    }
+
+    return str;
+}
+
+ZVariant operator %(const QString &var1, const ZVariant &var2)
+{
+    const QString var2Str = var2.toString();
+
+    if(var2Str.isEmpty())
+        return var1;
+
+    QString str;
+
+    int max_size = qMax(var1.size(), var2Str.size());
+
+    str.reserve(max_size);
+
+    for(int i = 0; i < max_size; ++i) {
+        str[i] = var1.at(i % var1.size()).unicode() % var2Str.at(i % var2Str.size()).unicode();
+    }
+
+    return str;
+}
+
+ZVariant operator ~(const ZVariant &var)
 {
     switch(var.type()) {
-    case Variant::Int:
-        return !var.toInt();
-    case Variant::Double:
-        return !var.toDouble();
-    case Variant::Bool:
-        return !var.toBool();
+    case ZVariant::Int:
+        return ~var.toInt();
+    case ZVariant::Double:
+        return ~(int)var.toDouble();
+    case ZVariant::Bool:
+        return ~var.toBool();
+    case ZVariant::String:{
+        QString str = var.toString();
+
+        for(QChar &ch : str) {
+            if(ch.isLower())
+                ch = ch.toUpper();
+            else
+                ch = ch.toLower();
+        }
+
+        return str;
+    }
     default: break;
     }
 
-    return Variant::NaN;
+    return ZVariant::NaN;
 }
 
 QByteArray readFile(const QString &fileName)
@@ -454,5 +644,3 @@ QByteArray readFile(const QString &fileName)
 
     return re;
 }
-
-

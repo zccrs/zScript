@@ -10,28 +10,40 @@ YYSTYPE *yylval = Q_NULLPTR;
 %}
 
 identifier [a-zA-Z_][a-zA-Z0-9_]*
-string (\'(.|\\\\.)*\'|\"(.|\\\\.)*\")
 number [1-9][0-9]*
-real ({number}|0)\.[0-9]*[1-9]
-operator ([-+*/=!<>,;{}\(\)\[\]]|!=|!==|==|===|<=|>=|&&|\|\|)
-note \/\/.*
-ignore [ \t\r\n]
+real ({number}|0)\.[0-9]+
+operator [-+*/=!<>,;{}\(\)\[\]&\|\^%~]
+ignore [ \t]
 
 %option noyywrap
 
 %%
-{note}
 {ignore}
 
-
-"var"       { return TOKEN_PREFIX::VAR;}
-"function"  { return TOKEN_PREFIX::FUNCTION;}
-"new"       { return TOKEN_PREFIX::NEW;}
-"delete"    { return TOKEN_PREFIX::DELETE;}
-"throw"     { return TOKEN_PREFIX::THROW;}
-"if"        { return TOKEN_PREFIX::IF;}
-"else"      { return TOKEN_PREFIX::ELSE;}
-"while"     { return TOKEN_PREFIX::WHILE;}
+"var"           { return TOKEN_PREFIX::VAR;}
+"function"      { return TOKEN_PREFIX::FUNCTION;}
+"new"           { return TOKEN_PREFIX::NEW;}
+"delete"        { return TOKEN_PREFIX::DELETE;}
+"throw"         { return TOKEN_PREFIX::THROW;}
+"if"            { return TOKEN_PREFIX::IF;}
+"else"          { return TOKEN_PREFIX::ELSE;}
+"while"         { return TOKEN_PREFIX::WHILE;}
+("=="|"===")    { return TOKEN_PREFIX::EQ;}
+("!="|"!==")    { return TOKEN_PREFIX::NEQ;}
+"<="            { return TOKEN_PREFIX::LE;}
+">="            { return TOKEN_PREFIX::GE;}
+"&="            { return TOKEN_PREFIX::ANDEQ;}
+"|="            { return TOKEN_PREFIX::OREQ;}
+"^="            { return TOKEN_PREFIX::XOREQ;}
+"%="            { return TOKEN_PREFIX::MODEQ;}
+"+="            { return TOKEN_PREFIX::AEQ;}
+"-="            { return TOKEN_PREFIX::SEQ;}
+"*="            { return TOKEN_PREFIX::MEQ;}
+"/="            { return TOKEN_PREFIX::DEQ;}
+"++"            { return TOKEN_PREFIX::ADDSELF;}
+"--"            { return TOKEN_PREFIX::SUBSELF;}
+"&&"            { return TOKEN_PREFIX::AND;}
+"||"            { return TOKEN_PREFIX::OR;}
 
 "true" {
     yylval->value = true;
@@ -45,6 +57,10 @@ ignore [ \t\r\n]
     return TOKEN_PREFIX::VARIANT;
 }
 
+[\r\n] {
+    return ';';
+}
+
 {operator} {
     return yytext[0];
 }
@@ -55,10 +71,63 @@ ignore [ \t\r\n]
     return TOKEN_PREFIX::IDENTIFIER;
 }
 
-{string} {
-    yylval->value = QString(yytext);
+['"] {
+    QString str;
+
+    while(!yyin.eof() && !yyin.fail()) {
+        char ch = yyin.get();
+
+        if(ch == yytext[0] || ch == '\n' || ch == '\r')
+            break;
+
+        if(ch == '\\') {
+            if(yyin.eof() || yyin.fail())
+                break;
+
+            char next_ch = yyin.get();
+
+            str.append(next_ch);
+        } else {
+            str.append(ch);
+        }
+    }
+
+
+    yylval->value = str;
 
     return TOKEN_PREFIX::VARIANT;
+}
+
+"//" {
+    while(!yyin.eof() && !yyin.fail()) {
+        char ch = yyin.get();
+
+        if(ch == '\n' || ch == '\r')
+            break;
+
+        if(ch == '\\') {
+            if(yyin.eof() || yyin.fail())
+                break;
+
+            yyin.get();
+        }
+    }
+}
+
+"/*" {
+    while(!yyin.eof() && !yyin.fail()) {
+        char ch = yyin.get();
+
+        if(ch == '*') {
+            if(yyin.eof() || yyin.fail())
+                break;
+
+            char ch_next = yyin.get();
+
+            if(ch_next == '/')
+                break;
+        }
+    }
 }
 
 {number} {

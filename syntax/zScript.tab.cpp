@@ -546,15 +546,15 @@ namespace yy {
           switch (yyn)
             {
   case 4:
-#line 32 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 41 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                zInfo << (yystack_[1].value).value;
+                //zInfo << $2.value;
             }
 #line 554 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 5:
-#line 37 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 46 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yystack_[2].value).value = (yystack_[0].value).value;
                 (yylhs.value) = (yystack_[2].value);
@@ -564,44 +564,234 @@ namespace yy {
 #line 565 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 6:
-#line 45 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                (yystack_[2].value).value = (yystack_[2].value).value + (yystack_[0].value).value;
-                (yylhs.value) = (yystack_[2].value);
-            }
-#line 574 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
   case 7:
-#line 49 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 55 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yystack_[2].value).value = (yystack_[2].value).value - (yystack_[0].value).value;
-                (yylhs.value) = (yystack_[2].value);
+                (yylhs.value).value = (yystack_[2].value).value + (yystack_[0].value).value;
             }
-#line 583 "zScript.tab.cpp" // lalr1.cc:859
+#line 573 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 8:
-#line 53 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 58 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yystack_[2].value).value = (yystack_[2].value).value * (yystack_[0].value).value;
-                (yylhs.value) = (yystack_[2].value);
+                (yylhs.value).value = (yystack_[2].value).value - (yystack_[0].value).value;
             }
-#line 592 "zScript.tab.cpp" // lalr1.cc:859
+#line 581 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 9:
-#line 57 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 61 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yystack_[2].value).value = (yystack_[2].value).value / (yystack_[0].value).value;
-                (yylhs.value) = (yystack_[2].value);
+                (yylhs.value).value = (yystack_[2].value).value * (yystack_[0].value).value;
             }
-#line 601 "zScript.tab.cpp" // lalr1.cc:859
+#line 589 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 10:
+#line 64 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value / (yystack_[0].value).value;
+            }
+#line 597 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 11:
+#line 67 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value += (yystack_[0].value).value;
+            }
+#line 605 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 12:
+#line 70 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value -= (yystack_[0].value).value;
+            }
+#line 613 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 13:
+#line 73 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value *= (yystack_[0].value).value;
+            }
+#line 621 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 14:
+#line 76 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value /= (yystack_[0].value).value;
+            }
+#line 629 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 15:
+#line 79 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value & (yystack_[0].value).value;
+            }
+#line 637 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 16:
+#line 82 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value | (yystack_[0].value).value;
+            }
+#line 645 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 17:
+#line 85 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value ^ (yystack_[0].value).value;
+            }
+#line 653 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 18:
+#line 88 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value % (yystack_[0].value).value;
+            }
+#line 661 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 19:
+#line 91 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value &= (yystack_[0].value).value;
+            }
+#line 669 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 20:
+#line 94 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value |= (yystack_[0].value).value;
+            }
+#line 677 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 21:
+#line 97 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value ^= (yystack_[0].value).value;
+            }
+#line 685 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 22:
+#line 100 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value %= (yystack_[0].value).value;
+            }
+#line 693 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 23:
+#line 103 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value == (yystack_[0].value).value;
+            }
+#line 701 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 24:
+#line 106 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value != (yystack_[0].value).value;
+            }
+#line 709 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 25:
+#line 109 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value <= (yystack_[0].value).value;
+            }
+#line 717 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 26:
+#line 112 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value >= (yystack_[0].value).value;
+            }
+#line 725 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 27:
+#line 115 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value && (yystack_[0].value).value;
+            }
+#line 733 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 28:
+#line 118 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[2].value).value || (yystack_[0].value).value;
+            }
+#line 741 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 29:
+#line 121 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = ++(yystack_[0].value).value;
+            }
+#line 749 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 30:
+#line 124 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[1].value).value++;
+            }
+#line 757 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 31:
+#line 127 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = --(yystack_[0].value).value;
+            }
+#line 765 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 32:
+#line 130 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value).value = (yystack_[1].value).value--;
+            }
+#line 773 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 33:
+#line 133 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {(yylhs.value).value = 0 -(yystack_[0].value).value;}
+#line 779 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 34:
+#line 134 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {(yylhs.value).value = (yystack_[0].value).value;}
+#line 785 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 35:
+#line 135 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {(yylhs.value).value = (yystack_[1].value).value;}
+#line 791 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
 
-#line 605 "zScript.tab.cpp" // lalr1.cc:859
+#line 795 "zScript.tab.cpp" // lalr1.cc:859
             default:
               break;
             }
@@ -762,71 +952,124 @@ namespace yy {
   }
 
 
-  const signed char parser::yypact_ninf_ = -26;
+  const signed char parser::yypact_ninf_ = -47;
 
   const signed char parser::yytable_ninf_ = -1;
 
-  const signed char
+  const short int
   parser::yypact_[] =
   {
-     -26,     0,   -26,   -11,   -26,   -18,   -25,   -26,    -2,   -26,
-     -24,    -1,     1,     2,     3,   -26,   -26,   -26,   -26
+     -47,     0,   -47,    -4,   -47,   -46,   -19,   -47,   -10,   -47,
+     -10,   -10,   -10,   -10,   -10,    87,   -13,   -13,   -13,   -13,
+      52,   -10,   -10,   -10,   -10,   -10,   -10,   -47,   -47,   -10,
+     -10,   -10,   -10,   -10,   -10,   -10,   -10,   -10,   -10,   -10,
+     -10,   -10,   -10,   -10,   -10,   -47,   153,   153,   -15,   -15,
+     117,   117,    87,    87,    87,    87,    87,    87,    87,    87,
+     125,   125,   125,    -3,    -3,   -13,   -13,   -13
   };
 
   const unsigned char
   parser::yydefact_[] =
   {
-       2,     0,     1,     0,     3,     0,     0,     4,     0,    10,
-       5,     0,     0,     0,     0,     6,     7,     8,     9
+       2,     0,     1,     0,     3,     0,     0,     4,     0,     6,
+       0,     0,     0,     0,     0,     5,    29,    31,    33,    34,
+       0,     0,     0,     0,     0,     0,     0,    30,    32,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    35,    23,    24,    25,    26,
+      27,    28,    14,    13,    11,    12,    22,    19,    20,    21,
+      15,    16,    17,     8,     7,     9,    10,    18
   };
 
   const signed char
   parser::yypgoto_[] =
   {
-     -26,   -26,   -26,   -26
+     -47,   -47,   -47,    20
   };
 
   const signed char
   parser::yydefgoto_[] =
   {
-      -1,     1,     5,    10
+      -1,     1,     5,    15
   };
 
   const unsigned char
   parser::yytable_[] =
   {
-       2,     6,     8,     3,    11,    12,    13,    14,     7,     9,
-      15,     0,    16,    17,    18,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     4
+       2,     9,     7,     3,    27,    28,    27,    28,     6,    10,
+      11,     8,     0,     0,     0,     0,    27,    28,     0,     0,
+       0,     0,     0,    40,    41,    42,    43,    44,    12,    13,
+      16,    17,    18,    19,    20,     0,    14,    42,    43,    44,
+       0,    46,    47,    48,    49,    50,    51,     0,     4,    52,
+      53,    54,    55,    56,    57,    58,    59,    60,    61,    62,
+      63,    64,    65,    66,    67,    21,    22,    23,    24,    25,
+      26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
+      36,     0,     0,     0,     0,    37,    38,    39,     0,     0,
+      40,    41,    42,    43,    44,     0,     0,     0,     0,    45,
+      21,    22,    23,    24,    25,    26,    27,    28,    29,    30,
+      31,    32,    33,    34,    35,    36,     0,     0,     0,     0,
+      37,    38,    39,     0,     0,    40,    41,    42,    43,    44,
+      21,    22,    23,    24,     0,     0,    27,    28,    21,    22,
+      23,    24,     0,     0,    27,    28,     0,     0,     0,     0,
+      37,    38,    39,     0,     0,    40,    41,    42,    43,    44,
+       0,     0,     0,    40,    41,    42,    43,    44,    23,    24,
+       0,     0,    27,    28,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,    40,    41,    42,    43,    44
   };
 
   const signed char
   parser::yycheck_[] =
   {
-       0,    12,    27,     3,    28,    29,    30,    31,    26,    11,
-      11,    -1,    11,    11,    11,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    26
+       0,    11,    48,     3,    19,    20,    19,    20,    12,    19,
+      20,    30,    -1,    -1,    -1,    -1,    19,    20,    -1,    -1,
+      -1,    -1,    -1,    38,    39,    40,    41,    42,    38,    39,
+      10,    11,    12,    13,    14,    -1,    46,    40,    41,    42,
+      -1,    21,    22,    23,    24,    25,    26,    -1,    48,    29,
+      30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
+      40,    41,    42,    43,    44,    13,    14,    15,    16,    17,
+      18,    19,    20,    21,    22,    23,    24,    25,    26,    27,
+      28,    -1,    -1,    -1,    -1,    33,    34,    35,    -1,    -1,
+      38,    39,    40,    41,    42,    -1,    -1,    -1,    -1,    47,
+      13,    14,    15,    16,    17,    18,    19,    20,    21,    22,
+      23,    24,    25,    26,    27,    28,    -1,    -1,    -1,    -1,
+      33,    34,    35,    -1,    -1,    38,    39,    40,    41,    42,
+      13,    14,    15,    16,    -1,    -1,    19,    20,    13,    14,
+      15,    16,    -1,    -1,    19,    20,    -1,    -1,    -1,    -1,
+      33,    34,    35,    -1,    -1,    38,    39,    40,    41,    42,
+      -1,    -1,    -1,    38,    39,    40,    41,    42,    15,    16,
+      -1,    -1,    19,    20,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    38,    39,    40,    41,    42
   };
 
   const unsigned char
   parser::yystos_[] =
   {
-       0,    33,     0,     3,    26,    34,    12,    26,    27,    11,
-      35,    28,    29,    30,    31,    11,    11,    11,    11
+       0,    50,     0,     3,    48,    51,    12,    48,    30,    11,
+      19,    20,    38,    39,    46,    52,    52,    52,    52,    52,
+      52,    13,    14,    15,    16,    17,    18,    19,    20,    21,
+      22,    23,    24,    25,    26,    27,    28,    33,    34,    35,
+      38,    39,    40,    41,    42,    47,    52,    52,    52,    52,
+      52,    52,    52,    52,    52,    52,    52,    52,    52,    52,
+      52,    52,    52,    52,    52,    52,    52,    52
   };
 
   const unsigned char
   parser::yyr1_[] =
   {
-       0,    32,    33,    33,    33,    34,    35,    35,    35,    35,
-      35
+       0,    49,    50,    50,    50,    51,    52,    52,    52,    52,
+      52,    52,    52,    52,    52,    52,    52,    52,    52,    52,
+      52,    52,    52,    52,    52,    52,    52,    52,    52,    52,
+      52,    52,    52,    52,    52,    52
   };
 
   const unsigned char
   parser::yyr2_[] =
   {
-       0,     2,     0,     2,     3,     4,     3,     3,     3,     3,
-       1
+       0,     2,     0,     2,     3,     4,     1,     3,     3,     3,
+       3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+       3,     3,     3,     3,     3,     3,     3,     3,     3,     2,
+       2,     2,     2,     2,     2,     3
   };
 
 
@@ -837,18 +1080,22 @@ namespace yy {
   const parser::yytname_[] =
   {
   "$end", "error", "$undefined", "VAR", "FUNCTION", "NEW", "DELETE",
-  "THROW", "IF", "ELSE", "WHILE", "VARIANT", "IDENTIFIER", "ASSIGN",
-  "PLUS", "SUB", "MUL", "DIV", "LPAREN", "RPAREN", "SEMI", "LBRACE",
-  "RBRACE", "LBRACKET", "RBRACKET", "COMMA", "';'", "'='", "'+'", "'-'",
-  "'*'", "'/'", "$accept", "start", "statement", "expression", YY_NULLPTR
+  "THROW", "IF", "ELSE", "WHILE", "VARIANT", "IDENTIFIER", "EQ", "NEQ",
+  "LE", "GE", "AND", "OR", "ADDSELF", "SUBSELF", "DEQ", "MEQ", "AEQ",
+  "SEQ", "MODEQ", "ANDEQ", "OREQ", "XOREQ", "','", "'='", "'?'", "':'",
+  "'&'", "'|'", "'^'", "'>'", "'<'", "'-'", "'+'", "'*'", "'/'", "'%'",
+  "UMINUS", "'!'", "'~'", "'('", "')'", "';'", "$accept", "start",
+  "statement", "expression", YY_NULLPTR
   };
 
 
   const unsigned char
   parser::yyrline_[] =
   {
-       0,    30,    30,    31,    32,    37,    45,    49,    53,    57,
-      61
+       0,    39,    39,    40,    41,    46,    54,    55,    58,    61,
+      64,    67,    70,    73,    76,    79,    82,    85,    88,    91,
+      94,    97,   100,   103,   106,   109,   112,   115,   118,   121,
+     124,   127,   130,   133,   134,   135
   };
 
   // Print the state stack on the debug stream.
@@ -892,16 +1139,16 @@ namespace yy {
      0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,    30,    28,     2,    29,     2,    31,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    26,
-       2,    27,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,    44,     2,     2,     2,    42,    33,     2,
+      46,    47,    40,    39,    29,    38,     2,    41,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,    32,    48,
+      37,    30,    36,    31,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,    35,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,    34,     2,    45,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -917,9 +1164,9 @@ namespace yy {
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25
+      25,    26,    27,    28,    43
     };
-    const unsigned int user_token_number_max_ = 280;
+    const unsigned int user_token_number_max_ = 284;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -932,8 +1179,8 @@ namespace yy {
 
 
 } // yy
-#line 936 "zScript.tab.cpp" // lalr1.cc:1167
-#line 64 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
+#line 1183 "zScript.tab.cpp" // lalr1.cc:1167
+#line 138 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
 
 
 yyFlexLexer flexLexer;
