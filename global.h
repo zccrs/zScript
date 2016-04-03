@@ -15,6 +15,8 @@
 #include <QObject>
 #include <QDebug>
 
+namespace Global {
+
 class ZObject;
 
 class ZVariant
@@ -89,7 +91,6 @@ private:
     QSharedDataPointer<VariantData> data;
 };
 
-Q_DECLARE_METATYPE(ZVariant)
 Q_CORE_EXPORT QDebug operator<<(QDebug deg, const ZVariant &var);
 
 class ZObject : public QObject
@@ -198,10 +199,35 @@ ZVariant operator ~(const ZVariant &var);
 
 QByteArray readFile(const QString &fileName);
 
-struct TreeNode
+struct IdentifierValue
 {
     ZVariant value;
     QByteArray name;
+
+    IdentifierValue &operator=(const IdentifierValue &other)
+    {
+        value = other.value;
+        name = other.name;
+
+        return *this;
+    }
 };
+
+struct NodeValue
+{
+    NodeValue *left;
+    NodeValue *right;
+    ZVariant *value;
+    int operatorType;
+
+    NodeValue(int o, ZVariant *v, NodeValue *l, NodeValue *r)
+        :left(l), right(r), value(v), operatorType(o){}
+};
+
+extern QHash<QByteArray, IdentifierValue*> identifiersHash;
+
+}/// namespace Global end
+
+Q_DECLARE_METATYPE(Global::ZVariant)
 
 #endif // GLOBAL_H

@@ -2,11 +2,10 @@
 #include "zScript.tab.hpp"
 #include "global.h"
 
-using namespace yy;
+yy::parser::semantic_type *yylval = Q_NULLPTR;
+yy::parser::location_type *yyloc = Q_NULLPTR;
 
-YYSTYPE *yylval = Q_NULLPTR;
-
-#define TOKEN_PREFIX parser::token
+#define TOKEN_PREFIX yy::parser::token
 %}
 
 identifier [a-zA-Z_][a-zA-Z0-9_]*
@@ -46,13 +45,13 @@ ignore [ \t]
 "||"            { return TOKEN_PREFIX::OR;}
 
 "true" {
-    yylval->value = true;
+    yylval->value = new Global::ZVariant(true);
 
     return TOKEN_PREFIX::VARIANT;
 }
 
 "false" {
-    yylval->value = false;
+    yylval->value = new Global::ZVariant(false);
 
     return TOKEN_PREFIX::VARIANT;
 }
@@ -66,13 +65,20 @@ ignore [ \t]
 }
 
 {identifier} {
-    yylval->name = QByteArray(yytext);
+    QByteArray name(yytext);
+
+    if(Global::identifiersHash.contains(name)) {
+        yylval->identifier = Global::identifiersHash.value(name);
+    } else {
+        yylval->identifier = new Global::IdentifierValue;
+        yylval->identifier->name = name;
+    }
 
     return TOKEN_PREFIX::IDENTIFIER;
 }
 
 ['"] {
-    QString str;
+    QByteArray str;
 
     while(!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
@@ -92,8 +98,7 @@ ignore [ \t]
         }
     }
 
-
-    yylval->value = str;
+    yylval->value = new Global::ZVariant(QString::fromLocal8Bit(str));
 
     return TOKEN_PREFIX::VARIANT;
 }
@@ -131,13 +136,13 @@ ignore [ \t]
 }
 
 {number} {
-    yylval->value = atoi(yytext);
+    yylval->value = new Global::ZVariant(atoi(yytext));
 
     return TOKEN_PREFIX::VARIANT;
 }
 
 {real} {
-    yylval->value = atof(yytext);
+    yylval->value = new Global::ZVariant(atof(yytext));
 
     return TOKEN_PREFIX::VARIANT;
 }

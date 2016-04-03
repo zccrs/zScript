@@ -1,21 +1,33 @@
 %{
 #include "global.h"
 
-#define YYSTYPE TreeNode
-
-int yylex(TreeNode *lval);
+/// enable debug
+#define YYDEBUG 1
 
 #include "lex.yy.cpp"
+
+int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location);
 %}
+
+/// enable debug
+%debug
+/// enable locations
+%locations
+
+%union{
+    Global::ZVariant *value;
+    Global::IdentifierValue *identifier;
+    Global::NodeValue *node;
+};
 
 /// keyword
 %token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE
 
 /// data type
-%token VARIANT
+%token <value> VARIANT
 
 /// identifier
-%token IDENTIFIER
+%token <identifier> IDENTIFIER
 
 ///   ==/=== !=/!==   <= >= &&  ||   ++      --
 %token  EQ     NEQ    LE GE AND OR ADDSELF SUBSELF
@@ -34,105 +46,140 @@ int yylex(TreeNode *lval);
 %right UMINUS ADDSELF SUBSELF '!' '~'
 %left '(' ')'
 
+%type <identifier> statement
+%type <value> assign expression
+
 %%
 
 start:
             | start ';'
-            | start statement ';' {
-                //zInfo << $2.value;
-            }
+            | start assign ';'
             ;
 
-statement:  VAR IDENTIFIER '=' expression {
-                $2.value = $4.value;
-                $$ = $2;
+assign:     statement '=' expression {
+                $1->value = *$3;
+                $$ = $3;
 
-                zInfo << $$.name << "=" << $$.value;
+                zInfo << $1->name << "=" << *$$;
+            }
+            | IDENTIFIER '=' expression {
+                if(!Global::identifiersHash.contains($1->name)) {
+                    std::cerr << $1->name.toStdString() << " is undefined!" << std::endl;
+                    delete $1;
+                    YYERROR;
+                }
+
+                $1->value = *$3;
+                $$ = $3;
+
+                zInfo << $1->name << "=" << *$$;
+            }
+
+statement:  VAR IDENTIFIER {
+                if(Global::identifiersHash.contains($2->name)) {
+                    std::cerr << $2->name.constData() << " is defined!" << std::endl;
+                    YYERROR;
+                } else {
+                    Global::identifiersHash[$2->name] = $2;
+                }
+
+                $$ = $2;
+            }
+            | FUNCTION IDENTIFIER '(' ')' '{' '}' {
+                zInfo << "function name: " << $2->name;
             }
             ;
 
 expression: VARIANT
+            | IDENTIFIER {
+                if(!Global::identifiersHash.contains($1->name)) {
+                    std::cerr << $1->name.toStdString() << " is undefined!" << std::endl;
+                    delete $1;
+                    YYERROR;
+                }
+                *$$ = $1->value;
+            }
             | expression '+' expression {
-                $$.value = $1.value + $3.value;
+                *$$ = *$1 + *$3;
             }
             | expression '-' expression {
-                $$.value = $1.value - $3.value;
+                *$$ = *$1 - *$3;
             }
             | expression '*' expression {
-                $$.value = $1.value * $3.value;
+                *$$ = *$1 * *$3;
             }
             | expression '/' expression {
-                $$.value = $1.value / $3.value;
+                *$$ = *$1 / *$3;
             }
             | expression AEQ expression {
-                $$.value = $1.value += $3.value;
+                *$$ = *$1 += *$3;
             }
             | expression SEQ expression {
-                $$.value = $1.value -= $3.value;
+                *$$ = *$1 -= *$3;
             }
             | expression MEQ expression {
-                $$.value = $1.value *= $3.value;
+                *$$ = *$1 *= *$3;
             }
             | expression DEQ expression {
-                $$.value = $1.value /= $3.value;
+                *$$ = *$1 /= *$3;
             }
             | expression '&' expression {
-                $$.value = $1.value & $3.value;
+                *$$ = *$1 & *$3;
             }
             | expression '|' expression {
-                $$.value = $1.value | $3.value;
+                *$$ = *$1 | *$3;
             }
             | expression '^' expression {
-                $$.value = $1.value ^ $3.value;
+                *$$ = *$1 ^ *$3;
             }
             | expression '%' expression {
-                $$.value = $1.value % $3.value;
+                *$$ = *$1 % *$3;
             }
             | expression ANDEQ expression {
-                $$.value = $1.value &= $3.value;
+                *$$ = *$1 &= *$3;
             }
             | expression OREQ expression {
-                $$.value = $1.value |= $3.value;
+                *$$ = *$1 |= *$3;
             }
             | expression XOREQ expression {
-                $$.value = $1.value ^= $3.value;
+                *$$ = *$1 ^= *$3;
             }
             | expression MODEQ expression {
-                $$.value = $1.value %= $3.value;
+                *$$ = *$1 %= *$3;
             }
             | expression EQ expression {
-                $$.value = $1.value == $3.value;
+                *$$ = *$1 == *$3;
             }
             | expression NEQ expression {
-                $$.value = $1.value != $3.value;
+                *$$ = *$1 != *$3;
             }
             | expression LE expression {
-                $$.value = $1.value <= $3.value;
+                *$$ = *$1 <= *$3;
             }
             | expression GE expression {
-                $$.value = $1.value >= $3.value;
+                *$$ = *$1 >= *$3;
             }
             | expression AND expression {
-                $$.value = $1.value && $3.value;
+                *$$ = *$1 && *$3;
             }
             | expression OR expression {
-                $$.value = $1.value || $3.value;
+                *$$ = *$1 || *$3;
             }
             | ADDSELF expression {
-                $$.value = ++$2.value;
+                *$$ = ++ *$2;
             }
             | expression ADDSELF {
-                $$.value = $1.value++;
+                *$$ = *$1++;
             }
             | SUBSELF expression {
-                $$.value = --$2.value;
+                *$$ = -- *$2;
             }
             | expression SUBSELF {
-                $$.value = $1.value--;
+                *$$ = *$1--;
             }
-            | '-' expression %prec UMINUS {$$.value = 0 -$2.value;}
-            | '+' expression %prec UMINUS {$$.value = $2.value;}
-            | '(' expression ')' {$$.value = $2.value;}
+            | '-' expression %prec UMINUS { *$$ = 0 - *$2;}
+            | '+' expression %prec UMINUS { *$$ = *$2;}
+            | '(' expression ')' { *$$ = *$2;}
             ;
 
 %%
@@ -146,14 +193,16 @@ int main()
     return parser.parse();
 }
 
-void yy::parser::error(const std::string& msg)
+void yy::parser::error(const location_type& loc, const std::string& msg)
 {
-    zStandardPrint << msg << std::endl;
+    std::cerr << "from " << loc.begin.line << " line, " << loc.begin.column << " column "
+              << "to " << loc.end.line << " line, " << loc.end.column << " column, " << msg << std::endl;
 }
 
-int yylex(TreeNode *lval)
+int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)
 {
     yylval = lval;
+    yyloc = location;
 
     return flexLexer.yylex();
 }

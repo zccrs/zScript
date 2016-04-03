@@ -3,6 +3,8 @@
 #include <QFile>
 #include <QVariant>
 
+namespace Global {
+
 /// ZVariant
 ZVariant::ZVariant(ZVariant::Type type)
     : data(new VariantData)
@@ -644,3 +646,7 @@ QByteArray readFile(const QString &fileName)
 
     return re;
 }
+
+QHash<QByteArray, IdentifierValue*> identifiersHash;
+
+}/// namespace Global end
