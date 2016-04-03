@@ -32,7 +32,7 @@
 
 
 // First part of user declarations.
-#line 1 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:404
+#line 1 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:404
 
 #include "global.h"
 
@@ -546,7 +546,7 @@ namespace yy {
           switch (yyn)
             {
   case 5:
-#line 35 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:859
+#line 35 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yystack_[2].value).value = (yystack_[0].value).value;
                 (yylhs.value) = (yystack_[2].value);
@@ -557,7 +557,7 @@ namespace yy {
     break;
 
   case 6:
-#line 43 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:859
+#line 43 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yystack_[2].value).value = (yystack_[2].value).value + (yystack_[0].value).value;
                 (yylhs.value) = (yystack_[2].value);
@@ -566,7 +566,7 @@ namespace yy {
     break;
 
   case 7:
-#line 47 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:859
+#line 47 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yystack_[2].value).value = (yystack_[2].value).value - (yystack_[0].value).value;
                 (yylhs.value) = (yystack_[2].value);
@@ -904,7 +904,7 @@ namespace yy {
 
 } // yy
 #line 907 "zScript.tab.cpp" // lalr1.cc:1167
-#line 54 "/home/zhang/projects/zScript/core/syntax/zScript.yy" // lalr1.cc:1168
+#line 54 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
 
 
 yyFlexLexer flexLexer;

@@ -23,7 +23,7 @@ Terminals unused in grammar
    COMMA
 
 
-语法
+Grammar
 
     0 $accept: start $end
 
@@ -90,7 +90,7 @@ State 0
 
     $default  reduce using rule 1 (start)
 
-    start  转到状态 1
+    start  go to state 1
 
 
 State 1
@@ -103,14 +103,14 @@ State 1
     VAR   shift, and go to state 3
     ';'   shift, and go to state 4
 
-    statement  转到状态 5
+    statement  go to state 5
 
 
 State 2
 
     0 $accept: start $end .
 
-    $default  接受
+    $default  accept
 
 
 State 3
@@ -154,7 +154,7 @@ State 8
 
     NUMBER  shift, and go to state 9
 
-    expression  转到状态 10
+    expression  go to state 10
 
 
 State 9
