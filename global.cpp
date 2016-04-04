@@ -226,6 +226,18 @@ bool ZVariant::toBool() const
 
 QString ZVariant::toString() const
 {
+    switch (data->type) {
+    case Object:
+        return QString::number((qlonglong)toObject(), 16);
+    case Null:
+        return "0x0";
+    case NaN:
+    case Undefined:
+        return QString(typeName());
+    default:
+        break;
+    }
+
     return data->variant.toString();
 }
 

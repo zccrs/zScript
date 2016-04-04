@@ -78,6 +78,32 @@ public:
     { return toBool() || v.toBool();}
     inline bool operator!() const
     { return !toBool();}
+    inline ZVariant operator-() const
+    {
+        switch(data->type) {
+        case Double:
+            return -toDouble();
+        case Int:
+        case Bool:
+            return -toInt();
+        case String:
+            return toString().toLower();
+        default: return NaN;
+        }
+    }
+    inline ZVariant operator+() const
+    {
+        switch(data->type) {
+        case Double:
+            return qAbs(toDouble());
+        case Int:
+        case Bool:
+            return qAbs(toInt());
+        case String:
+            return toString().toUpper();
+        default: return NaN;
+        }
+    }
 
 private:
     class VariantData : public QSharedData
@@ -201,16 +227,8 @@ QByteArray readFile(const QString &fileName);
 
 struct IdentifierValue
 {
-    ZVariant value;
+    ZVariant *value;
     QByteArray name;
-
-    IdentifierValue &operator=(const IdentifierValue &other)
-    {
-        value = other.value;
-        name = other.name;
-
-        return *this;
-    }
 };
 
 struct NodeValue

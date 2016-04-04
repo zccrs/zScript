@@ -47,20 +47,22 @@ int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location);
 %left '(' ')'
 
 %type <identifier> statement
-%type <value> assign expression
+%type <value> start assign expression
 
 %%
 
-start:
+start:      {$$ = Q_NULLPTR;}
             | start ';'
-            | start assign ';'
+            | start assign ';' {
+                $$ = $2;
+                std::cout << "(" << $$->typeName() << "," << $$->toString().toStdString() << ")" << std::endl;
+            }
             ;
 
-assign:     statement '=' expression {
-                $1->value = *$3;
-                $$ = $3;
-
-                zInfo << $1->name << "=" << *$$;
+assign:     expression {$$ = $1;}
+            | statement '=' expression {
+                *$1->value = *$3;
+                $$ = $1->value;
             }
             | IDENTIFIER '=' expression {
                 if(!Global::identifiersHash.contains($1->name)) {
@@ -69,17 +71,17 @@ assign:     statement '=' expression {
                     YYERROR;
                 }
 
-                $1->value = *$3;
-                $$ = $3;
-
-                zInfo << $1->name << "=" << *$$;
+                *$1->value = *$3;
+                $$ = $1->value;
             }
+            ;
 
 statement:  VAR IDENTIFIER {
                 if(Global::identifiersHash.contains($2->name)) {
                     std::cerr << $2->name.constData() << " is defined!" << std::endl;
                     YYERROR;
                 } else {
+                    $2->value = new Global::ZVariant;
                     Global::identifiersHash[$2->name] = $2;
                 }
 
@@ -97,89 +99,103 @@ expression: VARIANT
                     delete $1;
                     YYERROR;
                 }
-                *$$ = $1->value;
+                $$ = $1->value;
             }
             | expression '+' expression {
-                *$$ = *$1 + *$3;
+                $$ = new Global::ZVariant(*$1 + *$3);
             }
             | expression '-' expression {
-                *$$ = *$1 - *$3;
+                $$ = new Global::ZVariant(*$1 - *$3);
             }
             | expression '*' expression {
-                *$$ = *$1 * *$3;
+                $$ = new Global::ZVariant(*$1 * *$3);
             }
             | expression '/' expression {
-                *$$ = *$1 / *$3;
+                $$ = new Global::ZVariant(*$1 / *$3);
             }
             | expression AEQ expression {
-                *$$ = *$1 += *$3;
+                *$1 += *$3;
+                $$ = $1;
             }
             | expression SEQ expression {
-                *$$ = *$1 -= *$3;
+                *$1 -= *$3;
+                $$ = $1;
             }
             | expression MEQ expression {
-                *$$ = *$1 *= *$3;
+                *$1 *= *$3;
+                $$ = $1;
             }
             | expression DEQ expression {
-                *$$ = *$1 /= *$3;
+                *$1 /= *$3;
+                $$ = $1;
             }
             | expression '&' expression {
-                *$$ = *$1 & *$3;
+                $$ = new Global::ZVariant(*$1 & *$3);
             }
             | expression '|' expression {
-                *$$ = *$1 | *$3;
+                $$ = new Global::ZVariant(*$1 | *$3);
             }
             | expression '^' expression {
-                *$$ = *$1 ^ *$3;
+                $$ = new Global::ZVariant(*$1 ^ *$3);
             }
             | expression '%' expression {
-                *$$ = *$1 % *$3;
+                $$ = new Global::ZVariant(*$1 % *$3);
             }
             | expression ANDEQ expression {
-                *$$ = *$1 &= *$3;
+                *$1 &= *$3;
+                $$ = $1;
             }
             | expression OREQ expression {
-                *$$ = *$1 |= *$3;
+                *$1 |= *$3;
+                $$ = $1;
             }
             | expression XOREQ expression {
-                *$$ = *$1 ^= *$3;
+                *$1 ^= *$3;
+                $$ = $1;
             }
             | expression MODEQ expression {
-                *$$ = *$1 %= *$3;
+                *$1 %= *$3;
+                $$ = $1;
             }
             | expression EQ expression {
-                *$$ = *$1 == *$3;
+                $$ = new Global::ZVariant(*$1 == *$3);
             }
             | expression NEQ expression {
-                *$$ = *$1 != *$3;
+                $$ = new Global::ZVariant(*$1 != *$3);
             }
             | expression LE expression {
-                *$$ = *$1 <= *$3;
+                $$ = new Global::ZVariant(*$1 <= *$3);
             }
             | expression GE expression {
-                *$$ = *$1 >= *$3;
+                $$ = new Global::ZVariant(*$1 >= *$3);
             }
             | expression AND expression {
-                *$$ = *$1 && *$3;
+                $$ = new Global::ZVariant(*$1 && *$3);
             }
             | expression OR expression {
-                *$$ = *$1 || *$3;
+                $$ = new Global::ZVariant(*$1 || *$3);
             }
             | ADDSELF expression {
-                *$$ = ++ *$2;
+                ++*$2;
+                $$ = $2;
             }
             | expression ADDSELF {
-                *$$ = *$1++;
+                (*$1)++;
+                $$ = $1;
             }
             | SUBSELF expression {
-                *$$ = -- *$2;
+                --*$2;
+                $$ = $2;
             }
             | expression SUBSELF {
-                *$$ = *$1--;
+                (*$1)--;
+                $$ = $1;
             }
-            | '-' expression %prec UMINUS { *$$ = 0 - *$2;}
-            | '+' expression %prec UMINUS { *$$ = *$2;}
-            | '(' expression ')' { *$$ = *$2;}
+            | '~' expression { $$ = new Global::ZVariant(~*$2);}
+            | '!' expression { $$ = new Global::ZVariant(!*$2);}
+            | '-' expression %prec UMINUS { $$ = new Global::ZVariant(-*$2);}
+            | '+' expression %prec UMINUS { $$ = new Global::ZVariant(+*$2);}
+            | '(' expression ')' { $$ = $2;}
             ;
 
 %%
