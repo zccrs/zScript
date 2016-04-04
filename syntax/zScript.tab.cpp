@@ -603,15 +603,21 @@ namespace yy {
 
   case 6:
 #line 63 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {(yylhs.value.value) = (yystack_[0].value.identifier)->value;}
+#line 608 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 7:
+#line 64 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 *(yystack_[2].value.identifier)->value = *(yystack_[0].value.value);
                 (yylhs.value.value) = (yystack_[2].value.identifier)->value;
             }
-#line 611 "zScript.tab.cpp" // lalr1.cc:859
+#line 617 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 7:
-#line 67 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 8:
+#line 68 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 if(!Global::identifiersHash.contains((yystack_[2].value.identifier)->name)) {
                     std::cerr << (yystack_[2].value.identifier)->name.toStdString() << " is undefined!" << std::endl;
@@ -622,11 +628,11 @@ namespace yy {
                 *(yystack_[2].value.identifier)->value = *(yystack_[0].value.value);
                 (yylhs.value.value) = (yystack_[2].value.identifier)->value;
             }
-#line 626 "zScript.tab.cpp" // lalr1.cc:859
+#line 632 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 8:
-#line 79 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 9:
+#line 80 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 if(Global::identifiersHash.contains((yystack_[0].value.identifier)->name)) {
                     std::cerr << (yystack_[0].value.identifier)->name.constData() << " is defined!" << std::endl;
@@ -638,19 +644,19 @@ namespace yy {
 
                 (yylhs.value.identifier) = (yystack_[0].value.identifier);
             }
-#line 642 "zScript.tab.cpp" // lalr1.cc:859
+#line 648 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 9:
-#line 90 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 10:
+#line 91 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 zInfo << "function name: " << (yystack_[4].value.identifier)->name;
             }
-#line 650 "zScript.tab.cpp" // lalr1.cc:859
+#line 656 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 11:
-#line 96 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 12:
+#line 97 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 if(!Global::identifiersHash.contains((yystack_[0].value.identifier)->name)) {
                     std::cerr << (yystack_[0].value.identifier)->name.toStdString() << " is undefined!" << std::endl;
@@ -659,261 +665,261 @@ namespace yy {
                 }
                 (yylhs.value.value) = (yystack_[0].value.identifier)->value;
             }
-#line 663 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 12:
-#line 104 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) + *(yystack_[0].value.value));
-            }
-#line 671 "zScript.tab.cpp" // lalr1.cc:859
+#line 669 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 13:
-#line 107 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 105 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) - *(yystack_[0].value.value));
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) + *(yystack_[0].value.value));
             }
-#line 679 "zScript.tab.cpp" // lalr1.cc:859
+#line 677 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 14:
-#line 110 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 108 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) * *(yystack_[0].value.value));
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) - *(yystack_[0].value.value));
             }
-#line 687 "zScript.tab.cpp" // lalr1.cc:859
+#line 685 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 15:
-#line 113 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 111 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) / *(yystack_[0].value.value));
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) * *(yystack_[0].value.value));
             }
-#line 695 "zScript.tab.cpp" // lalr1.cc:859
+#line 693 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 16:
-#line 116 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 114 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) / *(yystack_[0].value.value));
+            }
+#line 701 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 17:
+#line 117 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 *(yystack_[2].value.value) += *(yystack_[0].value.value);
                 (yylhs.value.value) = (yystack_[2].value.value);
             }
-#line 704 "zScript.tab.cpp" // lalr1.cc:859
+#line 710 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 17:
-#line 120 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 18:
+#line 121 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 *(yystack_[2].value.value) -= *(yystack_[0].value.value);
                 (yylhs.value.value) = (yystack_[2].value.value);
             }
-#line 713 "zScript.tab.cpp" // lalr1.cc:859
+#line 719 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 18:
-#line 124 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 19:
+#line 125 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 *(yystack_[2].value.value) *= *(yystack_[0].value.value);
                 (yylhs.value.value) = (yystack_[2].value.value);
             }
-#line 722 "zScript.tab.cpp" // lalr1.cc:859
+#line 728 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 19:
-#line 128 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 20:
+#line 129 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 *(yystack_[2].value.value) /= *(yystack_[0].value.value);
                 (yylhs.value.value) = (yystack_[2].value.value);
             }
-#line 731 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 20:
-#line 132 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) & *(yystack_[0].value.value));
-            }
-#line 739 "zScript.tab.cpp" // lalr1.cc:859
+#line 737 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 21:
-#line 135 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 133 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) | *(yystack_[0].value.value));
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) & *(yystack_[0].value.value));
             }
-#line 747 "zScript.tab.cpp" // lalr1.cc:859
+#line 745 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 22:
-#line 138 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 136 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) ^ *(yystack_[0].value.value));
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) | *(yystack_[0].value.value));
             }
-#line 755 "zScript.tab.cpp" // lalr1.cc:859
+#line 753 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 23:
-#line 141 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 139 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) % *(yystack_[0].value.value));
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) ^ *(yystack_[0].value.value));
             }
-#line 763 "zScript.tab.cpp" // lalr1.cc:859
+#line 761 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 24:
-#line 144 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 142 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) % *(yystack_[0].value.value));
+            }
+#line 769 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 25:
+#line 145 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 *(yystack_[2].value.value) &= *(yystack_[0].value.value);
                 (yylhs.value.value) = (yystack_[2].value.value);
             }
-#line 772 "zScript.tab.cpp" // lalr1.cc:859
+#line 778 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 25:
-#line 148 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 26:
+#line 149 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 *(yystack_[2].value.value) |= *(yystack_[0].value.value);
                 (yylhs.value.value) = (yystack_[2].value.value);
             }
-#line 781 "zScript.tab.cpp" // lalr1.cc:859
+#line 787 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 26:
-#line 152 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 27:
+#line 153 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 *(yystack_[2].value.value) ^= *(yystack_[0].value.value);
                 (yylhs.value.value) = (yystack_[2].value.value);
             }
-#line 790 "zScript.tab.cpp" // lalr1.cc:859
+#line 796 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 27:
-#line 156 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 28:
+#line 157 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 *(yystack_[2].value.value) %= *(yystack_[0].value.value);
                 (yylhs.value.value) = (yystack_[2].value.value);
             }
-#line 799 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 28:
-#line 160 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) == *(yystack_[0].value.value));
-            }
-#line 807 "zScript.tab.cpp" // lalr1.cc:859
+#line 805 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 29:
-#line 163 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 161 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) != *(yystack_[0].value.value));
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) == *(yystack_[0].value.value));
             }
-#line 815 "zScript.tab.cpp" // lalr1.cc:859
+#line 813 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 30:
-#line 166 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 164 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) <= *(yystack_[0].value.value));
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) != *(yystack_[0].value.value));
             }
-#line 823 "zScript.tab.cpp" // lalr1.cc:859
+#line 821 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 31:
-#line 169 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 167 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) >= *(yystack_[0].value.value));
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) <= *(yystack_[0].value.value));
             }
-#line 831 "zScript.tab.cpp" // lalr1.cc:859
+#line 829 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 32:
-#line 172 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 170 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) && *(yystack_[0].value.value));
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) >= *(yystack_[0].value.value));
             }
-#line 839 "zScript.tab.cpp" // lalr1.cc:859
+#line 837 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 33:
-#line 175 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 173 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) || *(yystack_[0].value.value));
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) && *(yystack_[0].value.value));
             }
-#line 847 "zScript.tab.cpp" // lalr1.cc:859
+#line 845 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 34:
-#line 178 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 176 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[2].value.value) || *(yystack_[0].value.value));
+            }
+#line 853 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 35:
+#line 179 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ++*(yystack_[0].value.value);
                 (yylhs.value.value) = (yystack_[0].value.value);
             }
-#line 856 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 35:
-#line 182 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                (*(yystack_[1].value.value))++;
-                (yylhs.value.value) = (yystack_[1].value.value);
-            }
-#line 865 "zScript.tab.cpp" // lalr1.cc:859
+#line 862 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 36:
-#line 186 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 183 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[1].value.value));
+                (*(yystack_[1].value.value))++;
+            }
+#line 871 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 37:
+#line 187 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 --*(yystack_[0].value.value);
                 (yylhs.value.value) = (yystack_[0].value.value);
             }
-#line 874 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 37:
-#line 190 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                (*(yystack_[1].value.value))--;
-                (yylhs.value.value) = (yystack_[1].value.value);
-            }
-#line 883 "zScript.tab.cpp" // lalr1.cc:859
+#line 880 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 38:
-#line 194 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    { (yylhs.value.value) = new Global::ZVariant(~*(yystack_[0].value.value));}
+#line 191 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.value) = new Global::ZVariant(*(yystack_[1].value.value));
+                (*(yystack_[1].value.value))--;
+            }
 #line 889 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 39:
 #line 195 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    { (yylhs.value.value) = new Global::ZVariant(!*(yystack_[0].value.value));}
+    { (yylhs.value.value) = new Global::ZVariant(~*(yystack_[0].value.value));}
 #line 895 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 40:
 #line 196 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    { (yylhs.value.value) = new Global::ZVariant(-*(yystack_[0].value.value));}
+    { (yylhs.value.value) = new Global::ZVariant(!*(yystack_[0].value.value));}
 #line 901 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 41:
 #line 197 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    { (yylhs.value.value) = new Global::ZVariant(+*(yystack_[0].value.value));}
+    { (yylhs.value.value) = new Global::ZVariant(-*(yystack_[0].value.value));}
 #line 907 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 42:
 #line 198 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    { (yylhs.value.value) = (yystack_[1].value.value);}
+    { (yylhs.value.value) = new Global::ZVariant(+*(yystack_[0].value.value));}
 #line 913 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
+  case 43:
+#line 199 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    { (yylhs.value.value) = (yystack_[1].value.value);}
+#line 919 "zScript.tab.cpp" // lalr1.cc:859
+    break;
 
-#line 917 "zScript.tab.cpp" // lalr1.cc:859
+
+#line 923 "zScript.tab.cpp" // lalr1.cc:859
             default:
               break;
             }
@@ -1100,15 +1106,15 @@ namespace yy {
   const unsigned char
   parser::yydefact_[] =
   {
-       2,     0,     1,     0,     0,    10,    11,     0,     0,     0,
-       0,     0,     0,     0,     3,     0,     0,     5,     8,     0,
-       0,    11,    34,    36,    40,    41,    39,    38,     0,     4,
-       0,     0,     0,     0,     0,     0,     0,    35,    37,     0,
+       2,     0,     1,     0,     0,    11,    12,     0,     0,     0,
+       0,     0,     0,     0,     3,     0,     6,     5,     9,     0,
+       0,    12,    35,    37,    41,    42,    40,    39,     0,     4,
+       0,     0,     0,     0,     0,     0,     0,    36,    38,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     7,    42,     6,    28,
-      29,    30,    31,    32,    33,    19,    18,    16,    17,    27,
-      24,    25,    26,    20,    21,    22,    13,    12,    14,    15,
-      23,     0,     0,     9
+       0,     0,     0,     0,     0,     0,     8,    43,     7,    29,
+      30,    31,    32,    33,    34,    20,    19,    17,    18,    28,
+      25,    26,    27,    21,    22,    23,    14,    13,    15,    16,
+      24,     0,     0,    10
   };
 
   const signed char
@@ -1192,21 +1198,21 @@ namespace yy {
   const unsigned char
   parser::yyr1_[] =
   {
-       0,    51,    52,    52,    52,    53,    53,    53,    54,    54,
+       0,    51,    52,    52,    52,    53,    53,    53,    53,    54,
+      54,    55,    55,    55,    55,    55,    55,    55,    55,    55,
       55,    55,    55,    55,    55,    55,    55,    55,    55,    55,
       55,    55,    55,    55,    55,    55,    55,    55,    55,    55,
-      55,    55,    55,    55,    55,    55,    55,    55,    55,    55,
-      55,    55,    55
+      55,    55,    55,    55
   };
 
   const unsigned char
   parser::yyr2_[] =
   {
-       0,     2,     0,     2,     3,     1,     3,     3,     2,     6,
-       1,     1,     3,     3,     3,     3,     3,     3,     3,     3,
+       0,     2,     0,     2,     3,     1,     1,     3,     3,     2,
+       6,     1,     1,     3,     3,     3,     3,     3,     3,     3,
        3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     3,     3,     3,     2,     2,     2,     2,     2,     2,
-       2,     2,     3
+       3,     3,     3,     3,     3,     2,     2,     2,     2,     2,
+       2,     2,     2,     3
   };
 
 
@@ -1229,11 +1235,11 @@ namespace yy {
   const unsigned char
   parser::yyrline_[] =
   {
-       0,    54,    54,    55,    56,    62,    63,    67,    79,    90,
-      95,    96,   104,   107,   110,   113,   116,   120,   124,   128,
-     132,   135,   138,   141,   144,   148,   152,   156,   160,   163,
-     166,   169,   172,   175,   178,   182,   186,   190,   194,   195,
-     196,   197,   198
+       0,    54,    54,    55,    56,    62,    63,    64,    68,    80,
+      91,    96,    97,   105,   108,   111,   114,   117,   121,   125,
+     129,   133,   136,   139,   142,   145,   149,   153,   157,   161,
+     164,   167,   170,   173,   176,   179,   183,   187,   191,   195,
+     196,   197,   198,   199
   };
 
   // Print the state stack on the debug stream.
@@ -1317,8 +1323,8 @@ namespace yy {
 
 
 } // yy
-#line 1321 "zScript.tab.cpp" // lalr1.cc:1167
-#line 201 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
+#line 1327 "zScript.tab.cpp" // lalr1.cc:1167
+#line 202 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
 
 
 yyFlexLexer flexLexer;

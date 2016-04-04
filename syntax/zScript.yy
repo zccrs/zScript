@@ -60,6 +60,7 @@ start:      {$$ = Q_NULLPTR;}
             ;
 
 assign:     expression {$$ = $1;}
+            | statement {$$ = $1->value;}
             | statement '=' expression {
                 *$1->value = *$3;
                 $$ = $1->value;
@@ -180,16 +181,16 @@ expression: VARIANT
                 $$ = $2;
             }
             | expression ADDSELF {
+                $$ = new Global::ZVariant(*$1);
                 (*$1)++;
-                $$ = $1;
             }
             | SUBSELF expression {
                 --*$2;
                 $$ = $2;
             }
             | expression SUBSELF {
+                $$ = new Global::ZVariant(*$1);
                 (*$1)--;
-                $$ = $1;
             }
             | '~' expression { $$ = new Global::ZVariant(~*$2);}
             | '!' expression { $$ = new Global::ZVariant(!*$2);}

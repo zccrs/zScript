@@ -22,98 +22,99 @@ Terminals unused in grammar
     3      | start assign ';'
 
     4 assign: expression
-    5       | statement '=' expression
-    6       | IDENTIFIER '=' expression
+    5       | statement
+    6       | statement '=' expression
+    7       | IDENTIFIER '=' expression
 
-    7 statement: VAR IDENTIFIER
-    8          | FUNCTION IDENTIFIER '(' ')' '{' '}'
+    8 statement: VAR IDENTIFIER
+    9          | FUNCTION IDENTIFIER '(' ')' '{' '}'
 
-    9 expression: VARIANT
-   10           | IDENTIFIER
-   11           | expression '+' expression
-   12           | expression '-' expression
-   13           | expression '*' expression
-   14           | expression '/' expression
-   15           | expression AEQ expression
-   16           | expression SEQ expression
-   17           | expression MEQ expression
-   18           | expression DEQ expression
-   19           | expression '&' expression
-   20           | expression '|' expression
-   21           | expression '^' expression
-   22           | expression '%' expression
-   23           | expression ANDEQ expression
-   24           | expression OREQ expression
-   25           | expression XOREQ expression
-   26           | expression MODEQ expression
-   27           | expression EQ expression
-   28           | expression NEQ expression
-   29           | expression LE expression
-   30           | expression GE expression
-   31           | expression AND expression
-   32           | expression OR expression
-   33           | ADDSELF expression
-   34           | expression ADDSELF
-   35           | SUBSELF expression
-   36           | expression SUBSELF
-   37           | '~' expression
-   38           | '!' expression
-   39           | '-' expression
-   40           | '+' expression
-   41           | '(' expression ')'
+   10 expression: VARIANT
+   11           | IDENTIFIER
+   12           | expression '+' expression
+   13           | expression '-' expression
+   14           | expression '*' expression
+   15           | expression '/' expression
+   16           | expression AEQ expression
+   17           | expression SEQ expression
+   18           | expression MEQ expression
+   19           | expression DEQ expression
+   20           | expression '&' expression
+   21           | expression '|' expression
+   22           | expression '^' expression
+   23           | expression '%' expression
+   24           | expression ANDEQ expression
+   25           | expression OREQ expression
+   26           | expression XOREQ expression
+   27           | expression MODEQ expression
+   28           | expression EQ expression
+   29           | expression NEQ expression
+   30           | expression LE expression
+   31           | expression GE expression
+   32           | expression AND expression
+   33           | expression OR expression
+   34           | ADDSELF expression
+   35           | expression ADDSELF
+   36           | SUBSELF expression
+   37           | expression SUBSELF
+   38           | '~' expression
+   39           | '!' expression
+   40           | '-' expression
+   41           | '+' expression
+   42           | '(' expression ')'
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-'!' (33) 38
-'%' (37) 22
-'&' (38) 19
-'(' (40) 8 41
-')' (41) 8 41
-'*' (42) 13
-'+' (43) 11 40
+'!' (33) 39
+'%' (37) 23
+'&' (38) 20
+'(' (40) 9 42
+')' (41) 9 42
+'*' (42) 14
+'+' (43) 12 41
 ',' (44)
-'-' (45) 12 39
-'/' (47) 14
+'-' (45) 13 40
+'/' (47) 15
 ':' (58)
 ';' (59) 2 3
 '<' (60)
-'=' (61) 5 6
+'=' (61) 6 7
 '>' (62)
 '?' (63)
-'^' (94) 21
-'{' (123) 8
-'|' (124) 20
-'}' (125) 8
-'~' (126) 37
+'^' (94) 22
+'{' (123) 9
+'|' (124) 21
+'}' (125) 9
+'~' (126) 38
 error (256)
-VAR (258) 7
-FUNCTION (259) 8
+VAR (258) 8
+FUNCTION (259) 9
 NEW (260)
 DELETE (261)
 THROW (262)
 IF (263)
 ELSE (264)
 WHILE (265)
-VARIANT (266) 9
-IDENTIFIER (267) 6 7 8 10
-EQ (268) 27
-NEQ (269) 28
-LE (270) 29
-GE (271) 30
-AND (272) 31
-OR (273) 32
-ADDSELF (274) 33 34
-SUBSELF (275) 35 36
-DEQ (276) 18
-MEQ (277) 17
-AEQ (278) 15
-SEQ (279) 16
-MODEQ (280) 26
-ANDEQ (281) 23
-OREQ (282) 24
-XOREQ (283) 25
+VARIANT (266) 10
+IDENTIFIER (267) 7 8 9 11
+EQ (268) 28
+NEQ (269) 29
+LE (270) 30
+GE (271) 31
+AND (272) 32
+OR (273) 33
+ADDSELF (274) 34 35
+SUBSELF (275) 36 37
+DEQ (276) 19
+MEQ (277) 18
+AEQ (278) 16
+SEQ (279) 17
+MODEQ (280) 27
+ANDEQ (281) 24
+OREQ (282) 25
+XOREQ (283) 26
 UMINUS (284)
 
 
@@ -124,14 +125,14 @@ $accept (51)
 start (52)
     on left: 1 2 3, on right: 0 2 3
 assign (53)
-    on left: 4 5 6, on right: 3
+    on left: 4 5 6 7, on right: 3
 statement (54)
-    on left: 7 8, on right: 5
+    on left: 8 9, on right: 5 6
 expression (55)
-    on left: 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
-    28 29 30 31 32 33 34 35 36 37 38 39 40 41, on right: 4 5 6 11 12
+    on left: 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
+    28 29 30 31 32 33 34 35 36 37 38 39 40 41 42, on right: 4 6 7 12
     13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33
-    34 35 36 37 38 39 40 41
+    34 35 36 37 38 39 40 41 42
 
 
 State 0
@@ -177,38 +178,38 @@ State 2
 
 State 3
 
-    7 statement: VAR . IDENTIFIER
+    8 statement: VAR . IDENTIFIER
 
     IDENTIFIER  shift, and go to state 18
 
 
 State 4
 
-    8 statement: FUNCTION . IDENTIFIER '(' ')' '{' '}'
+    9 statement: FUNCTION . IDENTIFIER '(' ')' '{' '}'
 
     IDENTIFIER  shift, and go to state 19
 
 
 State 5
 
-    9 expression: VARIANT .
-
-    $default  reduce using rule 9 (expression)
-
-
-State 6
-
-    6 assign: IDENTIFIER . '=' expression
-   10 expression: IDENTIFIER .
-
-    '='  shift, and go to state 20
+   10 expression: VARIANT .
 
     $default  reduce using rule 10 (expression)
 
 
+State 6
+
+    7 assign: IDENTIFIER . '=' expression
+   11 expression: IDENTIFIER .
+
+    '='  shift, and go to state 20
+
+    $default  reduce using rule 11 (expression)
+
+
 State 7
 
-   33 expression: ADDSELF . expression
+   34 expression: ADDSELF . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -225,7 +226,7 @@ State 7
 
 State 8
 
-   35 expression: SUBSELF . expression
+   36 expression: SUBSELF . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -242,7 +243,7 @@ State 8
 
 State 9
 
-   39 expression: '-' . expression
+   40 expression: '-' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -259,7 +260,7 @@ State 9
 
 State 10
 
-   40 expression: '+' . expression
+   41 expression: '+' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -276,7 +277,7 @@ State 10
 
 State 11
 
-   38 expression: '!' . expression
+   39 expression: '!' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -293,7 +294,7 @@ State 11
 
 State 12
 
-   37 expression: '~' . expression
+   38 expression: '~' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -310,7 +311,7 @@ State 12
 
 State 13
 
-   41 expression: '(' . expression ')'
+   42 expression: '(' . expression ')'
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -341,38 +342,41 @@ State 15
 
 State 16
 
-    5 assign: statement . '=' expression
+    5 assign: statement .
+    6       | statement . '=' expression
 
     '='  shift, and go to state 30
+
+    $default  reduce using rule 5 (assign)
 
 
 State 17
 
     4 assign: expression .
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     EQ       shift, and go to state 31
     NEQ      shift, and go to state 32
@@ -404,21 +408,21 @@ State 17
 
 State 18
 
-    7 statement: VAR IDENTIFIER .
+    8 statement: VAR IDENTIFIER .
 
-    $default  reduce using rule 7 (statement)
+    $default  reduce using rule 8 (statement)
 
 
 State 19
 
-    8 statement: FUNCTION IDENTIFIER . '(' ')' '{' '}'
+    9 statement: FUNCTION IDENTIFIER . '(' ')' '{' '}'
 
     '('  shift, and go to state 55
 
 
 State 20
 
-    6 assign: IDENTIFIER '=' . expression
+    7 assign: IDENTIFIER '=' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -435,140 +439,106 @@ State 20
 
 State 21
 
-   10 expression: IDENTIFIER .
+   11 expression: IDENTIFIER .
 
-    $default  reduce using rule 10 (expression)
+    $default  reduce using rule 11 (expression)
 
 
 State 22
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   33           | ADDSELF expression .
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   34           | ADDSELF expression .
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     ADDSELF  shift, and go to state 37
     SUBSELF  shift, and go to state 38
 
-    $default  reduce using rule 33 (expression)
+    $default  reduce using rule 34 (expression)
 
 
 State 23
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   35           | SUBSELF expression .
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   36           | SUBSELF expression .
+   37           | expression . SUBSELF
 
     ADDSELF  shift, and go to state 37
     SUBSELF  shift, and go to state 38
 
-    $default  reduce using rule 35 (expression)
+    $default  reduce using rule 36 (expression)
 
 
 State 24
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-   39           | '-' expression .
-
-    ADDSELF  shift, and go to state 37
-    SUBSELF  shift, and go to state 38
-
-    $default  reduce using rule 39 (expression)
-
-
-State 25
-
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-   40           | '+' expression .
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+   40           | '-' expression .
 
     ADDSELF  shift, and go to state 37
     SUBSELF  shift, and go to state 38
@@ -576,33 +546,101 @@ State 25
     $default  reduce using rule 40 (expression)
 
 
+State 25
+
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+   41           | '+' expression .
+
+    ADDSELF  shift, and go to state 37
+    SUBSELF  shift, and go to state 38
+
+    $default  reduce using rule 41 (expression)
+
+
 State 26
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-   38           | '!' expression .
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+   39           | '!' expression .
+
+    ADDSELF  shift, and go to state 37
+    SUBSELF  shift, and go to state 38
+
+    $default  reduce using rule 39 (expression)
+
+
+State 27
+
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+   38           | '~' expression .
 
     ADDSELF  shift, and go to state 37
     SUBSELF  shift, and go to state 38
@@ -610,67 +648,33 @@ State 26
     $default  reduce using rule 38 (expression)
 
 
-State 27
-
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-   37           | '~' expression .
-
-    ADDSELF  shift, and go to state 37
-    SUBSELF  shift, and go to state 38
-
-    $default  reduce using rule 37 (expression)
-
-
 State 28
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-   41           | '(' expression . ')'
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+   42           | '(' expression . ')'
 
     EQ       shift, and go to state 31
     NEQ      shift, and go to state 32
@@ -708,7 +712,7 @@ State 29
 
 State 30
 
-    5 assign: statement '=' . expression
+    6 assign: statement '=' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -725,7 +729,7 @@ State 30
 
 State 31
 
-   27 expression: expression EQ . expression
+   28 expression: expression EQ . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -742,7 +746,7 @@ State 31
 
 State 32
 
-   28 expression: expression NEQ . expression
+   29 expression: expression NEQ . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -759,7 +763,7 @@ State 32
 
 State 33
 
-   29 expression: expression LE . expression
+   30 expression: expression LE . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -776,7 +780,7 @@ State 33
 
 State 34
 
-   30 expression: expression GE . expression
+   31 expression: expression GE . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -793,7 +797,7 @@ State 34
 
 State 35
 
-   31 expression: expression AND . expression
+   32 expression: expression AND . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -810,7 +814,7 @@ State 35
 
 State 36
 
-   32 expression: expression OR . expression
+   33 expression: expression OR . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -827,21 +831,21 @@ State 36
 
 State 37
 
-   34 expression: expression ADDSELF .
+   35 expression: expression ADDSELF .
 
-    $default  reduce using rule 34 (expression)
+    $default  reduce using rule 35 (expression)
 
 
 State 38
 
-   36 expression: expression SUBSELF .
+   37 expression: expression SUBSELF .
 
-    $default  reduce using rule 36 (expression)
+    $default  reduce using rule 37 (expression)
 
 
 State 39
 
-   18 expression: expression DEQ . expression
+   19 expression: expression DEQ . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -858,7 +862,7 @@ State 39
 
 State 40
 
-   17 expression: expression MEQ . expression
+   18 expression: expression MEQ . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -875,7 +879,7 @@ State 40
 
 State 41
 
-   15 expression: expression AEQ . expression
+   16 expression: expression AEQ . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -892,7 +896,7 @@ State 41
 
 State 42
 
-   16 expression: expression SEQ . expression
+   17 expression: expression SEQ . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -909,7 +913,7 @@ State 42
 
 State 43
 
-   26 expression: expression MODEQ . expression
+   27 expression: expression MODEQ . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -926,7 +930,7 @@ State 43
 
 State 44
 
-   23 expression: expression ANDEQ . expression
+   24 expression: expression ANDEQ . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -943,7 +947,7 @@ State 44
 
 State 45
 
-   24 expression: expression OREQ . expression
+   25 expression: expression OREQ . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -960,7 +964,7 @@ State 45
 
 State 46
 
-   25 expression: expression XOREQ . expression
+   26 expression: expression XOREQ . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -977,7 +981,7 @@ State 46
 
 State 47
 
-   19 expression: expression '&' . expression
+   20 expression: expression '&' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -994,7 +998,7 @@ State 47
 
 State 48
 
-   20 expression: expression '|' . expression
+   21 expression: expression '|' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -1011,7 +1015,7 @@ State 48
 
 State 49
 
-   21 expression: expression '^' . expression
+   22 expression: expression '^' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -1028,7 +1032,7 @@ State 49
 
 State 50
 
-   12 expression: expression '-' . expression
+   13 expression: expression '-' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -1045,7 +1049,7 @@ State 50
 
 State 51
 
-   11 expression: expression '+' . expression
+   12 expression: expression '+' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -1062,7 +1066,7 @@ State 51
 
 State 52
 
-   13 expression: expression '*' . expression
+   14 expression: expression '*' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -1079,7 +1083,7 @@ State 52
 
 State 53
 
-   14 expression: expression '/' . expression
+   15 expression: expression '/' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -1096,7 +1100,7 @@ State 53
 
 State 54
 
-   22 expression: expression '%' . expression
+   23 expression: expression '%' . expression
 
     VARIANT     shift, and go to state 5
     IDENTIFIER  shift, and go to state 21
@@ -1113,38 +1117,101 @@ State 54
 
 State 55
 
-    8 statement: FUNCTION IDENTIFIER '(' . ')' '{' '}'
+    9 statement: FUNCTION IDENTIFIER '(' . ')' '{' '}'
 
     ')'  shift, and go to state 81
 
 
 State 56
 
-    6 assign: IDENTIFIER '=' expression .
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+    7 assign: IDENTIFIER '=' expression .
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+
+    EQ       shift, and go to state 31
+    NEQ      shift, and go to state 32
+    LE       shift, and go to state 33
+    GE       shift, and go to state 34
+    AND      shift, and go to state 35
+    OR       shift, and go to state 36
+    ADDSELF  shift, and go to state 37
+    SUBSELF  shift, and go to state 38
+    DEQ      shift, and go to state 39
+    MEQ      shift, and go to state 40
+    AEQ      shift, and go to state 41
+    SEQ      shift, and go to state 42
+    MODEQ    shift, and go to state 43
+    ANDEQ    shift, and go to state 44
+    OREQ     shift, and go to state 45
+    XOREQ    shift, and go to state 46
+    '&'      shift, and go to state 47
+    '|'      shift, and go to state 48
+    '^'      shift, and go to state 49
+    '-'      shift, and go to state 50
+    '+'      shift, and go to state 51
+    '*'      shift, and go to state 52
+    '/'      shift, and go to state 53
+    '%'      shift, and go to state 54
+
+    $default  reduce using rule 7 (assign)
+
+
+State 57
+
+   42 expression: '(' expression ')' .
+
+    $default  reduce using rule 42 (expression)
+
+
+State 58
+
+    6 assign: statement '=' expression .
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     EQ       shift, and go to state 31
     NEQ      shift, and go to state 32
@@ -1174,40 +1241,285 @@ State 56
     $default  reduce using rule 6 (assign)
 
 
-State 57
+State 59
 
-   41 expression: '(' expression ')' .
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   28           | expression EQ expression .
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
-    $default  reduce using rule 41 (expression)
+    LE       shift, and go to state 33
+    GE       shift, and go to state 34
+    ADDSELF  shift, and go to state 37
+    SUBSELF  shift, and go to state 38
+    '-'      shift, and go to state 50
+    '+'      shift, and go to state 51
+    '*'      shift, and go to state 52
+    '/'      shift, and go to state 53
+    '%'      shift, and go to state 54
+
+    $default  reduce using rule 28 (expression)
 
 
-State 58
+State 60
 
-    5 assign: statement '=' expression .
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   29           | expression NEQ expression .
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+
+    LE       shift, and go to state 33
+    GE       shift, and go to state 34
+    ADDSELF  shift, and go to state 37
+    SUBSELF  shift, and go to state 38
+    '-'      shift, and go to state 50
+    '+'      shift, and go to state 51
+    '*'      shift, and go to state 52
+    '/'      shift, and go to state 53
+    '%'      shift, and go to state 54
+
+    $default  reduce using rule 29 (expression)
+
+
+State 61
+
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   30           | expression LE expression .
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+
+    ADDSELF  shift, and go to state 37
+    SUBSELF  shift, and go to state 38
+    '-'      shift, and go to state 50
+    '+'      shift, and go to state 51
+    '*'      shift, and go to state 52
+    '/'      shift, and go to state 53
+    '%'      shift, and go to state 54
+
+    $default  reduce using rule 30 (expression)
+
+
+State 62
+
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   31           | expression GE expression .
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+
+    ADDSELF  shift, and go to state 37
+    SUBSELF  shift, and go to state 38
+    '-'      shift, and go to state 50
+    '+'      shift, and go to state 51
+    '*'      shift, and go to state 52
+    '/'      shift, and go to state 53
+    '%'      shift, and go to state 54
+
+    $default  reduce using rule 31 (expression)
+
+
+State 63
+
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   32           | expression AND expression .
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+
+    EQ       shift, and go to state 31
+    NEQ      shift, and go to state 32
+    LE       shift, and go to state 33
+    GE       shift, and go to state 34
+    ADDSELF  shift, and go to state 37
+    SUBSELF  shift, and go to state 38
+    '&'      shift, and go to state 47
+    '|'      shift, and go to state 48
+    '^'      shift, and go to state 49
+    '-'      shift, and go to state 50
+    '+'      shift, and go to state 51
+    '*'      shift, and go to state 52
+    '/'      shift, and go to state 53
+    '%'      shift, and go to state 54
+
+    $default  reduce using rule 32 (expression)
+
+
+State 64
+
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   33           | expression OR expression .
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+
+    EQ       shift, and go to state 31
+    NEQ      shift, and go to state 32
+    LE       shift, and go to state 33
+    GE       shift, and go to state 34
+    ADDSELF  shift, and go to state 37
+    SUBSELF  shift, and go to state 38
+    '&'      shift, and go to state 47
+    '|'      shift, and go to state 48
+    '^'      shift, and go to state 49
+    '-'      shift, and go to state 50
+    '+'      shift, and go to state 51
+    '*'      shift, and go to state 52
+    '/'      shift, and go to state 53
+    '%'      shift, and go to state 54
+
+    $default  reduce using rule 33 (expression)
+
+
+State 65
+
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   19           | expression DEQ expression .
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     EQ       shift, and go to state 31
     NEQ      shift, and go to state 32
@@ -1234,288 +1546,36 @@ State 58
     '/'      shift, and go to state 53
     '%'      shift, and go to state 54
 
-    $default  reduce using rule 5 (assign)
+    $default  reduce using rule 19 (expression)
 
 
-State 59
+State 66
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   27           | expression EQ expression .
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-
-    LE       shift, and go to state 33
-    GE       shift, and go to state 34
-    ADDSELF  shift, and go to state 37
-    SUBSELF  shift, and go to state 38
-    '-'      shift, and go to state 50
-    '+'      shift, and go to state 51
-    '*'      shift, and go to state 52
-    '/'      shift, and go to state 53
-    '%'      shift, and go to state 54
-
-    $default  reduce using rule 27 (expression)
-
-
-State 60
-
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   28           | expression NEQ expression .
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-
-    LE       shift, and go to state 33
-    GE       shift, and go to state 34
-    ADDSELF  shift, and go to state 37
-    SUBSELF  shift, and go to state 38
-    '-'      shift, and go to state 50
-    '+'      shift, and go to state 51
-    '*'      shift, and go to state 52
-    '/'      shift, and go to state 53
-    '%'      shift, and go to state 54
-
-    $default  reduce using rule 28 (expression)
-
-
-State 61
-
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   29           | expression LE expression .
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-
-    ADDSELF  shift, and go to state 37
-    SUBSELF  shift, and go to state 38
-    '-'      shift, and go to state 50
-    '+'      shift, and go to state 51
-    '*'      shift, and go to state 52
-    '/'      shift, and go to state 53
-    '%'      shift, and go to state 54
-
-    $default  reduce using rule 29 (expression)
-
-
-State 62
-
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   30           | expression GE expression .
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-
-    ADDSELF  shift, and go to state 37
-    SUBSELF  shift, and go to state 38
-    '-'      shift, and go to state 50
-    '+'      shift, and go to state 51
-    '*'      shift, and go to state 52
-    '/'      shift, and go to state 53
-    '%'      shift, and go to state 54
-
-    $default  reduce using rule 30 (expression)
-
-
-State 63
-
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   31           | expression AND expression .
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-
-    EQ       shift, and go to state 31
-    NEQ      shift, and go to state 32
-    LE       shift, and go to state 33
-    GE       shift, and go to state 34
-    ADDSELF  shift, and go to state 37
-    SUBSELF  shift, and go to state 38
-    '&'      shift, and go to state 47
-    '|'      shift, and go to state 48
-    '^'      shift, and go to state 49
-    '-'      shift, and go to state 50
-    '+'      shift, and go to state 51
-    '*'      shift, and go to state 52
-    '/'      shift, and go to state 53
-    '%'      shift, and go to state 54
-
-    $default  reduce using rule 31 (expression)
-
-
-State 64
-
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   32           | expression OR expression .
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-
-    EQ       shift, and go to state 31
-    NEQ      shift, and go to state 32
-    LE       shift, and go to state 33
-    GE       shift, and go to state 34
-    ADDSELF  shift, and go to state 37
-    SUBSELF  shift, and go to state 38
-    '&'      shift, and go to state 47
-    '|'      shift, and go to state 48
-    '^'      shift, and go to state 49
-    '-'      shift, and go to state 50
-    '+'      shift, and go to state 51
-    '*'      shift, and go to state 52
-    '/'      shift, and go to state 53
-    '%'      shift, and go to state 54
-
-    $default  reduce using rule 32 (expression)
-
-
-State 65
-
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   18           | expression DEQ expression .
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   18           | expression MEQ expression .
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     EQ       shift, and go to state 31
     NEQ      shift, and go to state 32
@@ -1545,145 +1605,33 @@ State 65
     $default  reduce using rule 18 (expression)
 
 
-State 66
-
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   17           | expression MEQ expression .
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-
-    EQ       shift, and go to state 31
-    NEQ      shift, and go to state 32
-    LE       shift, and go to state 33
-    GE       shift, and go to state 34
-    AND      shift, and go to state 35
-    OR       shift, and go to state 36
-    ADDSELF  shift, and go to state 37
-    SUBSELF  shift, and go to state 38
-    DEQ      shift, and go to state 39
-    MEQ      shift, and go to state 40
-    AEQ      shift, and go to state 41
-    SEQ      shift, and go to state 42
-    MODEQ    shift, and go to state 43
-    ANDEQ    shift, and go to state 44
-    OREQ     shift, and go to state 45
-    XOREQ    shift, and go to state 46
-    '&'      shift, and go to state 47
-    '|'      shift, and go to state 48
-    '^'      shift, and go to state 49
-    '-'      shift, and go to state 50
-    '+'      shift, and go to state 51
-    '*'      shift, and go to state 52
-    '/'      shift, and go to state 53
-    '%'      shift, and go to state 54
-
-    $default  reduce using rule 17 (expression)
-
-
 State 67
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   15           | expression AEQ expression .
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-
-    EQ       shift, and go to state 31
-    NEQ      shift, and go to state 32
-    LE       shift, and go to state 33
-    GE       shift, and go to state 34
-    AND      shift, and go to state 35
-    OR       shift, and go to state 36
-    ADDSELF  shift, and go to state 37
-    SUBSELF  shift, and go to state 38
-    DEQ      shift, and go to state 39
-    MEQ      shift, and go to state 40
-    AEQ      shift, and go to state 41
-    SEQ      shift, and go to state 42
-    MODEQ    shift, and go to state 43
-    ANDEQ    shift, and go to state 44
-    OREQ     shift, and go to state 45
-    XOREQ    shift, and go to state 46
-    '&'      shift, and go to state 47
-    '|'      shift, and go to state 48
-    '^'      shift, and go to state 49
-    '-'      shift, and go to state 50
-    '+'      shift, and go to state 51
-    '*'      shift, and go to state 52
-    '/'      shift, and go to state 53
-    '%'      shift, and go to state 54
-
-    $default  reduce using rule 15 (expression)
-
-
-State 68
-
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   16           | expression SEQ expression .
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   16           | expression AEQ expression .
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     EQ       shift, and go to state 31
     NEQ      shift, and go to state 32
@@ -1713,33 +1661,33 @@ State 68
     $default  reduce using rule 16 (expression)
 
 
-State 69
+State 68
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   26           | expression MODEQ expression .
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   17           | expression SEQ expression .
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     EQ       shift, and go to state 31
     NEQ      shift, and go to state 32
@@ -1766,92 +1714,92 @@ State 69
     '/'      shift, and go to state 53
     '%'      shift, and go to state 54
 
-    $default  reduce using rule 26 (expression)
+    $default  reduce using rule 17 (expression)
+
+
+State 69
+
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   27           | expression MODEQ expression .
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+
+    EQ       shift, and go to state 31
+    NEQ      shift, and go to state 32
+    LE       shift, and go to state 33
+    GE       shift, and go to state 34
+    AND      shift, and go to state 35
+    OR       shift, and go to state 36
+    ADDSELF  shift, and go to state 37
+    SUBSELF  shift, and go to state 38
+    DEQ      shift, and go to state 39
+    MEQ      shift, and go to state 40
+    AEQ      shift, and go to state 41
+    SEQ      shift, and go to state 42
+    MODEQ    shift, and go to state 43
+    ANDEQ    shift, and go to state 44
+    OREQ     shift, and go to state 45
+    XOREQ    shift, and go to state 46
+    '&'      shift, and go to state 47
+    '|'      shift, and go to state 48
+    '^'      shift, and go to state 49
+    '-'      shift, and go to state 50
+    '+'      shift, and go to state 51
+    '*'      shift, and go to state 52
+    '/'      shift, and go to state 53
+    '%'      shift, and go to state 54
+
+    $default  reduce using rule 27 (expression)
 
 
 State 70
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   23           | expression ANDEQ expression .
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-
-    EQ       shift, and go to state 31
-    NEQ      shift, and go to state 32
-    LE       shift, and go to state 33
-    GE       shift, and go to state 34
-    AND      shift, and go to state 35
-    OR       shift, and go to state 36
-    ADDSELF  shift, and go to state 37
-    SUBSELF  shift, and go to state 38
-    DEQ      shift, and go to state 39
-    MEQ      shift, and go to state 40
-    AEQ      shift, and go to state 41
-    SEQ      shift, and go to state 42
-    MODEQ    shift, and go to state 43
-    ANDEQ    shift, and go to state 44
-    OREQ     shift, and go to state 45
-    XOREQ    shift, and go to state 46
-    '&'      shift, and go to state 47
-    '|'      shift, and go to state 48
-    '^'      shift, and go to state 49
-    '-'      shift, and go to state 50
-    '+'      shift, and go to state 51
-    '*'      shift, and go to state 52
-    '/'      shift, and go to state 53
-    '%'      shift, and go to state 54
-
-    $default  reduce using rule 23 (expression)
-
-
-State 71
-
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   24           | expression OREQ expression .
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   24           | expression ANDEQ expression .
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     EQ       shift, and go to state 31
     NEQ      shift, and go to state 32
@@ -1881,33 +1829,33 @@ State 71
     $default  reduce using rule 24 (expression)
 
 
-State 72
+State 71
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   25           | expression XOREQ expression .
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   25           | expression OREQ expression .
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     EQ       shift, and go to state 31
     NEQ      shift, and go to state 32
@@ -1937,76 +1885,89 @@ State 72
     $default  reduce using rule 25 (expression)
 
 
-State 73
+State 72
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   19           | expression '&' expression .
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   26           | expression XOREQ expression .
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     EQ       shift, and go to state 31
     NEQ      shift, and go to state 32
     LE       shift, and go to state 33
     GE       shift, and go to state 34
+    AND      shift, and go to state 35
+    OR       shift, and go to state 36
     ADDSELF  shift, and go to state 37
     SUBSELF  shift, and go to state 38
+    DEQ      shift, and go to state 39
+    MEQ      shift, and go to state 40
+    AEQ      shift, and go to state 41
+    SEQ      shift, and go to state 42
+    MODEQ    shift, and go to state 43
+    ANDEQ    shift, and go to state 44
+    OREQ     shift, and go to state 45
+    XOREQ    shift, and go to state 46
+    '&'      shift, and go to state 47
+    '|'      shift, and go to state 48
+    '^'      shift, and go to state 49
     '-'      shift, and go to state 50
     '+'      shift, and go to state 51
     '*'      shift, and go to state 52
     '/'      shift, and go to state 53
     '%'      shift, and go to state 54
 
-    $default  reduce using rule 19 (expression)
+    $default  reduce using rule 26 (expression)
 
 
-State 74
+State 73
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   20           | expression '|' expression .
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   20           | expression '&' expression .
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     EQ       shift, and go to state 31
     NEQ      shift, and go to state 32
@@ -2023,33 +1984,33 @@ State 74
     $default  reduce using rule 20 (expression)
 
 
-State 75
+State 74
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   21           | expression '^' expression .
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   21           | expression '|' expression .
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     EQ       shift, and go to state 31
     NEQ      shift, and go to state 32
@@ -2066,33 +2027,113 @@ State 75
     $default  reduce using rule 21 (expression)
 
 
+State 75
+
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   22           | expression '^' expression .
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+
+    EQ       shift, and go to state 31
+    NEQ      shift, and go to state 32
+    LE       shift, and go to state 33
+    GE       shift, and go to state 34
+    ADDSELF  shift, and go to state 37
+    SUBSELF  shift, and go to state 38
+    '-'      shift, and go to state 50
+    '+'      shift, and go to state 51
+    '*'      shift, and go to state 52
+    '/'      shift, and go to state 53
+    '%'      shift, and go to state 54
+
+    $default  reduce using rule 22 (expression)
+
+
 State 76
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   12           | expression '-' expression .
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   13           | expression '-' expression .
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+
+    ADDSELF  shift, and go to state 37
+    SUBSELF  shift, and go to state 38
+    '*'      shift, and go to state 52
+    '/'      shift, and go to state 53
+    '%'      shift, and go to state 54
+
+    $default  reduce using rule 13 (expression)
+
+
+State 77
+
+   12 expression: expression . '+' expression
+   12           | expression '+' expression .
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     ADDSELF  shift, and go to state 37
     SUBSELF  shift, and go to state 38
@@ -2103,104 +2144,33 @@ State 76
     $default  reduce using rule 12 (expression)
 
 
-State 77
-
-   11 expression: expression . '+' expression
-   11           | expression '+' expression .
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-
-    ADDSELF  shift, and go to state 37
-    SUBSELF  shift, and go to state 38
-    '*'      shift, and go to state 52
-    '/'      shift, and go to state 53
-    '%'      shift, and go to state 54
-
-    $default  reduce using rule 11 (expression)
-
-
 State 78
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   13           | expression '*' expression .
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
-
-    ADDSELF  shift, and go to state 37
-    SUBSELF  shift, and go to state 38
-
-    $default  reduce using rule 13 (expression)
-
-
-State 79
-
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   14           | expression '/' expression .
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   14           | expression '*' expression .
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     ADDSELF  shift, and go to state 37
     SUBSELF  shift, and go to state 38
@@ -2208,56 +2178,90 @@ State 79
     $default  reduce using rule 14 (expression)
 
 
-State 80
+State 79
 
-   11 expression: expression . '+' expression
-   12           | expression . '-' expression
-   13           | expression . '*' expression
-   14           | expression . '/' expression
-   15           | expression . AEQ expression
-   16           | expression . SEQ expression
-   17           | expression . MEQ expression
-   18           | expression . DEQ expression
-   19           | expression . '&' expression
-   20           | expression . '|' expression
-   21           | expression . '^' expression
-   22           | expression . '%' expression
-   22           | expression '%' expression .
-   23           | expression . ANDEQ expression
-   24           | expression . OREQ expression
-   25           | expression . XOREQ expression
-   26           | expression . MODEQ expression
-   27           | expression . EQ expression
-   28           | expression . NEQ expression
-   29           | expression . LE expression
-   30           | expression . GE expression
-   31           | expression . AND expression
-   32           | expression . OR expression
-   34           | expression . ADDSELF
-   36           | expression . SUBSELF
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   15           | expression '/' expression .
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
 
     ADDSELF  shift, and go to state 37
     SUBSELF  shift, and go to state 38
 
-    $default  reduce using rule 22 (expression)
+    $default  reduce using rule 15 (expression)
+
+
+State 80
+
+   12 expression: expression . '+' expression
+   13           | expression . '-' expression
+   14           | expression . '*' expression
+   15           | expression . '/' expression
+   16           | expression . AEQ expression
+   17           | expression . SEQ expression
+   18           | expression . MEQ expression
+   19           | expression . DEQ expression
+   20           | expression . '&' expression
+   21           | expression . '|' expression
+   22           | expression . '^' expression
+   23           | expression . '%' expression
+   23           | expression '%' expression .
+   24           | expression . ANDEQ expression
+   25           | expression . OREQ expression
+   26           | expression . XOREQ expression
+   27           | expression . MODEQ expression
+   28           | expression . EQ expression
+   29           | expression . NEQ expression
+   30           | expression . LE expression
+   31           | expression . GE expression
+   32           | expression . AND expression
+   33           | expression . OR expression
+   35           | expression . ADDSELF
+   37           | expression . SUBSELF
+
+    ADDSELF  shift, and go to state 37
+    SUBSELF  shift, and go to state 38
+
+    $default  reduce using rule 23 (expression)
 
 
 State 81
 
-    8 statement: FUNCTION IDENTIFIER '(' ')' . '{' '}'
+    9 statement: FUNCTION IDENTIFIER '(' ')' . '{' '}'
 
     '{'  shift, and go to state 82
 
 
 State 82
 
-    8 statement: FUNCTION IDENTIFIER '(' ')' '{' . '}'
+    9 statement: FUNCTION IDENTIFIER '(' ')' '{' . '}'
 
     '}'  shift, and go to state 83
 
 
 State 83
 
-    8 statement: FUNCTION IDENTIFIER '(' ')' '{' '}' .
+    9 statement: FUNCTION IDENTIFIER '(' ')' '{' '}' .
 
-    $default  reduce using rule 8 (statement)
+    $default  reduce using rule 9 (statement)

@@ -213,13 +213,13 @@ inline ZVariant &operator ++(ZVariant &var, int)
 {return var = 1 + var;}
 
 inline ZVariant &operator --(ZVariant &var, int)
-{return var = 1 - var;}
+{return var = -1 + var;}
 
 inline ZVariant &operator ++(ZVariant &var)
 {return var = 1 + var;}
 
 inline ZVariant &operator --(ZVariant &var)
-{return var = 1 - var;}
+{return var = -1 + var;}
 
 ZVariant operator ~(const ZVariant &var);
 
