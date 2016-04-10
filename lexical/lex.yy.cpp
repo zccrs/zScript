@@ -222,7 +222,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	int yy_n_chars;
+	yy_size_t yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -824,19 +824,33 @@ case 28:
 YY_RULE_SETUP
 #line 59 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
-    return ';';
+    while(yyin.rdbuf()->in_avail() && !yyin.eof() && !yyin.fail()) {
+        char ch = yyin.peek();
+
+        if(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {
+            yyin.get();
+            continue;
+        } else if(ch == ',' || ch == '}' || ch == ')' || ch == ']') {
+            break;
+        } else {
+            return ';';
+        }
+    }
+
+    if(!yyin.rdbuf()->in_avail() || yyin.eof())
+        return ';';
 }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 63 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 77 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     return yytext[0];
 }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 67 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 81 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     QByteArray name(yytext);
 
@@ -852,7 +866,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 80 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 94 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     QByteArray str;
 
@@ -881,7 +895,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 106 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 120 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     while(!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
@@ -900,7 +914,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 122 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 136 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     while(!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
@@ -919,7 +933,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 138 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 152 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     yylval->value = new Global::ZVariant(atoi(yytext));
 
@@ -928,7 +942,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 144 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 158 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     yylval->value = new Global::ZVariant(atof(yytext));
 
@@ -937,10 +951,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 149 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 163 "/home/zhang/projects/zScript/lexical/zScript.ll"
 ECHO;
 	YY_BREAK
-#line 944 "lex.yy.cpp"
+#line 958 "lex.yy.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1316,9 +1330,9 @@ int yyFlexLexer::yy_get_next_buffer()
 	else
 		ret_val = EOB_ACT_CONTINUE_SCAN;
 
-	if ((int) ((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
+	if ((yy_size_t) ((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
 		/* Extend the array by 50%, plus the number we really need. */
-		int new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
+		yy_size_t new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
 		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) yyrealloc((void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf,new_size  );
 		if ( ! YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
 			YY_FATAL_ERROR( "out of dynamic memory in yy_get_next_buffer()" );
@@ -1895,7 +1909,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 149 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 163 "/home/zhang/projects/zScript/lexical/zScript.ll"
 
 
 

@@ -57,7 +57,21 @@ ignore [ \t]
 }
 
 [\r\n] {
-    return ';';
+    while(yyin.rdbuf()->in_avail() && !yyin.eof() && !yyin.fail()) {
+        char ch = yyin.peek();
+
+        if(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {
+            yyin.get();
+            continue;
+        } else if(ch == ',' || ch == '}' || ch == ')' || ch == ']') {
+            break;
+        } else {
+            return ';';
+        }
+    }
+
+    if(!yyin.rdbuf()->in_avail() || yyin.eof())
+        return ';';
 }
 
 {operator} {
