@@ -1,3 +1,7 @@
+# bison tmp file
+
+syntax/zScript.output
+
 # C++ objects and libs
 
 *.slo
