@@ -53,31 +53,19 @@ int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location);
 
 start:      {$$ = Q_NULLPTR;}
             | start ';'
-            | start assign ';' {
+            | start statement ';' {
+
+            }
+            | start expression ';' {
                 $$ = $2;
                 std::cout << "(" << $$->typeName() << "," << $$->toString().toStdString() << ")" << std::endl;
             }
-            ;
+            | start conditional {
 
-assign:     expression {$$ = $1;}
-            | statement {$$ = $1->value;}
-            | statement '=' expression {
-                *$1->value = *$3;
-                $$ = $1->value;
-            }
-            | IDENTIFIER '=' expression {
-                if(!Global::identifiersHash.contains($1->name)) {
-                    std::cerr << $1->name.toStdString() << " is undefined!" << std::endl;
-                    delete $1;
-                    YYERROR;
-                }
-
-                *$1->value = *$3;
-                $$ = $1->value;
             }
             ;
 
-statement:  VAR IDENTIFIER {
+statement:  VAR define {
                 if(Global::identifiersHash.contains($2->name)) {
                     std::cerr << $2->name.constData() << " is defined!" << std::endl;
                     YYERROR;
@@ -88,20 +76,76 @@ statement:  VAR IDENTIFIER {
 
                 $$ = $2;
             }
-            | FUNCTION IDENTIFIER '(' ')' '{' '}' {
+            | FUNCTION IDENTIFIER '(' define ')' '{' start '}' {
                 zInfo << "function name: " << $2->name;
             }
             ;
 
-expression: VARIANT
-            | IDENTIFIER {
-                if(!Global::identifiersHash.contains($1->name)) {
-                    std::cerr << $1->name.toStdString() << " is undefined!" << std::endl;
-                    delete $1;
-                    YYERROR;
-                }
-                $$ = $1->value;
+define:     IDENTIFIER
+            | define ',' define
+            | IDENTIFIER '=' expression
+            ;
+
+expression:    lvalue | rvalue;
+
+lvalue:     IDENTIFIER
+            | lvalue '=' expression
+            | variant '[' expression ']'
+            | lvalue AEQ expression {
+                *$1 += *$3;
+                $$ = $1;
             }
+            | lvalue SEQ expression {
+                *$1 -= *$3;
+                $$ = $1;
+            }
+            | lvalue MEQ expression {
+                *$1 *= *$3;
+                $$ = $1;
+            }
+            | lvalue DEQ expression {
+                *$1 /= *$3;
+                $$ = $1;
+            }
+            | lvalue ANDEQ expression {
+                *$1 &= *$3;
+                $$ = $1;
+            }
+            | lvalue OREQ expression {
+                *$1 |= *$3;
+                $$ = $1;
+            }
+            | lvalue XOREQ expression {
+                *$1 ^= *$3;
+                $$ = $1;
+            }
+            | lvalue MODEQ expression {
+                *$1 %= *$3;
+                $$ = $1;
+            }
+            | ADDSELF lvalue {
+                ++*$2;
+                $$ = $2;
+            }
+            | SUBSELF lvalue {
+                --*$2;
+                $$ = $2;
+            }
+            | lvalue ADDSELF {
+                $$ = new Global::ZVariant(*$1);
+                (*$1)++;
+            }
+            | lvalue SUBSELF {
+                $$ = new Global::ZVariant(*$1);
+                (*$1)--;
+            }
+            ;
+
+rvalue:
+            | CONSTANT
+            | NEW IDENTIFIER
+            | expression '(' arguments ')'
+            | expression '.' IDENTIFIER
             | expression '+' expression {
                 $$ = new Global::ZVariant(*$1 + *$3);
             }
@@ -114,22 +158,6 @@ expression: VARIANT
             | expression '/' expression {
                 $$ = new Global::ZVariant(*$1 / *$3);
             }
-            | expression AEQ expression {
-                *$1 += *$3;
-                $$ = $1;
-            }
-            | expression SEQ expression {
-                *$1 -= *$3;
-                $$ = $1;
-            }
-            | expression MEQ expression {
-                *$1 *= *$3;
-                $$ = $1;
-            }
-            | expression DEQ expression {
-                *$1 /= *$3;
-                $$ = $1;
-            }
             | expression '&' expression {
                 $$ = new Global::ZVariant(*$1 & *$3);
             }
@@ -141,22 +169,6 @@ expression: VARIANT
             }
             | expression '%' expression {
                 $$ = new Global::ZVariant(*$1 % *$3);
-            }
-            | expression ANDEQ expression {
-                *$1 &= *$3;
-                $$ = $1;
-            }
-            | expression OREQ expression {
-                *$1 |= *$3;
-                $$ = $1;
-            }
-            | expression XOREQ expression {
-                *$1 ^= *$3;
-                $$ = $1;
-            }
-            | expression MODEQ expression {
-                *$1 %= *$3;
-                $$ = $1;
             }
             | expression EQ expression {
                 $$ = new Global::ZVariant(*$1 == *$3);
@@ -176,27 +188,25 @@ expression: VARIANT
             | expression OR expression {
                 $$ = new Global::ZVariant(*$1 || *$3);
             }
-            | ADDSELF expression {
-                ++*$2;
-                $$ = $2;
-            }
-            | expression ADDSELF {
-                $$ = new Global::ZVariant(*$1);
-                (*$1)++;
-            }
-            | SUBSELF expression {
-                --*$2;
-                $$ = $2;
-            }
-            | expression SUBSELF {
-                $$ = new Global::ZVariant(*$1);
-                (*$1)--;
-            }
             | '~' expression { $$ = new Global::ZVariant(~*$2);}
             | '!' expression { $$ = new Global::ZVariant(!*$2);}
             | '-' expression %prec UMINUS { $$ = new Global::ZVariant(-*$2);}
             | '+' expression %prec UMINUS { $$ = new Global::ZVariant(+*$2);}
             | '(' expression ')' { $$ = $2;}
+            ;
+
+arguments:  expression | arguments ',' expression;
+
+branch_head:IF '(' expression ')'
+            | WHILE '(' expression ')'
+            | FOR '(' expression ';' expression ';' expression ')'
+            | FOR '(' lvalue ':' expression ')';
+
+conditional:branch_head '{' start '}'
+            | branch_head expression ';'
+            | conditional ELSE conditional
+            | conditional ELSE '{' start '}'
+            | conditional ELSE expression ';'
             ;
 
 %%

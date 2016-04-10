@@ -40,6 +40,7 @@ public:
     ZVariant(bool val);
     ZVariant(const char *val);
     ZVariant(const ZVariant &other);
+    ZVariant(ZVariant &&other);
     ZVariant(const QString &val);
     ZVariant(QLatin1String val);
     template <typename T>
@@ -60,6 +61,10 @@ public:
     ZObject *toObject() const;
     QVariant toQVariant() const;
 
+    inline ZVariant& operator=(const ZVariant &other)
+    { data = other.data; return *this;}
+    inline ZVariant& operator=(ZVariant &&other)
+    { qSwap(data, other.data); return *this;}
     inline bool operator==(const ZVariant &v) const
     { return data->variant == v.data->variant; }
     inline bool operator!=(const ZVariant &v) const
@@ -233,13 +238,27 @@ struct IdentifierValue
 
 struct NodeValue
 {
-    NodeValue *left;
-    NodeValue *right;
-    ZVariant *value;
-    int operatorType;
+    NodeValue *left = Q_NULLPTR;
+    NodeValue *right = Q_NULLPTR;
+    ZVariant *value = Q_NULLPTR;
+    int operatorType = -1;
 
-    NodeValue(int o, ZVariant *v, NodeValue *l, NodeValue *r)
+    NodeValue(ZVariant *v, int o = -1, NodeValue *l = Q_NULLPTR, NodeValue *r = Q_NULLPTR)
         :left(l), right(r), value(v), operatorType(o){}
+
+    inline void operator =(int operatorType)
+    { this->operatorType = operatorType;}
+
+    inline void operator =(ZVariant *value)
+    { this->value = value;}
+
+    inline void operator =(const ZVariant &value)
+    {*this->value = value;}
+
+    inline void operator =(ZVariant &&value)
+    { qSwap(*this->value, value);}
+
+    ZVariant &getValue() const;
 };
 
 extern QHash<QByteArray, IdentifierValue*> identifiersHash;

@@ -56,6 +56,11 @@ ZVariant::ZVariant(const ZVariant &other)
 
 }
 
+ZVariant::ZVariant(ZVariant &&other)
+{
+    qSwap(data, other.data);
+}
+
 ZVariant::ZVariant(const QString &val)
     : data(new VariantData)
 {
@@ -660,5 +665,37 @@ QByteArray readFile(const QString &fileName)
 }
 
 QHash<QByteArray, IdentifierValue*> identifiersHash;
+
+ZVariant &NodeValue::getValue() const
+{
+    switch(operatorType) {
+    case '=': {
+        if(right)
+            *left = right->getValue();
+        else
+            *left = ZVariant();
+
+        break;
+    }
+    case '+': {
+        *value = left->getValue() + right->getValue();
+        break;
+    }
+    case '-': {
+        *value = left->getValue() - right->getValue();
+        break;
+    }
+    case '*': {
+        *value = left->getValue() * right->getValue();
+        break;
+    }
+    case '/': {
+        *value = left->getValue() / right->getValue();
+        break;
+    }
+    }
+
+    return *value;
+}
 
 }/// namespace Global end
