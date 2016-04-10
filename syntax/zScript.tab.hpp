@@ -124,7 +124,7 @@ namespace yy {
     /// Symbol semantic values.
     union semantic_type
     {
-    #line 23 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
+    #line 26 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
 
     Global::ZVariant *value;
     QByteArray *identifier;

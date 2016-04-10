@@ -41,6 +41,9 @@
 
 #include "lex.yy.cpp"
 
+#include <QCoreApplication>
+#include <QtConcurrent/QtConcurrentRun>
+
 #include <fstream>
 
 int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location);
@@ -49,7 +52,7 @@ Global::Code *currentCode = Q_NULLPTR;
 Global::Code *rootCode = Q_NULLPTR;
 
 
-#line 53 "zScript.tab.cpp" // lalr1.cc:404
+#line 56 "zScript.tab.cpp" // lalr1.cc:404
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -63,7 +66,7 @@ Global::Code *rootCode = Q_NULLPTR;
 
 // User implementation prologue.
 
-#line 67 "zScript.tab.cpp" // lalr1.cc:412
+#line 70 "zScript.tab.cpp" // lalr1.cc:412
 
 
 #ifndef YY_
@@ -149,7 +152,7 @@ Global::Code *rootCode = Q_NULLPTR;
 
 
 namespace yy {
-#line 153 "zScript.tab.cpp" // lalr1.cc:479
+#line 156 "zScript.tab.cpp" // lalr1.cc:479
 
   /// Build a parser object.
   parser::parser ()
@@ -587,31 +590,31 @@ namespace yy {
           switch (yyn)
             {
   case 4:
-#line 62 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 65 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 currentCode->nodeList << (yystack_[1].value.node);
             }
-#line 595 "zScript.tab.cpp" // lalr1.cc:859
+#line 598 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 5:
-#line 65 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 68 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 //currentCode->nodeList << $2;
             }
-#line 603 "zScript.tab.cpp" // lalr1.cc:859
+#line 606 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 7:
-#line 71 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 74 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 /// TODO
             }
-#line 611 "zScript.tab.cpp" // lalr1.cc:859
+#line 614 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 8:
-#line 76 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 79 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 if(currentCode->identifiersHash.contains(*(yystack_[0].value.identifier))) {
                     zError << *(yystack_[0].value.identifier) << "is defined!";
@@ -621,209 +624,212 @@ namespace yy {
                 currentCode->identifiersHash[*(yystack_[0].value.identifier)] = new Global::ZVariant;
                 delete (yystack_[0].value.identifier);
             }
-#line 625 "zScript.tab.cpp" // lalr1.cc:859
+#line 628 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 12:
-#line 90 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 93 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.node) = new Global::Node(Global::Node::Variant);
                 (yylhs.value.node)->name = *(yystack_[0].value.identifier);
                 delete (yystack_[0].value.identifier);
             }
-#line 635 "zScript.tab.cpp" // lalr1.cc:859
+#line 638 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 13:
-#line 95 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 98 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), (yystack_[0].value.node));
 
                 (yylhs.value.node)->value = (yystack_[2].value.node)->value;
             }
-#line 645 "zScript.tab.cpp" // lalr1.cc:859
+#line 648 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 14:
-#line 100 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 103 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.node) = (yystack_[3].value.node);
                 /// TODO
             }
-#line 654 "zScript.tab.cpp" // lalr1.cc:859
+#line 657 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 15:
-#line 104 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 107 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 Global::Node *child_node = new Global::Node(Global::Node::Add, (yystack_[2].value.node), (yystack_[0].value.node));
 
                 (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
                 (yylhs.value.node)->value = (yystack_[2].value.node)->value;
             }
-#line 665 "zScript.tab.cpp" // lalr1.cc:859
+#line 668 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 16:
-#line 110 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 113 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 Global::Node *child_node = new Global::Node(Global::Node::Sub, (yystack_[2].value.node), (yystack_[0].value.node));
 
                 (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
                 (yylhs.value.node)->value = (yystack_[2].value.node)->value;
             }
-#line 676 "zScript.tab.cpp" // lalr1.cc:859
+#line 679 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 17:
-#line 116 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 119 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 Global::Node *child_node = new Global::Node(Global::Node::Mul, (yystack_[2].value.node), (yystack_[0].value.node));
 
                 (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
                 (yylhs.value.node)->value = (yystack_[2].value.node)->value;
             }
-#line 687 "zScript.tab.cpp" // lalr1.cc:859
+#line 690 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 18:
-#line 122 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 125 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 Global::Node *child_node = new Global::Node(Global::Node::Div, (yystack_[2].value.node), (yystack_[0].value.node));
 
                 (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
                 (yylhs.value.node)->value = (yystack_[2].value.node)->value;
             }
-#line 698 "zScript.tab.cpp" // lalr1.cc:859
+#line 701 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 19:
-#line 128 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 131 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 Global::Node *child_node = new Global::Node(Global::Node::And, (yystack_[2].value.node), (yystack_[0].value.node));
 
                 (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
                 (yylhs.value.node)->value = (yystack_[2].value.node)->value;
             }
-#line 709 "zScript.tab.cpp" // lalr1.cc:859
+#line 712 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 20:
-#line 134 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 137 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 Global::Node *child_node = new Global::Node(Global::Node::Or, (yystack_[2].value.node), (yystack_[0].value.node));
 
                 (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
                 (yylhs.value.node)->value = (yystack_[2].value.node)->value;
             }
-#line 720 "zScript.tab.cpp" // lalr1.cc:859
+#line 723 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 21:
-#line 140 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 143 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 Global::Node *child_node = new Global::Node(Global::Node::Xor, (yystack_[2].value.node), (yystack_[0].value.node));
 
                 (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
                 (yylhs.value.node)->value = (yystack_[2].value.node)->value;
             }
-#line 731 "zScript.tab.cpp" // lalr1.cc:859
+#line 734 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 22:
-#line 146 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 149 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 Global::Node *child_node = new Global::Node(Global::Node::Mod, (yystack_[2].value.node), (yystack_[0].value.node));
 
                 (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
                 (yylhs.value.node)->value = (yystack_[2].value.node)->value;
             }
-#line 742 "zScript.tab.cpp" // lalr1.cc:859
+#line 745 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 23:
-#line 152 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 155 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.node) = new Global::Node(Global::Node::PrefixAddSelf, Q_NULLPTR, (yystack_[0].value.node));
                 (yylhs.value.node)->value = (yystack_[0].value.node)->value;
             }
-#line 751 "zScript.tab.cpp" // lalr1.cc:859
+#line 754 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 24:
-#line 156 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 159 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.node) = new Global::Node(Global::Node::PrefixSubSelf, Q_NULLPTR, (yystack_[0].value.node));
                 (yylhs.value.node)->value = (yystack_[0].value.node)->value;
             }
-#line 760 "zScript.tab.cpp" // lalr1.cc:859
+#line 763 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 25:
-#line 160 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 163 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.node) = new Global::Node(Global::Node::PostfixAddSelf, (yystack_[1].value.node), Q_NULLPTR);
                 (yylhs.value.node)->value = (yystack_[1].value.node)->value;
             }
-#line 769 "zScript.tab.cpp" // lalr1.cc:859
+#line 772 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 26:
-#line 164 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 167 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.node) = new Global::Node(Global::Node::PostfixSubSelf, (yystack_[1].value.node), Q_NULLPTR);
                 (yylhs.value.node)->value = (yystack_[1].value.node)->value;
             }
-#line 778 "zScript.tab.cpp" // lalr1.cc:859
+#line 781 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 27:
-#line 170 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 173 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.node) = new Global::Node(Global::Node::Constant);
                 (yylhs.value.node)->value = new Global::ZVariant;
             }
-#line 787 "zScript.tab.cpp" // lalr1.cc:859
+#line 790 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 28:
-#line 174 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 177 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.node) = new Global::Node(Global::Node::Constant);
                 (yylhs.value.node)->value = (yystack_[0].value.value);
             }
-#line 796 "zScript.tab.cpp" // lalr1.cc:859
+#line 799 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 29:
-#line 178 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 181 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 /// TODO
                 (yylhs.value.node) = Q_NULLPTR;
             }
-#line 805 "zScript.tab.cpp" // lalr1.cc:859
+#line 808 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 30:
-#line 182 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 185 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 /// TODO
                 (yylhs.value.node) = Q_NULLPTR;
             }
-#line 814 "zScript.tab.cpp" // lalr1.cc:859
+#line 817 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 31:
-#line 186 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 189 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                /// TODO
-                (yylhs.value.node) = Q_NULLPTR;
+                Global::Node *propertyName = new Global::Node(Global::Node::Constant);
+
+                propertyName->value = new Global::ZVariant(QString(*(yystack_[0].value.identifier)));
+                (yylhs.value.node) = new Global::Node(Global::Node::Get, (yystack_[2].value.node), propertyName);
+                (yylhs.value.node)->value = new Global::ZVariant();
             }
-#line 823 "zScript.tab.cpp" // lalr1.cc:859
+#line 829 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 32:
-#line 190 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 196 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -834,11 +840,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::Add, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 838 "zScript.tab.cpp" // lalr1.cc:859
+#line 844 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 33:
-#line 200 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 206 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -849,11 +855,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::Sub, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 853 "zScript.tab.cpp" // lalr1.cc:859
+#line 859 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 34:
-#line 210 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 216 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -864,11 +870,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::Mul, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 868 "zScript.tab.cpp" // lalr1.cc:859
+#line 874 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 35:
-#line 220 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 226 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -879,11 +885,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::Div, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 883 "zScript.tab.cpp" // lalr1.cc:859
+#line 889 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 36:
-#line 230 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 236 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -894,11 +900,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::And, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 898 "zScript.tab.cpp" // lalr1.cc:859
+#line 904 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 37:
-#line 240 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 246 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -909,11 +915,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::Or, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 913 "zScript.tab.cpp" // lalr1.cc:859
+#line 919 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 38:
-#line 250 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 256 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -924,11 +930,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::Xor, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 928 "zScript.tab.cpp" // lalr1.cc:859
+#line 934 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 39:
-#line 260 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 266 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -939,11 +945,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::Mod, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 943 "zScript.tab.cpp" // lalr1.cc:859
+#line 949 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 40:
-#line 270 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 276 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -954,11 +960,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::EQ, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 958 "zScript.tab.cpp" // lalr1.cc:859
+#line 964 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 41:
-#line 280 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 286 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -969,11 +975,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::NEQ, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 973 "zScript.tab.cpp" // lalr1.cc:859
+#line 979 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 42:
-#line 290 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 296 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -984,11 +990,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::LE, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 988 "zScript.tab.cpp" // lalr1.cc:859
+#line 994 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 43:
-#line 300 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 306 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -999,11 +1005,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::GE, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 1003 "zScript.tab.cpp" // lalr1.cc:859
+#line 1009 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 44:
-#line 310 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 316 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -1014,11 +1020,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::LAnd, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 1018 "zScript.tab.cpp" // lalr1.cc:859
+#line 1024 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 45:
-#line 320 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 326 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.node)->nodeType == Global::Node::Constant
                             && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
@@ -1029,11 +1035,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::LOr, (yystack_[2].value.node), (yystack_[0].value.node));
                     }
             }
-#line 1033 "zScript.tab.cpp" // lalr1.cc:859
+#line 1039 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 46:
-#line 330 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 336 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[0].value.node)->nodeType == Global::Node::Constant) {
                         (yylhs.value.node) = (yystack_[0].value.node);
@@ -1042,11 +1048,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::Contrary, Q_NULLPTR, (yystack_[0].value.node));
                     }
                 }
-#line 1046 "zScript.tab.cpp" // lalr1.cc:859
+#line 1052 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 47:
-#line 338 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 344 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[0].value.node)->nodeType == Global::Node::Constant) {
                         (yylhs.value.node) = (yystack_[0].value.node);
@@ -1055,11 +1061,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::Not, Q_NULLPTR, (yystack_[0].value.node));
                     }
                 }
-#line 1059 "zScript.tab.cpp" // lalr1.cc:859
+#line 1065 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 48:
-#line 346 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 352 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[0].value.node)->nodeType == Global::Node::Constant) {
                         (yylhs.value.node) = (yystack_[0].value.node);
@@ -1068,11 +1074,11 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::Minus, Q_NULLPTR, (yystack_[0].value.node));
                     }
                 }
-#line 1072 "zScript.tab.cpp" // lalr1.cc:859
+#line 1078 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 49:
-#line 354 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 360 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[0].value.node)->nodeType == Global::Node::Constant) {
                         (yylhs.value.node) = (yystack_[0].value.node);
@@ -1081,17 +1087,17 @@ namespace yy {
                         (yylhs.value.node) = new Global::Node(Global::Node::Abs, Q_NULLPTR, (yystack_[0].value.node));
                     }
                 }
-#line 1085 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 50:
-#line 362 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    { (yylhs.value.node) = (yystack_[1].value.node);}
 #line 1091 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
+  case 50:
+#line 368 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    { (yylhs.value.node) = (yystack_[1].value.node);}
+#line 1097 "zScript.tab.cpp" // lalr1.cc:859
+    break;
 
-#line 1095 "zScript.tab.cpp" // lalr1.cc:859
+
+#line 1101 "zScript.tab.cpp" // lalr1.cc:859
             default:
               break;
             }
@@ -1558,13 +1564,13 @@ namespace yy {
   const unsigned short int
   parser::yyrline_[] =
   {
-       0,    60,    60,    61,    62,    65,    70,    71,    76,    85,
-      88,    88,    90,    95,   100,   104,   110,   116,   122,   128,
-     134,   140,   146,   152,   156,   160,   164,   170,   174,   178,
-     182,   186,   190,   200,   210,   220,   230,   240,   250,   260,
-     270,   280,   290,   300,   310,   320,   330,   338,   346,   354,
-     362,   365,   365,   367,   368,   369,   370,   372,   373,   374,
-     375,   376
+       0,    63,    63,    64,    65,    68,    73,    74,    79,    88,
+      91,    91,    93,    98,   103,   107,   113,   119,   125,   131,
+     137,   143,   149,   155,   159,   163,   167,   173,   177,   181,
+     185,   189,   196,   206,   216,   226,   236,   246,   256,   266,
+     276,   286,   296,   306,   316,   326,   336,   344,   352,   360,
+     368,   371,   371,   373,   374,   375,   376,   378,   379,   380,
+     381,   382
   };
 
   // Print the state stack on the debug stream.
@@ -1648,18 +1654,20 @@ namespace yy {
 
 
 } // yy
-#line 1652 "zScript.tab.cpp" // lalr1.cc:1167
-#line 379 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
+#line 1658 "zScript.tab.cpp" // lalr1.cc:1167
+#line 385 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
 
 
 yyFlexLexer *flexLexer;
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication a(argc, argv);
+
     rootCode = new Global::Code();
     currentCode = rootCode;
 
-    rootCode->identifiersHash["console"] = new Global::ZVariant(new Global::ZObject);
+    rootCode->identifiersHash["console"] = new Global::ZVariant(new Global::ZConsole);
 
     if(argc > 1) {
         freopen(argv[1], "r", stdin);
@@ -1669,7 +1677,9 @@ int main(int argc, char *argv[])
 
     yy::parser parser;
 
-    return parser.parse();
+    QtConcurrent::run(QThreadPool::globalInstance(), &parser, &yy::parser::parse);
+
+    return a.exec();
 }
 
 void yy::parser::error(const location_type& loc, const std::string& msg)
@@ -1684,4 +1694,13 @@ int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)
     yyloc = location;
 
     return flexLexer->yylex();
+}
+
+int yyFlexLexer::yywrap()
+{
+    zDebug << "finished!";
+
+    rootCode->exec();
+
+    return 1;
 }

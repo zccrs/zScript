@@ -11,10 +11,8 @@ yy::parser::location_type *yyloc = Q_NULLPTR;
 identifier [a-zA-Z_][a-zA-Z0-9_]*
 number [1-9][0-9]*
 real ({number}|0)\.[0-9]+
-operator [-+*/=!<>,;{}\(\)\[\]&\|\^%~]
+operator [-+*/=!<>,;{}\(\)\[\]&\|\^%~.]
 ignore [ \t]
-
-%option noyywrap
 
 %%
 {ignore}

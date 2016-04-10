@@ -2,6 +2,11 @@
 
 #include <QFile>
 #include <QVariant>
+#include <QMetaMethod>
+#include <QMetaType>
+#include <QTimer>
+
+#include <iostream>
 
 namespace Global {
 
@@ -268,7 +273,7 @@ QDebug operator<<(QDebug deg, const ZVariant &var)
     switch(var.type()) {
     case ZVariant::Null:
     case ZVariant::Object:
-        deg.nospace() << var.toObject();
+        deg.nospace() << QByteArray::number(qlonglong(var.toObject()));
         break;
     case ZVariant::List:
         deg.nospace() << var.toList();
@@ -290,7 +295,9 @@ QDebug operator<<(QDebug deg, const ZVariant &var)
 ZObject::ZObject(ZObject *parent)
     : QObject(parent)
 {
+    /// call later
 
+    QMetaObject::invokeMethod(this, "initFunctionProperty", Qt::QueuedConnection);
 }
 
 ZVariant ZObject::property(const char *name) const
@@ -301,6 +308,51 @@ ZVariant ZObject::property(const char *name) const
 void ZObject::setProperty(const char *name, const ZVariant &value)
 {
     QObject::setProperty(name, value.toQVariant());
+}
+
+void ZObject::addFunctionProperty(const char *name)
+{
+    setProperty(name, new ZFunction(this, name, this));
+}
+
+void ZObject::initFunctionProperty()
+{
+    const QMetaObject *meta = this->metaObject();
+
+    int methodOffse = meta->methodOffset();
+    int methodCount = meta->methodCount();
+
+    for(int i = methodOffse; i < methodOffse + methodCount; ++i) {
+        const QMetaMethod &method = meta->method(i);
+
+        if(QByteArray(method.name()) == "call")
+            continue;
+
+        if(QByteArray(QMetaType::typeName(method.returnType())) == "QList<ZVariant*>"
+                && method.parameterCount() == 1
+                && QByteArray(QMetaType::typeName(method.parameterType(0))) == "QList<ZVariant*>") {
+            addFunctionProperty(method.name());
+        }
+    }
+}
+
+ZFunction::ZFunction(ZObject *target, const char *name, ZObject *parent)
+    : ZObject(parent)
+    , m_target(target)
+    , m_methodName(name)
+{
+
+}
+
+const QList<ZVariant *> ZFunction::call(const QList<ZVariant *> &args) const
+{
+    QList<ZVariant*> retVal;
+
+    zDebug << QMetaObject::invokeMethod(m_target, m_methodName.constData(),
+                              Q_RETURN_ARG(QList<ZVariant*>, retVal),
+                              Q_ARG(const QList<ZVariant*>, args));
+
+    return retVal;
 }
 
 /// global
@@ -672,6 +724,12 @@ Node::Node(OperatorType t, Node *l, Node *r)
 
 void Node::recursion()
 {
+    if(left)
+        left->codeEnv = codeEnv;
+
+    if(right)
+        right->codeEnv = codeEnv;
+
     switch(nodeType) {
     case Assign:
         if(left->value)
@@ -762,6 +820,12 @@ void Node::recursion()
     case LOr:
         *value = left->recursionAndGetValue() || right->recursionAndGetValue();
         break;
+    case Get: {
+        ZObject *obj = left->recursionAndGetValue().toObject();
+
+        *value = obj->property(right->value->toString().toLatin1().constData());
+        break;
+    }
     case Variant: {
         value = codeEnv->variantValue(name);
         break;
@@ -776,9 +840,9 @@ Code::Code(Code *p)
 
 }
 
-ZVariant *Code::variantValue(const QByteArray &name)
+ZVariant *Code::variantValue(const QByteArray &name) const
 {
-    Code *code = this;
+    const Code *code = this;
 
     do {
         if(identifiersHash.contains(name))
@@ -792,8 +856,31 @@ ZVariant *Code::variantValue(const QByteArray &name)
 
 void Code::exec() const
 {
-    for(Node *node : nodeList)
+    for(Node *node : nodeList) {
+        node->codeEnv = const_cast<Code*>(this);
         node->recursion();
+    }
+}
+
+ZConsole::ZConsole(ZObject *parent)
+    : ZObject(parent)
+{
+    qRegisterMetaType<QList<ZVariant*>>("QList<ZVariant*>");
+}
+
+const QList<ZVariant *> ZConsole::log(const QList<ZVariant *> &args) const
+{
+    QList<ZVariant*> list;
+
+    if(args.isEmpty())
+        return list;
+
+    for(int i = 0; i < args.count() - 1; ++i)
+        zStandardPrint << args.at(i)->toString().toStdString() << " ";
+
+    zStandardPrint << args.last()->toString().toStdString() << std::endl;
+
+    return list;
 }
 
 }/// namespace Global end

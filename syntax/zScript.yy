@@ -6,6 +6,9 @@
 
 #include "lex.yy.cpp"
 
+#include <QCoreApplication>
+#include <QtConcurrent/QtConcurrentRun>
+
 #include <fstream>
 
 int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location);
@@ -24,7 +27,6 @@ Global::Code *rootCode = Q_NULLPTR;
     Global::ZVariant *value;
     QByteArray *identifier;
     Global::Node *node;
-    QList<Global::Node*> *nodeList;
 };
 
 /// keyword
@@ -54,6 +56,7 @@ Global::Code *rootCode = Q_NULLPTR;
 %left '(' ')'
 
 %type <node> expression lvalue rvalue
+%type <value> arguments
 
 %%
 
@@ -184,8 +187,11 @@ rvalue:     {
                 $$ = Q_NULLPTR;
             }
             | expression '.' IDENTIFIER {
-                /// TODO
-                $$ = Q_NULLPTR;
+                Global::Node *propertyName = new Global::Node(Global::Node::Constant);
+
+                propertyName->value = new Global::ZVariant(QString(*$3));
+                $$ = new Global::Node(Global::Node::Get, $1, propertyName);
+                $$->value = new Global::ZVariant();
             }
             | expression '+' expression {
                     if($1->nodeType == Global::Node::Constant
@@ -362,7 +368,12 @@ rvalue:     {
             | '(' expression ')' { $$ = $2;}
             ;
 
-arguments:  expression | arguments ',' expression;
+arguments:  expression
+            | arguments ',' expression {
+                    $$ = new Global::Node(Global::Node::Comma, $1, $3);
+                    $$->value = new Global::ZVariant(Global::ZVariant::List);
+            }
+            ;
 
 branch_head:IF '(' expression ')'
             | WHILE '(' expression ')'
@@ -382,10 +393,12 @@ yyFlexLexer *flexLexer;
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication a(argc, argv);
+
     rootCode = new Global::Code();
     currentCode = rootCode;
 
-    rootCode->identifiersHash["console"] = new Global::ZVariant(new Global::ZObject);
+    rootCode->identifiersHash["console"] = new Global::ZVariant(new Global::ZConsole);
 
     if(argc > 1) {
         freopen(argv[1], "r", stdin);
@@ -395,7 +408,9 @@ int main(int argc, char *argv[])
 
     yy::parser parser;
 
-    return parser.parse();
+    QtConcurrent::run(QThreadPool::globalInstance(), &parser, &yy::parser::parse);
+
+    return a.exec();
 }
 
 void yy::parser::error(const location_type& loc, const std::string& msg)
@@ -410,4 +425,13 @@ int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)
     yyloc = location;
 
     return flexLexer->yylex();
+}
+
+int yyFlexLexer::yywrap()
+{
+    zDebug << "finished!";
+
+    rootCode->exec();
+
+    return 1;
 }

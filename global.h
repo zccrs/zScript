@@ -135,6 +135,25 @@ public:
 
 public slots:
     void setProperty(const char *name, const ZVariant &value);
+    void addFunctionProperty(const char *name);
+
+private slots:
+    void initFunctionProperty();
+};
+
+class ZFunction : public ZObject
+{
+    Q_OBJECT
+
+public:
+    explicit ZFunction(ZObject *target, const char *name, ZObject *parent = 0);
+
+public slots:
+    const QList<ZVariant*> call(const QList<ZVariant*> &args) const;
+
+private:
+    ZObject *m_target;
+    QByteArray m_methodName;
 };
 
 /// int
@@ -266,6 +285,8 @@ struct Node
         PostfixAddSelf,     // ++
         PrefixSubSelf,      // --
         PostfixSubSelf,     // --
+        Get,                // .
+        Comma,              // ,
         Variant,
         Constant,
         Unknow
@@ -294,9 +315,20 @@ struct Code
 
     Code(Code *parent = Q_NULLPTR);
 
-    ZVariant *variantValue(const QByteArray &name);
+    ZVariant *variantValue(const QByteArray &name) const;
 
     void exec() const;
+};
+
+class ZConsole : public ZObject
+{
+    Q_OBJECT
+
+public:
+    explicit ZConsole(ZObject *parent = 0);
+
+public slots:
+    const QList<ZVariant*> log(const QList<ZVariant*> &args) const;
 };
 
 }/// namespace Global end

@@ -1,6 +1,6 @@
 TARGET = zScript
 
-QT += core
+QT += core concurrent
 QT -= gui
 
 CONFIG += c++11
