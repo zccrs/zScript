@@ -664,38 +664,136 @@ QByteArray readFile(const QString &fileName)
     return re;
 }
 
-QHash<QByteArray, IdentifierValue*> identifiersHash;
-
-ZVariant &NodeValue::getValue() const
+Node::Node(OperatorType t, Node *l, Node *r)
+    :left(l), right(r), nodeType(t)
 {
-    switch(operatorType) {
-    case '=': {
-        if(right)
-            *left = right->getValue();
+
+}
+
+void Node::recursion()
+{
+    switch(nodeType) {
+    case Assign:
+        if(left->value)
+            *left->value = right->recursionAndGetValue();
         else
-            *left = ZVariant();
+            zError << "Undefined reference";
+        break;
+    case Add:
+        *value = left->recursionAndGetValue() + right->recursionAndGetValue();
+        break;
+    case Sub:
+        *value = left->recursionAndGetValue() - right->recursionAndGetValue();
+        break;
+    case Mul:
+        *value = left->recursionAndGetValue() * right->recursionAndGetValue();
+        break;
+    case Div:
+        *value = left->recursionAndGetValue() / right->recursionAndGetValue();
+        break;
+    case Abs:
+        *value = +right->recursionAndGetValue();
+        break;
+    case Minus:
+        *value = -right->recursionAndGetValue();
+        break;
+    case And:
+        *value = left->recursionAndGetValue() & right->recursionAndGetValue();
+        break;
+    case Or:
+        *value = left->recursionAndGetValue() | right->recursionAndGetValue();
+        break;
+    case Xor:
+        *value = left->recursionAndGetValue() ^ right->recursionAndGetValue();
+        break;
+    case Contrary:
+        *value = ~left->recursionAndGetValue();
+        break;
+    case Mod:
+        *value = left->recursionAndGetValue() % right->recursionAndGetValue();
+        break;
+    case Not:
+        *value = !left->recursionAndGetValue();
+        break;
+    case Less:
+        *value = left->recursionAndGetValue() < right->recursionAndGetValue();
+        break;
+    case Greater:
+        *value = left->recursionAndGetValue() > right->recursionAndGetValue();
+        break;
+    case New:
+        /// TODO
+        break;
+    case Delete:
+        /// TODO
+        break;
+    case Throw:
+        /// TODO
+        break;
+    case EQ:
+        *value = left->recursionAndGetValue() == right->recursionAndGetValue();
+        break;
+    case STEQ: {
+        const ZVariant &v1 = left->recursionAndGetValue();
+        const ZVariant &v2 = right->recursionAndGetValue();
 
+        *value = v1.type() == v2.type() && v1 == v2;
         break;
     }
-    case '+': {
-        *value = left->getValue() + right->getValue();
+    case NEQ:
+        *value = left->recursionAndGetValue() != right->recursionAndGetValue();
         break;
-    }
-    case '-': {
-        *value = left->getValue() - right->getValue();
-        break;
-    }
-    case '*': {
-        *value = left->getValue() * right->getValue();
-        break;
-    }
-    case '/': {
-        *value = left->getValue() / right->getValue();
-        break;
-    }
-    }
+    case STNEQ: {
+        const ZVariant &v1 = left->recursionAndGetValue();
+        const ZVariant &v2 = right->recursionAndGetValue();
 
-    return *value;
+        *value = v1.type() != v2.type() || v1 != v2;
+        break;
+    }
+    case LE:
+        *value = left->recursionAndGetValue() <= right->recursionAndGetValue();
+        break;
+    case GE:
+        *value = left->recursionAndGetValue() >= right->recursionAndGetValue();
+        break;
+    case LAnd:
+        *value = left->recursionAndGetValue() && right->recursionAndGetValue();
+        break;
+    case LOr:
+        *value = left->recursionAndGetValue() || right->recursionAndGetValue();
+        break;
+    case Variant: {
+        value = codeEnv->variantValue(name);
+        break;
+    }
+    default: break;
+    }
+}
+
+Code::Code(Code *p)
+    : parent(p)
+{
+
+}
+
+ZVariant *Code::variantValue(const QByteArray &name)
+{
+    Code *code = this;
+
+    do {
+        if(identifiersHash.contains(name))
+            return identifiersHash.value(name);
+
+        code = code->parent;
+    } while(code);
+
+    return Q_NULLPTR;
+}
+
+void Code::exec() const
+{
+    for(Node *node : nodeList)
+        node->recursion();
 }
 
 }/// namespace Global end

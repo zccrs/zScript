@@ -230,38 +230,74 @@ ZVariant operator ~(const ZVariant &var);
 
 QByteArray readFile(const QString &fileName);
 
-struct IdentifierValue
-{
-    ZVariant *value;
-    QByteArray name;
-};
+struct Code;
 
-struct NodeValue
+struct Node
 {
-    NodeValue *left = Q_NULLPTR;
-    NodeValue *right = Q_NULLPTR;
+    enum OperatorType
+    {
+        Assign,             // =
+        Add,                // +
+        Sub,                // -
+        Mul,                // *
+        Div,                // /
+        Abs,                // +
+        Minus,              // -
+        And,                // &
+        Or,                 // |
+        Xor,                // ^
+        Contrary,           // ~
+        Mod,                // %
+        Not,                // !
+        Less,               // <
+        Greater,            // >
+        New,                // new
+        Delete,             // delete
+        Throw,              // throw
+        EQ,                 // ==
+        STEQ,               // ===
+        NEQ,                // !=
+        STNEQ,              // !==
+        LE,                 // <=
+        GE,                 // >=
+        LAnd,               // &&
+        LOr,                // ||
+        PrefixAddSelf,      // ++
+        PostfixAddSelf,     // ++
+        PrefixSubSelf,      // --
+        PostfixSubSelf,     // --
+        Variant,
+        Constant,
+        Unknow
+    };
+
+    Code *codeEnv = Q_NULLPTR;
+    Node *left = Q_NULLPTR;
+    Node *right = Q_NULLPTR;
     ZVariant *value = Q_NULLPTR;
-    int operatorType = -1;
+    QByteArray name;
+    OperatorType nodeType = Unknow;
 
-    NodeValue(ZVariant *v, int o = -1, NodeValue *l = Q_NULLPTR, NodeValue *r = Q_NULLPTR)
-        :left(l), right(r), value(v), operatorType(o){}
+    Node(OperatorType t, Node *l = Q_NULLPTR, Node *r = Q_NULLPTR);
 
-    inline void operator =(int operatorType)
-    { this->operatorType = operatorType;}
+    void recursion();
 
-    inline void operator =(ZVariant *value)
-    { this->value = value;}
-
-    inline void operator =(const ZVariant &value)
-    {*this->value = value;}
-
-    inline void operator =(ZVariant &&value)
-    { qSwap(*this->value, value);}
-
-    ZVariant &getValue() const;
+    inline ZVariant &recursionAndGetValue()
+    {recursion(); return *value;}
 };
 
-extern QHash<QByteArray, IdentifierValue*> identifiersHash;
+struct Code
+{
+    Code *parent = Q_NULLPTR;
+    QList<Node*> nodeList;
+    QHash<QByteArray, ZVariant*> identifiersHash;
+
+    Code(Code *parent = Q_NULLPTR);
+
+    ZVariant *variantValue(const QByteArray &name);
+
+    void exec() const;
+};
 
 }/// namespace Global end
 

@@ -6,7 +6,13 @@
 
 #include "lex.yy.cpp"
 
+#include <fstream>
+
 int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location);
+
+Global::Code *currentCode = Q_NULLPTR;
+Global::Code *rootCode = Q_NULLPTR;
+
 %}
 
 /// enable debug
@@ -16,28 +22,29 @@ int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location);
 
 %union{
     Global::ZVariant *value;
-    Global::IdentifierValue *identifier;
-    Global::NodeValue *node;
+    QByteArray *identifier;
+    Global::Node *node;
+    QList<Global::Node*> *nodeList;
 };
 
 /// keyword
-%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE
+%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR
 
 /// data type
-%token <value> VARIANT
+%token <value> CONSTANT
 
 /// identifier
 %token <identifier> IDENTIFIER
 
-///   ==/=== !=/!==   <= >= &&  ||   ++      --
-%token  EQ     NEQ    LE GE AND OR ADDSELF SUBSELF
+///     ==  ===    !=  !==  <= >= &&   ||   ++      --
+%token  EQ  STEQ  NEQ STNEQ LE GE LAND LOR ADDSELF SUBSELF
 ///     /=  *=  +=  -=   %=    &=    |=   ^=
 %token  DEQ MEQ AEQ SEQ MODEQ ANDEQ OREQ XOREQ
 
 %left ','
 %right '=' DEQ MEQ AEQ SEQ MODEQ ANDEQ OREQ XOREQ
 %left '?' ':'
-%left AND OR
+%left LAND LOR
 %left '&' '|' '^'
 %left EQ NEQ
 %left '>' '<' GE LE
@@ -46,152 +53,312 @@ int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location);
 %right UMINUS ADDSELF SUBSELF '!' '~'
 %left '(' ')'
 
-%type <identifier> statement
-%type <value> start assign expression
+%type <node> expression lvalue rvalue
 
 %%
 
-start:      {$$ = Q_NULLPTR;}
-            | start ';'
-            | start statement ';' {
-
-            }
+start:
+            | start statement ';'
             | start expression ';' {
-                $$ = $2;
-                std::cout << "(" << $$->typeName() << "," << $$->toString().toStdString() << ")" << std::endl;
+                currentCode->nodeList << $2;
             }
             | start conditional {
-
+                //currentCode->nodeList << $2;
             }
             ;
 
-statement:  VAR define {
-                if(Global::identifiersHash.contains($2->name)) {
-                    std::cerr << $2->name.constData() << " is defined!" << std::endl;
+statement:  VAR define
+            | FUNCTION IDENTIFIER '(' define ')' '{' start '}' {
+                /// TODO
+            }
+            ;
+
+define:     IDENTIFIER {
+                if(currentCode->identifiersHash.contains(*$1)) {
+                    zError << *$1 << "is defined!";
                     YYERROR;
-                } else {
-                    $2->value = new Global::ZVariant;
-                    Global::identifiersHash[$2->name] = $2;
                 }
 
-                $$ = $2;
+                currentCode->identifiersHash[*$1] = new Global::ZVariant;
+                delete $1;
             }
-            | FUNCTION IDENTIFIER '(' define ')' '{' start '}' {
-                zInfo << "function name: " << $2->name;
-            }
-            ;
-
-define:     IDENTIFIER
             | define ',' define
-            | IDENTIFIER '=' expression
             ;
 
-expression:    lvalue | rvalue;
+expression: lvalue | rvalue;
 
-lvalue:     IDENTIFIER
-            | lvalue '=' expression
-            | variant '[' expression ']'
-            | lvalue AEQ expression {
-                *$1 += *$3;
+lvalue:     IDENTIFIER {
+                $$ = new Global::Node(Global::Node::Variant);
+                $$->name = *$1;
+                delete $1;
+            }
+            | lvalue '=' expression {
+                $$ = new Global::Node(Global::Node::Assign, $1, $3);
+
+                $$->value = $1->value;
+            }
+            | expression '[' expression ']' {
                 $$ = $1;
+                /// TODO
+            }
+            | lvalue AEQ expression {
+                Global::Node *child_node = new Global::Node(Global::Node::Add, $1, $3);
+
+                $$ = new Global::Node(Global::Node::Assign, $1, child_node);
+                $$->value = $1->value;
             }
             | lvalue SEQ expression {
-                *$1 -= *$3;
-                $$ = $1;
+                Global::Node *child_node = new Global::Node(Global::Node::Sub, $1, $3);
+
+                $$ = new Global::Node(Global::Node::Assign, $1, child_node);
+                $$->value = $1->value;
             }
             | lvalue MEQ expression {
-                *$1 *= *$3;
-                $$ = $1;
+                Global::Node *child_node = new Global::Node(Global::Node::Mul, $1, $3);
+
+                $$ = new Global::Node(Global::Node::Assign, $1, child_node);
+                $$->value = $1->value;
             }
             | lvalue DEQ expression {
-                *$1 /= *$3;
-                $$ = $1;
+                Global::Node *child_node = new Global::Node(Global::Node::Div, $1, $3);
+
+                $$ = new Global::Node(Global::Node::Assign, $1, child_node);
+                $$->value = $1->value;
             }
             | lvalue ANDEQ expression {
-                *$1 &= *$3;
-                $$ = $1;
+                Global::Node *child_node = new Global::Node(Global::Node::And, $1, $3);
+
+                $$ = new Global::Node(Global::Node::Assign, $1, child_node);
+                $$->value = $1->value;
             }
             | lvalue OREQ expression {
-                *$1 |= *$3;
-                $$ = $1;
+                Global::Node *child_node = new Global::Node(Global::Node::Or, $1, $3);
+
+                $$ = new Global::Node(Global::Node::Assign, $1, child_node);
+                $$->value = $1->value;
             }
             | lvalue XOREQ expression {
-                *$1 ^= *$3;
-                $$ = $1;
+                Global::Node *child_node = new Global::Node(Global::Node::Xor, $1, $3);
+
+                $$ = new Global::Node(Global::Node::Assign, $1, child_node);
+                $$->value = $1->value;
             }
             | lvalue MODEQ expression {
-                *$1 %= *$3;
-                $$ = $1;
+                Global::Node *child_node = new Global::Node(Global::Node::Mod, $1, $3);
+
+                $$ = new Global::Node(Global::Node::Assign, $1, child_node);
+                $$->value = $1->value;
             }
             | ADDSELF lvalue {
-                ++*$2;
-                $$ = $2;
+                $$ = new Global::Node(Global::Node::PrefixAddSelf, Q_NULLPTR, $2);
+                $$->value = $2->value;
             }
             | SUBSELF lvalue {
-                --*$2;
-                $$ = $2;
+                $$ = new Global::Node(Global::Node::PrefixSubSelf, Q_NULLPTR, $2);
+                $$->value = $2->value;
             }
             | lvalue ADDSELF {
-                $$ = new Global::ZVariant(*$1);
-                (*$1)++;
+                $$ = new Global::Node(Global::Node::PostfixAddSelf, $1, Q_NULLPTR);
+                $$->value = $1->value;
             }
             | lvalue SUBSELF {
-                $$ = new Global::ZVariant(*$1);
-                (*$1)--;
+                $$ = new Global::Node(Global::Node::PostfixSubSelf, $1, Q_NULLPTR);
+                $$->value = $1->value;
             }
             ;
 
-rvalue:
-            | CONSTANT
-            | NEW IDENTIFIER
-            | expression '(' arguments ')'
-            | expression '.' IDENTIFIER
+rvalue:     {
+                $$ = new Global::Node(Global::Node::Constant);
+                $$->value = new Global::ZVariant;
+            }
+            | CONSTANT {
+                $$ = new Global::Node(Global::Node::Constant);
+                $$->value = $1;
+            }
+            | NEW IDENTIFIER {
+                /// TODO
+                $$ = Q_NULLPTR;
+            }
+            | expression '(' arguments ')' {
+                /// TODO
+                $$ = Q_NULLPTR;
+            }
+            | expression '.' IDENTIFIER {
+                /// TODO
+                $$ = Q_NULLPTR;
+            }
             | expression '+' expression {
-                $$ = new Global::ZVariant(*$1 + *$3);
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value + *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::Add, $1, $3);
+                    }
             }
             | expression '-' expression {
-                $$ = new Global::ZVariant(*$1 - *$3);
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value - *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::Sub, $1, $3);
+                    }
             }
             | expression '*' expression {
-                $$ = new Global::ZVariant(*$1 * *$3);
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value * *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::Mul, $1, $3);
+                    }
             }
             | expression '/' expression {
-                $$ = new Global::ZVariant(*$1 / *$3);
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value / *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::Div, $1, $3);
+                    }
             }
             | expression '&' expression {
-                $$ = new Global::ZVariant(*$1 & *$3);
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value & *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::And, $1, $3);
+                    }
             }
             | expression '|' expression {
-                $$ = new Global::ZVariant(*$1 | *$3);
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value | *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::Or, $1, $3);
+                    }
             }
             | expression '^' expression {
-                $$ = new Global::ZVariant(*$1 ^ *$3);
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value ^ *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::Xor, $1, $3);
+                    }
             }
             | expression '%' expression {
-                $$ = new Global::ZVariant(*$1 % *$3);
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value % *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::Mod, $1, $3);
+                    }
             }
             | expression EQ expression {
-                $$ = new Global::ZVariant(*$1 == *$3);
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value == *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::EQ, $1, $3);
+                    }
             }
             | expression NEQ expression {
-                $$ = new Global::ZVariant(*$1 != *$3);
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value != *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::NEQ, $1, $3);
+                    }
             }
             | expression LE expression {
-                $$ = new Global::ZVariant(*$1 <= *$3);
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value <= *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::LE, $1, $3);
+                    }
             }
             | expression GE expression {
-                $$ = new Global::ZVariant(*$1 >= *$3);
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value >= *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::GE, $1, $3);
+                    }
             }
-            | expression AND expression {
-                $$ = new Global::ZVariant(*$1 && *$3);
+            | expression LAND expression {
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value && *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::LAnd, $1, $3);
+                    }
             }
-            | expression OR expression {
-                $$ = new Global::ZVariant(*$1 || *$3);
+            | expression LOR expression {
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = $1;
+                        $$->value = new Global::ZVariant(*$1->value || *$3->value);
+                        delete $3;
+                    } else {
+                        $$ = new Global::Node(Global::Node::LOr, $1, $3);
+                    }
             }
-            | '~' expression { $$ = new Global::ZVariant(~*$2);}
-            | '!' expression { $$ = new Global::ZVariant(!*$2);}
-            | '-' expression %prec UMINUS { $$ = new Global::ZVariant(-*$2);}
-            | '+' expression %prec UMINUS { $$ = new Global::ZVariant(+*$2);}
+            | '~' expression {
+                    if($2->nodeType == Global::Node::Constant) {
+                        $$ = $2;
+                        *$$->value = ~*$2->value;
+                    } else {
+                        $$ = new Global::Node(Global::Node::Contrary, Q_NULLPTR, $2);
+                    }
+                }
+            | '!' expression {
+                    if($2->nodeType == Global::Node::Constant) {
+                        $$ = $2;
+                        *$$->value = !*$2->value;
+                    } else {
+                        $$ = new Global::Node(Global::Node::Not, Q_NULLPTR, $2);
+                    }
+                }
+            | '-' expression %prec UMINUS {
+                    if($2->nodeType == Global::Node::Constant) {
+                        $$ = $2;
+                        *$$->value = -*$2->value;
+                    } else {
+                        $$ = new Global::Node(Global::Node::Minus, Q_NULLPTR, $2);
+                    }
+                }
+            | '+' expression %prec UMINUS {
+                    if($2->nodeType == Global::Node::Constant) {
+                        $$ = $2;
+                        *$$->value = +*$2->value;
+                    } else {
+                        $$ = new Global::Node(Global::Node::Abs, Q_NULLPTR, $2);
+                    }
+                }
             | '(' expression ')' { $$ = $2;}
             ;
 
@@ -211,10 +378,21 @@ conditional:branch_head '{' start '}'
 
 %%
 
-yyFlexLexer flexLexer;
+yyFlexLexer *flexLexer;
 
-int main()
+int main(int argc, char *argv[])
 {
+    rootCode = new Global::Code();
+    currentCode = rootCode;
+
+    rootCode->identifiersHash["console"] = new Global::ZVariant(new Global::ZObject);
+
+    if(argc > 1) {
+        freopen(argv[1], "r", stdin);
+    }
+
+    flexLexer = new yyFlexLexer();
+
     yy::parser parser;
 
     return parser.parse();
@@ -231,5 +409,5 @@ int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)
     yylval = lval;
     yyloc = location;
 
-    return flexLexer.yylex();
+    return flexLexer->yylex();
 }

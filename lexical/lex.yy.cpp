@@ -222,7 +222,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	yy_size_t yy_n_chars;
+	int yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -794,12 +794,12 @@ YY_RULE_SETUP
 case 24:
 YY_RULE_SETUP
 #line 44 "/home/zhang/projects/zScript/lexical/zScript.ll"
-{ return TOKEN_PREFIX::AND;}
+{ return TOKEN_PREFIX::LAND;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 45 "/home/zhang/projects/zScript/lexical/zScript.ll"
-{ return TOKEN_PREFIX::OR;}
+{ return TOKEN_PREFIX::LOR;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
@@ -807,7 +807,7 @@ YY_RULE_SETUP
 {
     yylval->value = new Global::ZVariant(true);
 
-    return TOKEN_PREFIX::VARIANT;
+    return TOKEN_PREFIX::CONSTANT;
 }
 	YY_BREAK
 case 27:
@@ -816,7 +816,7 @@ YY_RULE_SETUP
 {
     yylval->value = new Global::ZVariant(false);
 
-    return TOKEN_PREFIX::VARIANT;
+    return TOKEN_PREFIX::CONSTANT;
 }
 	YY_BREAK
 case 28:
@@ -852,21 +852,14 @@ case 30:
 YY_RULE_SETUP
 #line 81 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
-    QByteArray name(yytext);
-
-    if(Global::identifiersHash.contains(name)) {
-        yylval->identifier = Global::identifiersHash.value(name);
-    } else {
-        yylval->identifier = new Global::IdentifierValue;
-        yylval->identifier->name = name;
-    }
+    yylval->identifier = new QByteArray(yytext);
 
     return TOKEN_PREFIX::IDENTIFIER;
 }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 94 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 87 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     QByteArray str;
 
@@ -890,12 +883,12 @@ YY_RULE_SETUP
 
     yylval->value = new Global::ZVariant(QString::fromLocal8Bit(str));
 
-    return TOKEN_PREFIX::VARIANT;
+    return TOKEN_PREFIX::CONSTANT;
 }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 120 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 113 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     while(!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
@@ -914,7 +907,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 136 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 129 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     while(!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
@@ -933,28 +926,28 @@ YY_RULE_SETUP
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 152 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 145 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     yylval->value = new Global::ZVariant(atoi(yytext));
 
-    return TOKEN_PREFIX::VARIANT;
+    return TOKEN_PREFIX::CONSTANT;
 }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 158 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 151 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     yylval->value = new Global::ZVariant(atof(yytext));
 
-    return TOKEN_PREFIX::VARIANT;
+    return TOKEN_PREFIX::CONSTANT;
 }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 163 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 156 "/home/zhang/projects/zScript/lexical/zScript.ll"
 ECHO;
 	YY_BREAK
-#line 958 "lex.yy.cpp"
+#line 951 "lex.yy.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1330,9 +1323,9 @@ int yyFlexLexer::yy_get_next_buffer()
 	else
 		ret_val = EOB_ACT_CONTINUE_SCAN;
 
-	if ((yy_size_t) ((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
+	if ((int) ((yy_n_chars) + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
 		/* Extend the array by 50%, plus the number we really need. */
-		yy_size_t new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
+		int new_size = (yy_n_chars) + number_to_move + ((yy_n_chars) >> 1);
 		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) yyrealloc((void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf,new_size  );
 		if ( ! YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
 			YY_FATAL_ERROR( "out of dynamic memory in yy_get_next_buffer()" );
@@ -1909,7 +1902,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 163 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 156 "/home/zhang/projects/zScript/lexical/zScript.ll"
 
 
 

@@ -124,13 +124,14 @@ namespace yy {
     /// Symbol semantic values.
     union semantic_type
     {
-    #line 17 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
+    #line 23 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
 
     Global::ZVariant *value;
-    Global::IdentifierValue *identifier;
-    Global::NodeValue *node;
+    QByteArray *identifier;
+    Global::Node *node;
+    QList<Global::Node*> *nodeList;
 
-#line 134 "zScript.tab.hpp" // lalr1.cc:377
+#line 135 "zScript.tab.hpp" // lalr1.cc:377
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -158,25 +159,28 @@ namespace yy {
         IF = 263,
         ELSE = 264,
         WHILE = 265,
-        VARIANT = 266,
-        IDENTIFIER = 267,
-        EQ = 268,
-        NEQ = 269,
-        LE = 270,
-        GE = 271,
-        AND = 272,
-        OR = 273,
-        ADDSELF = 274,
-        SUBSELF = 275,
-        DEQ = 276,
-        MEQ = 277,
-        AEQ = 278,
-        SEQ = 279,
-        MODEQ = 280,
-        ANDEQ = 281,
-        OREQ = 282,
-        XOREQ = 283,
-        UMINUS = 284
+        FOR = 266,
+        CONSTANT = 267,
+        IDENTIFIER = 268,
+        EQ = 269,
+        STEQ = 270,
+        NEQ = 271,
+        STNEQ = 272,
+        LE = 273,
+        GE = 274,
+        LAND = 275,
+        LOR = 276,
+        ADDSELF = 277,
+        SUBSELF = 278,
+        DEQ = 279,
+        MEQ = 280,
+        AEQ = 281,
+        SEQ = 282,
+        MODEQ = 283,
+        ANDEQ = 284,
+        OREQ = 285,
+        XOREQ = 286,
+        UMINUS = 287
       };
     };
 
@@ -362,9 +366,9 @@ namespace yy {
   // YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
   // positive, shift that token.  If negative, reduce the rule whose
   // number is the opposite.  If YYTABLE_NINF, syntax error.
-  static const unsigned char yytable_[];
+  static const short int yytable_[];
 
-  static const signed char yycheck_[];
+  static const short int yycheck_[];
 
   // YYSTOS[STATE-NUM] -- The (internal number of the) accessing
   // symbol of state STATE-NUM.
@@ -382,7 +386,7 @@ namespace yy {
     static const char* const yytname_[];
 
   // YYRLINE[YYN] -- Source line where rule number YYN was defined.
-  static const unsigned char yyrline_[];
+  static const unsigned short int yyrline_[];
     /// Report on the debug stream that the rule \a r is going to be reduced.
     virtual void yy_reduce_print_ (int r);
     /// Print the state stack on the debug stream.
@@ -481,12 +485,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 205,     ///< Last index in yytable_.
-      yynnts_ = 5,  ///< Number of nonterminal symbols.
+      yylast_ = 853,     ///< Last index in yytable_.
+      yynnts_ = 10,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 51  ///< Number of tokens.
+      yyntokens_ = 57  ///< Number of tokens.
     };
 
 
@@ -495,7 +499,7 @@ namespace yy {
 
 
 } // yy
-#line 499 "zScript.tab.hpp" // lalr1.cc:377
+#line 503 "zScript.tab.hpp" // lalr1.cc:377
 
 
 
