@@ -148,9 +148,9 @@ ZVariant::ZVariant(const QVariant &val)
         data->type = Object;
         break;
     case QVariant::UserType:{
-        if(QString(val.typeName()) == "ZObject*") {
+        if(QString(val.typeName()) == "Global::ZObject*") {
             data->type = toObject() ? Object : Null;
-        } else if(QString(val.typeName()) == "ZVariant") {
+        } else if(QString(val.typeName()) == "Global::ZVariant") {
             data = qvariant_cast<ZVariant>(val).data;
         } else {
             zError << "Unknow Type:" << val.typeName();
@@ -328,9 +328,9 @@ void ZObject::initFunctionProperty()
         if(QByteArray(method.name()) == "call")
             continue;
 
-        if(QByteArray(QMetaType::typeName(method.returnType())) == "QList<ZVariant*>"
+        if(QByteArray(QMetaType::typeName(method.returnType())) == "QList<Global::ZVariant>"
                 && method.parameterCount() == 1
-                && QByteArray(QMetaType::typeName(method.parameterType(0))) == "QList<ZVariant*>") {
+                && method.parameterTypes().first() == "QList<ZVariant>") {
             addFunctionProperty(method.name());
         }
     }
@@ -344,13 +344,13 @@ ZFunction::ZFunction(ZObject *target, const char *name, ZObject *parent)
 
 }
 
-const QList<ZVariant *> ZFunction::call(const QList<ZVariant *> &args) const
+QList<ZVariant> ZFunction::call(const QList<ZVariant> &args) const
 {
-    QList<ZVariant*> retVal;
+    QList<ZVariant> retVal;
 
-    zDebug << QMetaObject::invokeMethod(m_target, m_methodName.constData(),
-                              Q_RETURN_ARG(QList<ZVariant*>, retVal),
-                              Q_ARG(const QList<ZVariant*>, args));
+    QMetaObject::invokeMethod(m_target, m_methodName.constData(),
+//                                          Q_RETURN_ARG(QList<Global::ZVariant>, retVal),
+                              Q_ARG(const QList<ZVariant>, args));
 
     return retVal;
 }
@@ -722,6 +722,18 @@ Node::Node(OperatorType t, Node *l, Node *r)
 
 }
 
+Node::~Node()
+{
+    if(left)
+        delete left;
+
+    if(right)
+        delete right;
+
+    if(value)
+        delete value;
+}
+
 void Node::recursion()
 {
     if(left)
@@ -732,6 +744,8 @@ void Node::recursion()
 
     switch(nodeType) {
     case Assign:
+        left->recursion();
+
         if(left->value)
             *left->value = right->recursionAndGetValue();
         else
@@ -826,6 +840,24 @@ void Node::recursion()
         *value = obj->property(right->value->toString().toLatin1().constData());
         break;
     }
+    case Comma: {
+        const ZVariant &left_value = left->recursionAndGetValue();
+
+        if(left_value.type() == ZVariant::List) {
+            *value = ZVariant(left_value.toList() << right->recursionAndGetValue());
+        } else {
+            *value = QList<ZVariant>() << left_value << right->recursionAndGetValue();
+        }
+        break;
+    }
+    case Call: {
+        const ZFunction *fun = qobject_cast<ZFunction*>(left->recursionAndGetValue().toObject());
+
+        if(fun) {
+            fun->call(right->recursionAndGetValue().toList());
+        }
+        break;
+    }
     case Variant: {
         value = codeEnv->variantValue(name);
         break;
@@ -834,24 +866,25 @@ void Node::recursion()
     }
 }
 
-Code::Code(Code *p)
-    : parent(p)
+ZVariant *CodeData::variantValue(const QByteArray &name) const
 {
-
-}
-
-ZVariant *Code::variantValue(const QByteArray &name) const
-{
-    const Code *code = this;
+    const CodeData *code = this;
 
     do {
         if(identifiersHash.contains(name))
             return identifiersHash.value(name);
 
-        code = code->parent;
+        code = code->parent.constData();
     } while(code);
 
     return Q_NULLPTR;
+}
+
+Code::Code(Code *p)
+    : data(new CodeData)
+{
+    if(p)
+        data->parent = p->data.constData()->parent;
 }
 
 void Code::exec() const
@@ -865,20 +898,20 @@ void Code::exec() const
 ZConsole::ZConsole(ZObject *parent)
     : ZObject(parent)
 {
-    qRegisterMetaType<QList<ZVariant*>>("QList<ZVariant*>");
+    qRegisterMetaType<QList<ZVariant>>("QList<ZVariant>");
 }
 
-const QList<ZVariant *> ZConsole::log(const QList<ZVariant *> &args) const
+QList<ZVariant> ZConsole::log(const QList<ZVariant> &args) const
 {
-    QList<ZVariant*> list;
+    QList<ZVariant> list;
 
     if(args.isEmpty())
         return list;
 
     for(int i = 0; i < args.count() - 1; ++i)
-        zStandardPrint << args.at(i)->toString().toStdString() << " ";
+        zStandardPrint << args.at(i).toString().toStdString() << " ";
 
-    zStandardPrint << args.last()->toString().toStdString() << std::endl;
+    zStandardPrint << args.last().toString().toStdString() << std::endl;
 
     return list;
 }

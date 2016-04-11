@@ -149,7 +149,7 @@ public:
     explicit ZFunction(ZObject *target, const char *name, ZObject *parent = 0);
 
 public slots:
-    const QList<ZVariant*> call(const QList<ZVariant*> &args) const;
+    QList<ZVariant> call(const QList<ZVariant> &args) const;
 
 private:
     ZObject *m_target;
@@ -287,6 +287,7 @@ struct Node
         PostfixSubSelf,     // --
         Get,                // .
         Comma,              // ,
+        Call,               // ()
         Variant,
         Constant,
         Unknow
@@ -300,6 +301,7 @@ struct Node
     OperatorType nodeType = Unknow;
 
     Node(OperatorType t, Node *l = Q_NULLPTR, Node *r = Q_NULLPTR);
+    ~Node();
 
     void recursion();
 
@@ -307,15 +309,26 @@ struct Node
     {recursion(); return *value;}
 };
 
-struct Code
+class CodeData : public QSharedData
 {
-    Code *parent = Q_NULLPTR;
-    QList<Node*> nodeList;
+public:
+    QSharedDataPointer<CodeData> parent;
     QHash<QByteArray, ZVariant*> identifiersHash;
 
+    ZVariant *variantValue(const QByteArray &name) const;
+};
+
+struct Code
+{
+    QList<Node*> nodeList;
+    QSharedDataPointer<CodeData> data;
     Code(Code *parent = Q_NULLPTR);
 
-    ZVariant *variantValue(const QByteArray &name) const;
+    inline const CodeData *constData() const
+    {return data.constData();}
+
+    ZVariant *variantValue(const QByteArray &name) const
+    {return data->variantValue(name);}
 
     void exec() const;
 };
@@ -328,7 +341,7 @@ public:
     explicit ZConsole(ZObject *parent = 0);
 
 public slots:
-    const QList<ZVariant*> log(const QList<ZVariant*> &args) const;
+    QList<ZVariant> log(const QList<ZVariant> &args) const;
 };
 
 }/// namespace Global end

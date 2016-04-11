@@ -55,8 +55,7 @@ Global::Code *rootCode = Q_NULLPTR;
 %right UMINUS ADDSELF SUBSELF '!' '~'
 %left '(' ')'
 
-%type <node> expression lvalue rvalue
-%type <value> arguments
+%type <node> expression lvalue rvalue arguments
 
 %%
 
@@ -77,12 +76,12 @@ statement:  VAR define
             ;
 
 define:     IDENTIFIER {
-                if(currentCode->identifiersHash.contains(*$1)) {
+                if(currentCode->constData()->identifiersHash.contains(*$1)) {
                     zError << *$1 << "is defined!";
                     YYERROR;
                 }
 
-                currentCode->identifiersHash[*$1] = new Global::ZVariant;
+                currentCode->data->identifiersHash[*$1] = new Global::ZVariant;
                 delete $1;
             }
             | define ',' define
@@ -184,7 +183,19 @@ rvalue:     {
             }
             | expression '(' arguments ')' {
                 /// TODO
-                $$ = Q_NULLPTR;
+
+                Global::Node *right_node = $3;
+
+                if($3->nodeType != Global::Node::Comma) {
+                    Global::Node *left = new Global::Node(Global::Node::Constant);
+
+                    left->value = new Global::ZVariant(QList<Global::ZVariant>());
+
+                    right_node = new Global::Node(Global::Node::Comma, left, $3);
+                    right_node->value = new Global::ZVariant();
+                }
+                $$ = new Global::Node(Global::Node::Call, $1, right_node);
+                $$->value = new Global::ZVariant();
             }
             | expression '.' IDENTIFIER {
                 Global::Node *propertyName = new Global::Node(Global::Node::Constant);
@@ -370,8 +381,16 @@ rvalue:     {
 
 arguments:  expression
             | arguments ',' expression {
-                    $$ = new Global::Node(Global::Node::Comma, $1, $3);
-                    $$->value = new Global::ZVariant(Global::ZVariant::List);
+                    if($1->nodeType == Global::Node::Constant
+                            && $3->nodeType == Global::Node::Constant) {
+                        $$ = new Global::Node(Global::Node::Constant);
+                        QList<Global::ZVariant> value;
+                        value << *$1->value << *$3->value;
+                        $$->value = new Global::ZVariant(value);
+                    } else {
+                        $$ = new Global::Node(Global::Node::Comma, $1, $3);
+                        $$->value = new Global::ZVariant();
+                    }
             }
             ;
 
@@ -398,7 +417,7 @@ int main(int argc, char *argv[])
     rootCode = new Global::Code();
     currentCode = rootCode;
 
-    rootCode->identifiersHash["console"] = new Global::ZVariant(new Global::ZConsole);
+    rootCode->data->identifiersHash["console"] = new Global::ZVariant(new Global::ZConsole);
 
     if(argc > 1) {
         freopen(argv[1], "r", stdin);
@@ -429,8 +448,6 @@ int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)
 
 int yyFlexLexer::yywrap()
 {
-    zDebug << "finished!";
-
     rootCode->exec();
 
     return 1;

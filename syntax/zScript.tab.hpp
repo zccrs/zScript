@@ -129,9 +129,8 @@ namespace yy {
     Global::ZVariant *value;
     QByteArray *identifier;
     Global::Node *node;
-    QList<Global::Node*> *nodeList;
 
-#line 135 "zScript.tab.hpp" // lalr1.cc:377
+#line 134 "zScript.tab.hpp" // lalr1.cc:377
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -499,7 +498,7 @@ namespace yy {
 
 
 } // yy
-#line 503 "zScript.tab.hpp" // lalr1.cc:377
+#line 502 "zScript.tab.hpp" // lalr1.cc:377
 
 
 
