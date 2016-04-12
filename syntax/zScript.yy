@@ -16,6 +16,8 @@ int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location);
 Global::Code *currentCode = Q_NULLPTR;
 Global::Code *rootCode = Q_NULLPTR;
 
+QHash<QByteArray, Global::ZVariant*> *undefinedId = Q_NULLPTR;
+
 %}
 
 /// enable debug

@@ -293,12 +293,20 @@ struct Node
         Unknow
     };
 
-    Code *codeEnv = Q_NULLPTR;
-    Node *left = Q_NULLPTR;
-    Node *right = Q_NULLPTR;
-    ZVariant *value = Q_NULLPTR;
-    QByteArray name;
+    struct Children{
+        Node *left = Q_NULLPTR;
+        Node *right = Q_NULLPTR;
+    };
+
+    union Data{
+        Children *nodeChildrens = Q_NULLPTR;
+        Node *nodeChildren = Q_NULLPTR;
+        Code *codeChildren = Q_NULLPTR;
+        ZVariant *value = Q_NULLPTR;
+    };
+
     OperatorType nodeType = Unknow;
+    Data data;
 
     Node(OperatorType t, Node *l = Q_NULLPTR, Node *r = Q_NULLPTR);
     ~Node();
@@ -315,7 +323,7 @@ public:
     QSharedDataPointer<CodeData> parent;
     QHash<QByteArray, ZVariant*> identifiersHash;
 
-    ZVariant *variantValue(const QByteArray &name) const;
+    ZVariant variantValue(const QByteArray &name) const;
 };
 
 struct Code
@@ -327,7 +335,7 @@ struct Code
     inline const CodeData *constData() const
     {return data.constData();}
 
-    ZVariant *variantValue(const QByteArray &name) const
+    ZVariant variantValue(const QByteArray &name) const
     {return data->variantValue(name);}
 
     void exec() const;

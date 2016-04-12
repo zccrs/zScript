@@ -866,7 +866,7 @@ void Node::recursion()
     }
 }
 
-ZVariant *CodeData::variantValue(const QByteArray &name) const
+ZVariant CodeData::variantValue(const QByteArray &name) const
 {
     const CodeData *code = this;
 
