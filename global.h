@@ -122,39 +122,9 @@ private:
     QSharedDataPointer<VariantData> data;
 };
 
+QT_BEGIN_NAMESPACE
 Q_CORE_EXPORT QDebug operator<<(QDebug deg, const ZVariant &var);
-
-class ZObject : public QObject
-{
-    Q_OBJECT
-
-public:
-    explicit ZObject(ZObject *parent = 0);
-
-    ZVariant property(const char *name) const;
-
-public slots:
-    void setProperty(const char *name, const ZVariant &value);
-    void addFunctionProperty(const char *name);
-
-private slots:
-    void initFunctionProperty();
-};
-
-class ZFunction : public ZObject
-{
-    Q_OBJECT
-
-public:
-    explicit ZFunction(ZObject *target, const char *name, ZObject *parent = 0);
-
-public slots:
-    QList<ZVariant> call(const QList<ZVariant> &args) const;
-
-private:
-    ZObject *m_target;
-    QByteArray m_methodName;
-};
+QT_END_NAMESPACE
 
 /// int
 ZVariant operator +(const int var1, const ZVariant &var2);
@@ -247,7 +217,37 @@ inline ZVariant &operator --(ZVariant &var)
 
 ZVariant operator ~(const ZVariant &var);
 
-QByteArray readFile(const QString &fileName);
+class ZObject : public QObject
+{
+    Q_OBJECT
+
+public:
+    explicit ZObject(ZObject *parent = 0);
+
+    ZVariant property(const char *name) const;
+
+public slots:
+    void setProperty(const char *name, const ZVariant &value);
+    void addFunctionProperty(const char *name);
+
+private slots:
+    void initFunctionProperty();
+};
+
+class ZFunction : public ZObject
+{
+    Q_OBJECT
+
+public:
+    explicit ZFunction(ZObject *target, const char *name, ZObject *parent = 0);
+
+public slots:
+    QList<ZVariant> call(const QList<ZVariant> &args) const;
+
+private:
+    ZObject *m_target;
+    QByteArray m_methodName;
+};
 
 struct Code;
 
@@ -298,23 +298,20 @@ struct Node
         Node *right = Q_NULLPTR;
     };
 
-    union Data{
-        Children *nodeChildrens = Q_NULLPTR;
-        Node *nodeChildren = Q_NULLPTR;
-        Code *codeChildren = Q_NULLPTR;
-        ZVariant *value = Q_NULLPTR;
-    };
+//    union Data{
+//        Children *nodeChildrens = Q_NULLPTR;
+//        Node *nodeChildren = Q_NULLPTR;
+//        Code *codeChildren = Q_NULLPTR;
+//        ZVariant *value = Q_NULLPTR;
+//    };
 
     OperatorType nodeType = Unknow;
-    Data data;
+    //Data data;
 
     Node(OperatorType t, Node *l = Q_NULLPTR, Node *r = Q_NULLPTR);
     ~Node();
 
     void recursion();
-
-    inline ZVariant &recursionAndGetValue()
-    {recursion(); return *value;}
 };
 
 class CodeData : public QSharedData
@@ -351,6 +348,75 @@ public:
 public slots:
     QList<ZVariant> log(const QList<ZVariant> &args) const;
 };
+
+struct ZCode
+{
+    enum Action
+    {
+        Assign,             // =                            0
+        Add,                // +                            1
+        Sub,                // -                            2
+        Mul,                // *                            3
+        Div,                // /                            4
+        Abs,                // +                            5
+        Minus,              // -                            6
+        And,                // &                            7
+        Or,                 // |                            8
+        Xor,                // ^                            9
+        Contrary,           // ~                            10
+        Mod,                // %                            11
+        Not,                // !                            12
+        AddAssign,          // +=                           13
+        SubAssign,          // -=                           14
+        MulAssign,          // *=                           15
+        DivAssign,          // /=                           16
+        AndAssign,          // &=                           17
+        OrAssign,           // |=                           18
+        XorAssign,          // ^=                           19
+        ContraryAssign,     // ~=                           20
+        ModAssign,          // %=                           21
+        NotAssign,          // !=                           22
+        Less,               // <                            23
+        Greater,            // >                            24
+        New,                // new                          25
+        Delete,             // delete                       26
+        Throw,              // throw                        27
+        EQ,                 // ==                           28
+        STEQ,               // ===                          29
+        NEQ,                // !=                           30
+        STNEQ,              // !==                          31
+        LE,                 // <=                           32
+        GE,                 // >=                           33
+        LAnd,               // &&                           34
+        LOr,                // ||                           35
+        LAndAssign,         // ||=                          36
+        LOrAssign,          // $$=                          37
+        PrefixAddSelf,      // ++                           38
+        PostfixAddSelf,     // ++                           39
+        PrefixSubSelf,      // --                           40
+        PostfixSubSelf,     // --                           41
+        Get,                // .                            42
+        Comma,              // ,                            43
+        Call,               // ()                           44
+        Push,               // push target value to stack   45
+        Pop,                // pop stack                    46
+        PopAll,             // clear stack                  47
+        Variant,            //                              48
+        Constant,           //                              49
+        Unknow              //                              50
+    };
+
+    Action action = Unknow;
+    ZVariant *target;
+};
+
+QT_BEGIN_NAMESPACE
+Q_CORE_EXPORT QDebug operator<<(QDebug deg, const ZCode &var);
+QT_END_NAMESPACE
+
+extern QStack<ZVariant*> virtualStack;
+extern ZVariant virtualRegister;
+extern QList<ZCode*> codeList;
 
 }/// namespace Global end
 

@@ -48,11 +48,30 @@
 
 int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location);
 
-Global::Code *currentCode = Q_NULLPTR;
-Global::Code *rootCode = Q_NULLPTR;
+inline Global::ZVariant *getIdentifierAddress(const QByteArray &name);
+inline Global::ZVariant *getConstantAddress(const QByteArray &name, Global::ZVariant::Type type);
+inline Global::ZVariant *getConstantAddressByValue(const Global::ZVariant &value);
+inline Global::ZCode *createCode(const Global::ZCode::Action &action, Global::ZVariant *val = Q_NULLPTR);
+
+struct Scope{
+    Scope *parent = Q_NULLPTR;
+    QHash<QByteArray, Global::ZVariant**> identifiers;
+};
+
+enum ValueType {
+    Variant,
+    Constant
+};
+
+Scope *createScope(Scope *parent = Q_NULLPTR);
+
+Scope *currentScope = Q_NULLPTR;
+QSet<const QByteArray> *undefinedIdentifier = Q_NULLPTR;
+QList<Scope*> *scopeList = Q_NULLPTR;
+QHash<const QByteArray, Global::ZVariant*> *constantHash = Q_NULLPTR;
 
 
-#line 56 "zScript.tab.cpp" // lalr1.cc:404
+#line 75 "zScript.tab.cpp" // lalr1.cc:404
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -66,7 +85,7 @@ Global::Code *rootCode = Q_NULLPTR;
 
 // User implementation prologue.
 
-#line 70 "zScript.tab.cpp" // lalr1.cc:412
+#line 89 "zScript.tab.cpp" // lalr1.cc:412
 
 
 #ifndef YY_
@@ -152,7 +171,7 @@ Global::Code *rootCode = Q_NULLPTR;
 
 
 namespace yy {
-#line 156 "zScript.tab.cpp" // lalr1.cc:479
+#line 175 "zScript.tab.cpp" // lalr1.cc:479
 
   /// Build a parser object.
   parser::parser ()
@@ -589,544 +608,660 @@ namespace yy {
         {
           switch (yyn)
             {
-  case 4:
-#line 64 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 3:
+#line 78 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                currentCode->nodeList << (yystack_[1].value.node);
+                Global::codeList << createCode(Global::ZCode::PopAll);
             }
-#line 598 "zScript.tab.cpp" // lalr1.cc:859
+#line 617 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 4:
+#line 81 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                Global::codeList << createCode(Global::ZCode::PopAll);
+            }
+#line 625 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 5:
-#line 67 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 84 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 //currentCode->nodeList << $2;
             }
-#line 606 "zScript.tab.cpp" // lalr1.cc:859
+#line 633 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 7:
-#line 73 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 90 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 /// TODO
             }
-#line 614 "zScript.tab.cpp" // lalr1.cc:859
+#line 641 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 8:
-#line 78 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 95 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                if(currentCode->constData()->identifiersHash.contains(*(yystack_[0].value.identifier))) {
-                    zError << *(yystack_[0].value.identifier) << "is defined!";
-                    YYERROR;
-                }
+                undefinedIdentifier->remove(*(yystack_[0].value.identifier));
 
-                currentCode->data->identifiersHash[*(yystack_[0].value.identifier)] = new Global::ZVariant;
                 delete (yystack_[0].value.identifier);
             }
-#line 628 "zScript.tab.cpp" // lalr1.cc:859
+#line 651 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 12:
-#line 92 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 105 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.node) = new Global::Node(Global::Node::Variant);
-                (yylhs.value.node)->name = *(yystack_[0].value.identifier);
+                (yylhs.value.valueType) = ValueType::Variant;
+
+                Global::codeList << createCode(Global::ZCode::Push, getIdentifierAddress(*(yystack_[0].value.identifier)));
+
                 delete (yystack_[0].value.identifier);
             }
-#line 638 "zScript.tab.cpp" // lalr1.cc:859
+#line 663 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 13:
-#line 97 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 112 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), (yystack_[0].value.node));
+                (yylhs.value.valueType) = ValueType::Variant;
 
-                (yylhs.value.node)->value = (yystack_[2].value.node)->value;
+                Global::codeList << createCode(Global::ZCode::Assign);
             }
-#line 648 "zScript.tab.cpp" // lalr1.cc:859
+#line 673 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 14:
-#line 102 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 117 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.node) = (yystack_[3].value.node);
+                (yylhs.value.valueType) = ValueType::Variant;
                 /// TODO
             }
-#line 657 "zScript.tab.cpp" // lalr1.cc:859
+#line 682 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 15:
-#line 106 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 121 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                Global::Node *child_node = new Global::Node(Global::Node::Add, (yystack_[2].value.node), (yystack_[0].value.node));
+                (yylhs.value.valueType) = ValueType::Variant;
 
-                (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
-                (yylhs.value.node)->value = (yystack_[2].value.node)->value;
+                Global::codeList << createCode(Global::ZCode::AndAssign);
             }
-#line 668 "zScript.tab.cpp" // lalr1.cc:859
+#line 692 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 16:
-#line 112 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 126 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                Global::Node *child_node = new Global::Node(Global::Node::Sub, (yystack_[2].value.node), (yystack_[0].value.node));
+                (yylhs.value.valueType) = ValueType::Variant;
 
-                (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
-                (yylhs.value.node)->value = (yystack_[2].value.node)->value;
+                Global::codeList << createCode(Global::ZCode::SubAssign);
             }
-#line 679 "zScript.tab.cpp" // lalr1.cc:859
+#line 702 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 17:
-#line 118 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 131 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                Global::Node *child_node = new Global::Node(Global::Node::Mul, (yystack_[2].value.node), (yystack_[0].value.node));
+                (yylhs.value.valueType) = ValueType::Variant;
 
-                (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
-                (yylhs.value.node)->value = (yystack_[2].value.node)->value;
-            }
-#line 690 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 18:
-#line 124 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                Global::Node *child_node = new Global::Node(Global::Node::Div, (yystack_[2].value.node), (yystack_[0].value.node));
-
-                (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
-                (yylhs.value.node)->value = (yystack_[2].value.node)->value;
-            }
-#line 701 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 19:
-#line 130 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                Global::Node *child_node = new Global::Node(Global::Node::And, (yystack_[2].value.node), (yystack_[0].value.node));
-
-                (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
-                (yylhs.value.node)->value = (yystack_[2].value.node)->value;
+                Global::codeList << createCode(Global::ZCode::MulAssign);
             }
 #line 712 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 20:
+  case 18:
 #line 136 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                Global::Node *child_node = new Global::Node(Global::Node::Or, (yystack_[2].value.node), (yystack_[0].value.node));
+                (yylhs.value.valueType) = ValueType::Variant;
 
-                (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
-                (yylhs.value.node)->value = (yystack_[2].value.node)->value;
+                Global::codeList << createCode(Global::ZCode::DivAssign);
             }
-#line 723 "zScript.tab.cpp" // lalr1.cc:859
+#line 722 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 19:
+#line 141 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.valueType) = ValueType::Variant;
+
+                Global::codeList << createCode(Global::ZCode::AndAssign);
+            }
+#line 732 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 20:
+#line 146 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.valueType) = ValueType::Variant;
+
+                Global::codeList << createCode(Global::ZCode::OrAssign);
+            }
+#line 742 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 21:
-#line 142 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 151 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                Global::Node *child_node = new Global::Node(Global::Node::Xor, (yystack_[2].value.node), (yystack_[0].value.node));
+                (yylhs.value.valueType) = ValueType::Variant;
 
-                (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
-                (yylhs.value.node)->value = (yystack_[2].value.node)->value;
+                Global::codeList << createCode(Global::ZCode::XorAssign);
             }
-#line 734 "zScript.tab.cpp" // lalr1.cc:859
+#line 752 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 22:
-#line 148 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 156 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                Global::Node *child_node = new Global::Node(Global::Node::Mod, (yystack_[2].value.node), (yystack_[0].value.node));
+                (yylhs.value.valueType) = ValueType::Variant;
 
-                (yylhs.value.node) = new Global::Node(Global::Node::Assign, (yystack_[2].value.node), child_node);
-                (yylhs.value.node)->value = (yystack_[2].value.node)->value;
+                Global::codeList << createCode(Global::ZCode::ModAssign);
             }
-#line 745 "zScript.tab.cpp" // lalr1.cc:859
+#line 762 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 23:
-#line 154 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 161 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.node) = new Global::Node(Global::Node::PrefixAddSelf, Q_NULLPTR, (yystack_[0].value.node));
-                (yylhs.value.node)->value = (yystack_[0].value.node)->value;
-            }
-#line 754 "zScript.tab.cpp" // lalr1.cc:859
-    break;
+                (yylhs.value.valueType) = ValueType::Variant;
 
-  case 24:
-#line 158 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                (yylhs.value.node) = new Global::Node(Global::Node::PrefixSubSelf, Q_NULLPTR, (yystack_[0].value.node));
-                (yylhs.value.node)->value = (yystack_[0].value.node)->value;
-            }
-#line 763 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 25:
-#line 162 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                (yylhs.value.node) = new Global::Node(Global::Node::PostfixAddSelf, (yystack_[1].value.node), Q_NULLPTR);
-                (yylhs.value.node)->value = (yystack_[1].value.node)->value;
+                Global::codeList << createCode(Global::ZCode::PrefixAddSelf);
             }
 #line 772 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 26:
+  case 24:
 #line 166 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.node) = new Global::Node(Global::Node::PostfixSubSelf, (yystack_[1].value.node), Q_NULLPTR);
-                (yylhs.value.node)->value = (yystack_[1].value.node)->value;
+                (yylhs.value.valueType) = ValueType::Variant;
+
+                Global::codeList << createCode(Global::ZCode::PrefixSubSelf);
             }
-#line 781 "zScript.tab.cpp" // lalr1.cc:859
+#line 782 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 25:
+#line 171 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.valueType) = ValueType::Variant;
+
+                Global::codeList << createCode(Global::ZCode::PostfixAddSelf);
+            }
+#line 792 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 26:
+#line 176 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.valueType) = ValueType::Variant;
+
+                Global::codeList << createCode(Global::ZCode::PostfixSubSelf);
+            }
+#line 802 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 27:
-#line 172 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 183 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.node) = new Global::Node(Global::Node::Constant);
-                (yylhs.value.node)->value = new Global::ZVariant;
+                (yylhs.value.valueType) = ValueType::Constant;
+
+                Global::codeList << createCode(Global::ZCode::Push, getConstantAddress(QByteArray(), Global::ZVariant::Null));
             }
-#line 790 "zScript.tab.cpp" // lalr1.cc:859
+#line 812 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 28:
-#line 176 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 188 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                (yylhs.value.node) = new Global::Node(Global::Node::Constant);
-                (yylhs.value.node)->value = (yystack_[0].value.value);
+                (yylhs.value.valueType) = ValueType::Constant;
+
+                Global::codeList << createCode(Global::ZCode::Push, getConstantAddress(*(yystack_[0].value.identifier), Global::ZVariant::Int));
+
+                delete (yystack_[0].value.identifier);
             }
-#line 799 "zScript.tab.cpp" // lalr1.cc:859
+#line 824 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 29:
-#line 180 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 195 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                /// TODO
-                (yylhs.value.node) = Q_NULLPTR;
+                (yylhs.value.valueType) = ValueType::Constant;
+
+                Global::codeList << createCode(Global::ZCode::Push, getConstantAddress(*(yystack_[0].value.identifier), Global::ZVariant::String));
+
+                delete (yystack_[0].value.identifier);
             }
-#line 808 "zScript.tab.cpp" // lalr1.cc:859
+#line 836 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 30:
-#line 184 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 202 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                /// TODO
+                (yylhs.value.valueType) = ValueType::Constant;
 
-                Global::Node *right_node = (yystack_[1].value.node);
+                Global::codeList << createCode(Global::ZCode::Push, getConstantAddress(*(yystack_[0].value.identifier), Global::ZVariant::Double));
 
-                if((yystack_[1].value.node)->nodeType != Global::Node::Comma) {
-                    Global::Node *left = new Global::Node(Global::Node::Constant);
-
-                    left->value = new Global::ZVariant(QList<Global::ZVariant>());
-
-                    right_node = new Global::Node(Global::Node::Comma, left, (yystack_[1].value.node));
-                    right_node->value = new Global::ZVariant();
-                }
-                (yylhs.value.node) = new Global::Node(Global::Node::Call, (yystack_[3].value.node), right_node);
-                (yylhs.value.node)->value = new Global::ZVariant();
+                delete (yystack_[0].value.identifier);
             }
-#line 829 "zScript.tab.cpp" // lalr1.cc:859
+#line 848 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 31:
-#line 200 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 209 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                Global::Node *propertyName = new Global::Node(Global::Node::Constant);
+                (yylhs.value.valueType) = ValueType::Constant;
 
-                propertyName->value = new Global::ZVariant(QString(*(yystack_[0].value.identifier)));
-                (yylhs.value.node) = new Global::Node(Global::Node::Get, (yystack_[2].value.node), propertyName);
-                (yylhs.value.node)->value = new Global::ZVariant();
+                Global::codeList << createCode(Global::ZCode::Push, getConstantAddress(*(yystack_[0].value.identifier), Global::ZVariant::Bool));
+
+                delete (yystack_[0].value.identifier);
             }
-#line 841 "zScript.tab.cpp" // lalr1.cc:859
+#line 860 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 32:
-#line 207 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 216 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value + *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
-                    } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::Add, (yystack_[2].value.node), (yystack_[0].value.node));
-                    }
+                /// TODO
+                (yylhs.value.valueType) = ValueType::Constant;
             }
-#line 856 "zScript.tab.cpp" // lalr1.cc:859
+#line 869 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 33:
-#line 217 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 220 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value - *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
-                    } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::Sub, (yystack_[2].value.node), (yystack_[0].value.node));
-                    }
+                    (yylhs.value.valueType) = ValueType::Variant;
+
+                    Global::codeList << createCode(Global::ZCode::Call);
             }
-#line 871 "zScript.tab.cpp" // lalr1.cc:859
+#line 879 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 34:
-#line 227 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 225 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value * *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
-                    } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::Mul, (yystack_[2].value.node), (yystack_[0].value.node));
-                    }
+                    (yylhs.value.valueType) = ValueType::Variant;
+
+                    Global::codeList << createCode(Global::ZCode::Get, getConstantAddress(*(yystack_[0].value.identifier), Global::ZVariant::String));
             }
-#line 886 "zScript.tab.cpp" // lalr1.cc:859
+#line 889 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 35:
-#line 237 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 230 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value / *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(*pre_code->target + *last_code->target);
+
+                        delete pre_code;
                     } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::Div, (yystack_[2].value.node), (yystack_[0].value.node));
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::Add);
                     }
             }
-#line 901 "zScript.tab.cpp" // lalr1.cc:859
+#line 910 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 36:
-#line 247 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 246 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value & *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
-                    } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::And, (yystack_[2].value.node), (yystack_[0].value.node));
-                    }
-            }
-#line 916 "zScript.tab.cpp" // lalr1.cc:859
-    break;
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-  case 37:
-#line 257 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value | *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(*pre_code->target - *last_code->target);
+
+                        delete pre_code;
                     } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::Or, (yystack_[2].value.node), (yystack_[0].value.node));
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::Sub);
                     }
             }
 #line 931 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 38:
-#line 267 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 37:
+#line 262 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value ^ *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(*pre_code->target * *last_code->target);
+
+                        delete pre_code;
                     } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::Xor, (yystack_[2].value.node), (yystack_[0].value.node));
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::Mul);
                     }
             }
-#line 946 "zScript.tab.cpp" // lalr1.cc:859
+#line 952 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 38:
+#line 278 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(*pre_code->target / *last_code->target);
+
+                        delete pre_code;
+                    } else {
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::Div);
+                    }
+            }
+#line 973 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 39:
-#line 277 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 294 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value % *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(*pre_code->target & *last_code->target);
+
+                        delete pre_code;
                     } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::Mod, (yystack_[2].value.node), (yystack_[0].value.node));
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::And);
                     }
             }
-#line 961 "zScript.tab.cpp" // lalr1.cc:859
+#line 994 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 40:
-#line 287 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 310 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value == *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(*pre_code->target | *last_code->target);
+
+                        delete pre_code;
                     } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::EQ, (yystack_[2].value.node), (yystack_[0].value.node));
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::Or);
                     }
             }
-#line 976 "zScript.tab.cpp" // lalr1.cc:859
+#line 1015 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 41:
-#line 297 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 326 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value != *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
-                    } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::NEQ, (yystack_[2].value.node), (yystack_[0].value.node));
-                    }
-            }
-#line 991 "zScript.tab.cpp" // lalr1.cc:859
-    break;
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-  case 42:
-#line 307 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value <= *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
-                    } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::LE, (yystack_[2].value.node), (yystack_[0].value.node));
-                    }
-            }
-#line 1006 "zScript.tab.cpp" // lalr1.cc:859
-    break;
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
 
-  case 43:
-#line 317 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value >= *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
-                    } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::GE, (yystack_[2].value.node), (yystack_[0].value.node));
-                    }
-            }
-#line 1021 "zScript.tab.cpp" // lalr1.cc:859
-    break;
+                        last_code->target = getConstantAddressByValue(*pre_code->target ^ *last_code->target);
 
-  case 44:
-#line 327 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value && *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
+                        delete pre_code;
                     } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::LAnd, (yystack_[2].value.node), (yystack_[0].value.node));
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::Xor);
                     }
             }
 #line 1036 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 45:
-#line 337 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 42:
+#line 342 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[2].value.node);
-                        (yylhs.value.node)->value = new Global::ZVariant(*(yystack_[2].value.node)->value || *(yystack_[0].value.node)->value);
-                        delete (yystack_[0].value.node);
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(*pre_code->target % *last_code->target);
+
+                        delete pre_code;
                     } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::LOr, (yystack_[2].value.node), (yystack_[0].value.node));
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::Mod);
                     }
             }
-#line 1051 "zScript.tab.cpp" // lalr1.cc:859
+#line 1057 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 43:
+#line 358 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(*pre_code->target == *last_code->target);
+
+                        delete pre_code;
+                    } else {
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::EQ);
+                    }
+            }
+#line 1078 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 44:
+#line 374 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(*pre_code->target != *last_code->target);
+
+                        delete pre_code;
+                    } else {
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::NEQ);
+                    }
+            }
+#line 1099 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 45:
+#line 390 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(*pre_code->target <= *last_code->target);
+
+                        delete pre_code;
+                    } else {
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::LE);
+                    }
+            }
+#line 1120 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 46:
-#line 347 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 406 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[0].value.node);
-                        *(yylhs.value.node)->value = ~*(yystack_[0].value.node)->value;
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(*pre_code->target >= *last_code->target);
+
+                        delete pre_code;
                     } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::Contrary, Q_NULLPTR, (yystack_[0].value.node));
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::GE);
                     }
-                }
-#line 1064 "zScript.tab.cpp" // lalr1.cc:859
+            }
+#line 1141 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 47:
-#line 355 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 422 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[0].value.node);
-                        *(yylhs.value.node)->value = !*(yystack_[0].value.node)->value;
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(*pre_code->target && *last_code->target);
+
+                        delete pre_code;
                     } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::Not, Q_NULLPTR, (yystack_[0].value.node));
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::LAnd);
                     }
-                }
-#line 1077 "zScript.tab.cpp" // lalr1.cc:859
+            }
+#line 1162 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 48:
-#line 363 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 438 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[0].value.node);
-                        *(yylhs.value.node)->value = -*(yystack_[0].value.node)->value;
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        Global::ZCode *pre_code = Global::codeList.takeLast();
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(*pre_code->target || *last_code->target);
+
+                        delete pre_code;
                     } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::Minus, Q_NULLPTR, (yystack_[0].value.node));
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::LOr);
                     }
-                }
-#line 1090 "zScript.tab.cpp" // lalr1.cc:859
+            }
+#line 1183 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 49:
-#line 371 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 454 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = (yystack_[0].value.node);
-                        *(yylhs.value.node)->value = +*(yystack_[0].value.node)->value;
+                    if((yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[0].value.valueType);
+
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(~ *last_code->target);
                     } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::Abs, Q_NULLPTR, (yystack_[0].value.node));
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::Contrary);
                     }
                 }
-#line 1103 "zScript.tab.cpp" // lalr1.cc:859
+#line 1201 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 50:
-#line 379 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    { (yylhs.value.node) = (yystack_[1].value.node);}
-#line 1109 "zScript.tab.cpp" // lalr1.cc:859
+#line 467 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                    if((yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[0].value.valueType);
+
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(! *last_code->target);
+                    } else {
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::Not);
+                    }
+                }
+#line 1219 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 51:
+#line 480 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                    if((yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[0].value.valueType);
+
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(- *last_code->target);
+                    } else {
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::Minus);
+                    }
+                }
+#line 1237 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 52:
-#line 383 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 493 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                    if((yystack_[2].value.node)->nodeType == Global::Node::Constant
-                            && (yystack_[0].value.node)->nodeType == Global::Node::Constant) {
-                        (yylhs.value.node) = new Global::Node(Global::Node::Constant);
-                        QList<Global::ZVariant> value;
-                        value << *(yystack_[2].value.node)->value << *(yystack_[0].value.node)->value;
-                        (yylhs.value.node)->value = new Global::ZVariant(value);
+                    if((yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[0].value.valueType);
+
+                        Global::ZCode *last_code = Global::codeList.last();
+
+                        last_code->target = getConstantAddressByValue(+ *last_code->target);
                     } else {
-                        (yylhs.value.node) = new Global::Node(Global::Node::Comma, (yystack_[2].value.node), (yystack_[0].value.node));
-                        (yylhs.value.node)->value = new Global::ZVariant();
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        Global::codeList << createCode(Global::ZCode::Abs);
                     }
-            }
-#line 1126 "zScript.tab.cpp" // lalr1.cc:859
+                }
+#line 1255 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 53:
+#line 506 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    { (yylhs.value.valueType) = (yystack_[1].value.valueType);}
+#line 1261 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
 
-#line 1130 "zScript.tab.cpp" // lalr1.cc:859
+#line 1265 "zScript.tab.cpp" // lalr1.cc:859
             default:
               break;
             }
@@ -1292,271 +1427,277 @@ namespace yy {
   }
 
 
-  const signed char parser::yypact_ninf_ = -63;
+  const signed char parser::yypact_ninf_ = -66;
 
   const signed char parser::yytable_ninf_ = -25;
 
   const short int
   parser::yypact_[] =
   {
-     -63,   178,   -63,     1,     3,     8,   -26,   -25,   -24,   -63,
-     -63,   225,   225,   225,   225,   225,   225,   225,    -4,   261,
-     301,   -63,   209,    39,   -63,    26,    10,   -63,   225,   225,
-     225,   683,   766,   780,   -34,   -34,   -34,   -34,   300,   -63,
-     225,   225,   225,   225,   225,   225,   225,   225,   225,   225,
-     225,   225,   225,   225,   225,   -63,   225,    54,   -63,   -63,
-     225,   225,   225,   225,   225,   225,   225,   225,   225,   -63,
-     339,   194,     1,     1,   378,   417,   456,   818,   -63,    43,
-      43,   783,   783,   715,   715,   731,   731,   731,   240,   240,
-     -34,   -34,   -34,   683,   -22,   495,   -63,   683,   683,   683,
-     683,   683,   683,   683,   683,   683,    60,   -63,   -63,   527,
-      39,   -63,    -6,   -63,   -63,   225,   225,   225,   -63,   -63,
-     -63,   111,   -63,    17,   566,   605,   683,   -63,   -63,   225,
-     -63,   127,   644,   -63,   -63
+     -66,   222,   -66,     2,     4,     9,   -29,   -28,   -27,   -66,
+     -66,   -66,   -66,   -66,   288,   288,   288,   288,   288,   288,
+     288,    -7,   303,   343,   -66,   266,    39,   -66,    23,     7,
+     -66,   288,   288,   288,   725,   808,   822,   -37,   -37,   -37,
+     -37,   342,   -66,   288,   288,   288,   288,   288,   288,   288,
+     288,   288,   288,   288,   288,   288,   288,   288,   -66,   288,
+      51,   -66,   -66,   288,   288,   288,   288,   288,   288,   288,
+     288,   288,   -66,   381,   244,     2,     2,   420,   459,   498,
+     170,   -66,    40,    40,    93,    93,   757,   757,   773,   773,
+     773,   101,   101,   -37,   -37,   -37,   725,   -25,   537,   -66,
+     725,   725,   725,   725,   725,   725,   725,   725,   725,    64,
+     -66,   -66,   569,    39,   -66,    -9,   -66,   -66,   288,   288,
+     288,   -66,   -66,   -66,   118,   -66,    10,   608,   647,   725,
+     -66,   -66,   288,   -66,   168,   686,   -66,   -66
   };
 
   const unsigned char
   parser::yydefact_[] =
   {
-       2,    27,     1,     0,     0,     0,     0,     0,     0,    28,
-      12,    27,    27,    27,    27,    27,    27,    27,     0,     0,
-      10,    11,    27,     5,     8,     6,     0,    29,    27,    27,
-      27,     0,    10,    10,    48,    49,    47,    46,     0,     3,
-      27,    27,    27,    27,    27,    27,    27,    27,    27,    27,
-      27,    27,    27,    27,    27,     4,    27,     0,    25,    26,
-      27,    27,    27,    27,    27,    27,    27,    27,    27,     2,
-       0,    27,     0,     0,     0,     0,     0,    10,    50,    40,
-      41,    42,    43,    44,    45,    36,    37,    38,    33,    32,
-      34,    35,    39,    51,     0,     0,    31,    18,    17,    15,
-      16,    22,    19,    20,    21,    13,    27,    58,     2,     0,
-      59,     9,     0,    53,    54,    27,    27,    27,    30,    14,
-      57,    27,    61,     0,     0,     0,    52,    60,     2,    27,
-      56,    27,     0,     7,    55
+       2,    27,     1,     0,     0,     0,     0,     0,     0,    12,
+      28,    29,    31,    30,    27,    27,    27,    27,    27,    27,
+      27,     0,     0,    10,    11,    27,     5,     8,     6,     0,
+      32,    27,    27,    27,     0,    10,    10,    51,    52,    50,
+      49,     0,     3,    27,    27,    27,    27,    27,    27,    27,
+      27,    27,    27,    27,    27,    27,    27,    27,     4,    27,
+       0,    25,    26,    27,    27,    27,    27,    27,    27,    27,
+      27,    27,     2,     0,    27,     0,     0,     0,     0,     0,
+      10,    53,    43,    44,    45,    46,    47,    48,    39,    40,
+      41,    36,    35,    37,    38,    42,    54,     0,     0,    34,
+      18,    17,    15,    16,    22,    19,    20,    21,    13,    27,
+      61,     2,     0,    62,     9,     0,    56,    57,    27,    27,
+      27,    33,    14,    60,    27,    64,     0,     0,     0,    55,
+      63,     2,    27,    59,    27,     0,     7,    58
   };
 
   const signed char
   parser::yypgoto_[] =
   {
-     -63,   -62,   -63,   -60,   -11,    -3,   -63,   -63,   -63,     4
+     -66,   -65,   -66,   -63,   -14,    -6,   -66,   -66,   -66,   -10
   };
 
   const signed char
   parser::yydefgoto_[] =
   {
-      -1,     1,    18,    25,    19,    20,    21,    94,    22,    23
+      -1,     1,    21,    28,    22,    23,    24,    97,    25,    26
   };
 
   const short int
   parser::yytable_[] =
   {
-      31,    31,    34,    35,    36,    37,    38,   106,    32,    33,
-     117,    70,   111,   112,    24,    54,    26,    74,    75,    76,
-      56,    27,    57,    28,    29,    30,    72,    77,   118,    79,
-      80,    81,    82,    83,    84,    85,    86,    87,    88,    89,
-      90,    91,    92,    93,   123,    95,   121,    39,    71,    97,
-      98,    99,   100,   101,   102,   103,   104,   105,    72,    73,
-     109,    42,    43,     3,     4,     5,   131,    96,     6,   128,
-       7,     8,     9,    10,     0,   110,     0,     0,     0,     0,
-       0,     0,    11,    12,    49,    50,    51,    52,    53,     0,
-       0,     0,    54,     0,     0,     0,     0,    56,     0,    57,
-       0,    13,    14,     0,   124,   125,   126,    15,    16,    17,
-       0,     0,     0,   120,     3,     4,     5,     0,   132,     6,
-       0,     7,     8,     9,    10,     0,     0,     0,     0,     0,
-       3,     4,     5,    11,    12,     6,     0,     7,     8,     9,
-      10,     0,     0,     0,     0,     0,     0,     0,     0,    11,
-      12,     0,    13,    14,     0,     0,     0,     0,    15,    16,
-      17,     0,     0,     0,   127,     0,     0,     0,    13,    14,
-       0,     0,     0,     0,    15,    16,    17,     0,     2,     0,
-     133,     3,     4,     5,     0,     0,     6,     0,     7,     8,
-       9,    10,     0,     0,     0,     0,     0,     0,     0,     5,
-      11,    12,     6,     0,     7,     8,     9,    10,     0,     0,
-       0,     0,     0,     0,     5,     0,    11,    12,     0,    13,
-      14,     9,    10,     0,     0,    15,    16,    17,     0,     0,
-       5,    11,    12,     0,     0,    13,    14,     9,    10,     0,
-       0,    15,    16,    17,     0,     0,   108,    11,    12,     0,
-      13,    14,     0,     0,     0,     0,    15,    16,    17,     0,
-       0,    69,     0,     0,     0,     0,    13,    14,     0,     0,
-       0,     0,    15,    16,    17,    40,     0,    41,     0,    42,
-      43,    44,    45,    51,    52,    53,     0,     0,     0,    54,
-       0,     0,     0,     0,    56,     0,    57,    46,    47,    48,
-       0,     0,    49,    50,    51,    52,    53,     0,     0,     0,
-      54,     0,    55,     0,    40,    56,    41,    57,    42,    43,
-      44,    45,     0,    58,    59,    60,    61,    62,    63,    64,
-      65,    66,    67,     0,    68,     0,    46,    47,    48,     0,
-       0,    49,    50,    51,    52,    53,     0,     0,     0,    54,
-      78,     0,     0,    40,    56,    41,    57,    42,    43,    44,
-      45,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,    46,    47,    48,     0,     0,
-      49,    50,    51,    52,    53,     0,     0,     0,    54,     0,
-     107,     0,    40,    56,    41,    57,    42,    43,    44,    45,
+      34,    34,    37,    38,    39,    40,    41,   109,    35,    36,
+     120,    73,   114,   115,    27,    57,    29,    77,    78,    79,
+      59,    30,    60,    31,    32,    33,    75,    80,   121,    82,
+      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+      93,    94,    95,    96,   126,    98,   124,    42,    74,   100,
+     101,   102,   103,   104,   105,   106,   107,   108,    75,    76,
+     112,    45,    46,    99,   113,   131,   134,     3,     4,     5,
+       0,     0,     6,     0,     7,     8,     9,    10,    11,    12,
+      13,     0,     0,     0,    52,    53,    54,    55,    56,    14,
+      15,     0,    57,     0,     0,     0,     0,    59,     0,    60,
+       0,     0,     0,     0,   127,   128,   129,     0,    16,    17,
+       0,     0,     0,     0,    18,    19,    20,     0,   135,     0,
+     123,     3,     4,     5,     0,     0,     6,     0,     7,     8,
+       9,    10,    11,    12,    13,     0,     0,    52,    53,    54,
+      55,    56,     0,    14,    15,    57,     0,    54,    55,    56,
+      59,     0,    60,    57,     0,     0,     0,     0,    59,     0,
+      60,     0,    16,    17,     0,     0,     0,     0,    18,    19,
+      20,     3,     4,     5,   130,     0,     6,     0,     7,     8,
+       9,    10,    11,    12,    13,     0,     0,     0,     0,     0,
+       0,     0,     0,    14,    15,    61,    62,    63,    64,    65,
+      66,    67,    68,    69,    70,     0,    71,     0,   119,     0,
+       0,     0,    16,    17,     0,     0,     0,     0,    18,    19,
+      20,     0,     2,     0,   136,     3,     4,     5,     0,     0,
+       6,     0,     7,     8,     9,    10,    11,    12,    13,     0,
+       0,     0,     0,     0,     0,     0,     0,    14,    15,     5,
+       0,     0,     6,     0,     7,     8,     9,    10,    11,    12,
+      13,     0,     0,     0,     0,     0,    16,    17,     0,    14,
+      15,     5,    18,    19,    20,     0,     0,     0,     9,    10,
+      11,    12,    13,     0,     0,     0,     0,     0,    16,    17,
+       0,    14,    15,     5,    18,    19,    20,     0,     0,   111,
+       9,    10,    11,    12,    13,     0,     0,     0,     0,     0,
+      16,    17,     0,    14,    15,     0,    18,    19,    20,     0,
+      43,    72,    44,     0,    45,    46,    47,    48,     0,     0,
+       0,     0,    16,    17,     0,     0,     0,     0,    18,    19,
+      20,     0,    49,    50,    51,     0,     0,    52,    53,    54,
+      55,    56,     0,     0,     0,    57,     0,    58,     0,    43,
+      59,    44,    60,    45,    46,    47,    48,     0,    61,    62,
+      63,    64,    65,    66,    67,    68,    69,    70,     0,    71,
+       0,    49,    50,    51,     0,     0,    52,    53,    54,    55,
+      56,     0,     0,     0,    57,    81,     0,     0,    43,    59,
+      44,    60,    45,    46,    47,    48,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,    46,    47,    48,     0,     0,    49,
-      50,    51,    52,    53,     0,     0,     0,    54,   113,     0,
-       0,    40,    56,    41,    57,    42,    43,    44,    45,     0,
+      49,    50,    51,     0,     0,    52,    53,    54,    55,    56,
+       0,     0,     0,    57,     0,   110,     0,    43,    59,    44,
+      60,    45,    46,    47,    48,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,    49,
+      50,    51,     0,     0,    52,    53,    54,    55,    56,     0,
+       0,     0,    57,   116,     0,     0,    43,    59,    44,    60,
+      45,    46,    47,    48,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,    49,    50,
+      51,     0,     0,    52,    53,    54,    55,    56,     0,     0,
+       0,    57,   117,     0,     0,    43,    59,    44,    60,    45,
+      46,    47,    48,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    49,    50,    51,
+       0,     0,    52,    53,    54,    55,    56,     0,     0,     0,
+      57,     0,   118,     0,    43,    59,    44,    60,    45,    46,
+      47,    48,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,    49,    50,    51,     0,
+       0,    52,    53,    54,    55,    56,    43,     0,    44,    57,
+      45,    46,    47,    48,    59,   122,    60,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,    49,    50,
+      51,     0,     0,    52,    53,    54,    55,    56,     0,     0,
+       0,    57,     0,   125,     0,    43,    59,    44,    60,    45,
+      46,    47,    48,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    49,    50,    51,
+       0,     0,    52,    53,    54,    55,    56,     0,     0,     0,
+      57,     0,   132,     0,    43,    59,    44,    60,    45,    46,
+      47,    48,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,    49,    50,    51,     0,
+       0,    52,    53,    54,    55,    56,     0,     0,     0,    57,
+     133,     0,     0,    43,    59,    44,    60,    45,    46,    47,
+      48,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    49,    50,    51,     0,     0,
+      52,    53,    54,    55,    56,     0,     0,     0,    57,   137,
+       0,     0,    43,    59,    44,    60,    45,    46,    47,    48,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,    46,    47,    48,     0,     0,    49,    50,
-      51,    52,    53,     0,     0,     0,    54,   114,     0,     0,
-      40,    56,    41,    57,    42,    43,    44,    45,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    46,    47,    48,     0,     0,    49,    50,    51,
-      52,    53,     0,     0,     0,    54,     0,   115,     0,    40,
-      56,    41,    57,    42,    43,    44,    45,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,    46,    47,    48,     0,     0,    49,    50,    51,    52,
-      53,    40,     0,    41,    54,    42,    43,    44,    45,    56,
-     119,    57,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,    46,    47,    48,     0,     0,    49,    50,
-      51,    52,    53,     0,     0,     0,    54,     0,   122,     0,
-      40,    56,    41,    57,    42,    43,    44,    45,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    46,    47,    48,     0,     0,    49,    50,    51,
-      52,    53,     0,     0,     0,    54,     0,   129,     0,    40,
-      56,    41,    57,    42,    43,    44,    45,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,    46,    47,    48,     0,     0,    49,    50,    51,    52,
-      53,     0,     0,     0,    54,   130,     0,     0,    40,    56,
-      41,    57,    42,    43,    44,    45,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-      46,    47,    48,     0,     0,    49,    50,    51,    52,    53,
-       0,     0,     0,    54,   134,     0,     0,    40,    56,    41,
-      57,    42,    43,    44,    45,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,    46,
-      47,    48,     0,     0,    49,    50,    51,    52,    53,    40,
-       0,    41,    54,    42,    43,     0,     0,    56,     0,    57,
-       0,     0,     0,     0,     0,    40,     0,    41,     0,    42,
-      43,    46,    47,    48,     0,     0,    49,    50,    51,    52,
-      53,     0,     0,     0,    54,     0,     0,     0,     0,    56,
-       0,    57,    49,    50,    51,    52,    53,     0,     0,     0,
-      54,     0,     0,     0,     0,    56,     0,    57,    58,    59,
-     -23,   -23,   -23,   -23,   -23,   -23,   -23,   -23,   -23,   -23,
-       0,   -23,    58,    59,   -24,   -24,   -24,   -24,   -24,   -24,
-     -24,   -24,   -24,   -24,     0,   -24,   -23,   -23,     0,     0,
-       0,   -23,     0,     0,    49,    50,    51,    52,    53,     0,
-     -24,   -24,    54,     0,     0,   -24,     0,    56,     0,    57,
-      58,    59,    60,    61,    62,    63,    64,    65,    66,    67,
-       0,    68,     0,   116
+       0,     0,     0,     0,    49,    50,    51,     0,     0,    52,
+      53,    54,    55,    56,    43,     0,    44,    57,    45,    46,
+       0,     0,    59,     0,    60,     0,     0,     0,     0,     0,
+      43,     0,    44,     0,    45,    46,    49,    50,    51,     0,
+       0,    52,    53,    54,    55,    56,     0,     0,     0,    57,
+       0,     0,     0,     0,    59,     0,    60,    52,    53,    54,
+      55,    56,     0,     0,     0,    57,     0,     0,     0,     0,
+      59,     0,    60,    61,    62,   -23,   -23,   -23,   -23,   -23,
+     -23,   -23,   -23,   -23,   -23,     0,   -23,    61,    62,   -24,
+     -24,   -24,   -24,   -24,   -24,   -24,   -24,   -24,   -24,     0,
+     -24,   -23,   -23,     0,     0,     0,   -23,     0,     0,     0,
+       0,     0,     0,     0,     0,   -24,   -24,     0,     0,     0,
+     -24
   };
 
   const short int
   parser::yycheck_[] =
   {
-      11,    12,    13,    14,    15,    16,    17,    69,    11,    12,
-      32,    22,    72,    73,    13,    49,    13,    28,    29,    30,
-      54,    13,    56,    49,    49,    49,    32,    30,    50,    40,
-      41,    42,    43,    44,    45,    46,    47,    48,    49,    50,
-      51,    52,    53,    54,    50,    56,   108,    51,     9,    60,
-      61,    62,    63,    64,    65,    66,    67,    68,    32,    49,
-      71,    18,    19,     3,     4,     5,   128,    13,     8,    52,
-      10,    11,    12,    13,    -1,    71,    -1,    -1,    -1,    -1,
-      -1,    -1,    22,    23,    41,    42,    43,    44,    45,    -1,
-      -1,    -1,    49,    -1,    -1,    -1,    -1,    54,    -1,    56,
-      -1,    41,    42,    -1,   115,   116,   117,    47,    48,    49,
-      -1,    -1,    -1,    53,     3,     4,     5,    -1,   129,     8,
-      -1,    10,    11,    12,    13,    -1,    -1,    -1,    -1,    -1,
-       3,     4,     5,    22,    23,     8,    -1,    10,    11,    12,
-      13,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    22,
-      23,    -1,    41,    42,    -1,    -1,    -1,    -1,    47,    48,
-      49,    -1,    -1,    -1,    53,    -1,    -1,    -1,    41,    42,
-      -1,    -1,    -1,    -1,    47,    48,    49,    -1,     0,    -1,
-      53,     3,     4,     5,    -1,    -1,     8,    -1,    10,    11,
-      12,    13,    -1,    -1,    -1,    -1,    -1,    -1,    -1,     5,
-      22,    23,     8,    -1,    10,    11,    12,    13,    -1,    -1,
-      -1,    -1,    -1,    -1,     5,    -1,    22,    23,    -1,    41,
-      42,    12,    13,    -1,    -1,    47,    48,    49,    -1,    -1,
-       5,    22,    23,    -1,    -1,    41,    42,    12,    13,    -1,
-      -1,    47,    48,    49,    -1,    -1,    52,    22,    23,    -1,
-      41,    42,    -1,    -1,    -1,    -1,    47,    48,    49,    -1,
-      -1,    52,    -1,    -1,    -1,    -1,    41,    42,    -1,    -1,
-      -1,    -1,    47,    48,    49,    14,    -1,    16,    -1,    18,
-      19,    20,    21,    43,    44,    45,    -1,    -1,    -1,    49,
-      -1,    -1,    -1,    -1,    54,    -1,    56,    36,    37,    38,
-      -1,    -1,    41,    42,    43,    44,    45,    -1,    -1,    -1,
-      49,    -1,    51,    -1,    14,    54,    16,    56,    18,    19,
-      20,    21,    -1,    22,    23,    24,    25,    26,    27,    28,
-      29,    30,    31,    -1,    33,    -1,    36,    37,    38,    -1,
-      -1,    41,    42,    43,    44,    45,    -1,    -1,    -1,    49,
-      50,    -1,    -1,    14,    54,    16,    56,    18,    19,    20,
-      21,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    36,    37,    38,    -1,    -1,
-      41,    42,    43,    44,    45,    -1,    -1,    -1,    49,    -1,
-      51,    -1,    14,    54,    16,    56,    18,    19,    20,    21,
+      14,    15,    16,    17,    18,    19,    20,    72,    14,    15,
+      35,    25,    75,    76,    12,    52,    12,    31,    32,    33,
+      57,    12,    59,    52,    52,    52,    35,    33,    53,    43,
+      44,    45,    46,    47,    48,    49,    50,    51,    52,    53,
+      54,    55,    56,    57,    53,    59,   111,    54,     9,    63,
+      64,    65,    66,    67,    68,    69,    70,    71,    35,    52,
+      74,    21,    22,    12,    74,    55,   131,     3,     4,     5,
+      -1,    -1,     8,    -1,    10,    11,    12,    13,    14,    15,
+      16,    -1,    -1,    -1,    44,    45,    46,    47,    48,    25,
+      26,    -1,    52,    -1,    -1,    -1,    -1,    57,    -1,    59,
+      -1,    -1,    -1,    -1,   118,   119,   120,    -1,    44,    45,
+      -1,    -1,    -1,    -1,    50,    51,    52,    -1,   132,    -1,
+      56,     3,     4,     5,    -1,    -1,     8,    -1,    10,    11,
+      12,    13,    14,    15,    16,    -1,    -1,    44,    45,    46,
+      47,    48,    -1,    25,    26,    52,    -1,    46,    47,    48,
+      57,    -1,    59,    52,    -1,    -1,    -1,    -1,    57,    -1,
+      59,    -1,    44,    45,    -1,    -1,    -1,    -1,    50,    51,
+      52,     3,     4,     5,    56,    -1,     8,    -1,    10,    11,
+      12,    13,    14,    15,    16,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    25,    26,    25,    26,    27,    28,    29,
+      30,    31,    32,    33,    34,    -1,    36,    -1,    38,    -1,
+      -1,    -1,    44,    45,    -1,    -1,    -1,    -1,    50,    51,
+      52,    -1,     0,    -1,    56,     3,     4,     5,    -1,    -1,
+       8,    -1,    10,    11,    12,    13,    14,    15,    16,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    25,    26,     5,
+      -1,    -1,     8,    -1,    10,    11,    12,    13,    14,    15,
+      16,    -1,    -1,    -1,    -1,    -1,    44,    45,    -1,    25,
+      26,     5,    50,    51,    52,    -1,    -1,    -1,    12,    13,
+      14,    15,    16,    -1,    -1,    -1,    -1,    -1,    44,    45,
+      -1,    25,    26,     5,    50,    51,    52,    -1,    -1,    55,
+      12,    13,    14,    15,    16,    -1,    -1,    -1,    -1,    -1,
+      44,    45,    -1,    25,    26,    -1,    50,    51,    52,    -1,
+      17,    55,    19,    -1,    21,    22,    23,    24,    -1,    -1,
+      -1,    -1,    44,    45,    -1,    -1,    -1,    -1,    50,    51,
+      52,    -1,    39,    40,    41,    -1,    -1,    44,    45,    46,
+      47,    48,    -1,    -1,    -1,    52,    -1,    54,    -1,    17,
+      57,    19,    59,    21,    22,    23,    24,    -1,    25,    26,
+      27,    28,    29,    30,    31,    32,    33,    34,    -1,    36,
+      -1,    39,    40,    41,    -1,    -1,    44,    45,    46,    47,
+      48,    -1,    -1,    -1,    52,    53,    -1,    -1,    17,    57,
+      19,    59,    21,    22,    23,    24,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    36,    37,    38,    -1,    -1,    41,
-      42,    43,    44,    45,    -1,    -1,    -1,    49,    50,    -1,
-      -1,    14,    54,    16,    56,    18,    19,    20,    21,    -1,
+      39,    40,    41,    -1,    -1,    44,    45,    46,    47,    48,
+      -1,    -1,    -1,    52,    -1,    54,    -1,    17,    57,    19,
+      59,    21,    22,    23,    24,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    39,
+      40,    41,    -1,    -1,    44,    45,    46,    47,    48,    -1,
+      -1,    -1,    52,    53,    -1,    -1,    17,    57,    19,    59,
+      21,    22,    23,    24,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    39,    40,
+      41,    -1,    -1,    44,    45,    46,    47,    48,    -1,    -1,
+      -1,    52,    53,    -1,    -1,    17,    57,    19,    59,    21,
+      22,    23,    24,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    39,    40,    41,
+      -1,    -1,    44,    45,    46,    47,    48,    -1,    -1,    -1,
+      52,    -1,    54,    -1,    17,    57,    19,    59,    21,    22,
+      23,    24,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    39,    40,    41,    -1,
+      -1,    44,    45,    46,    47,    48,    17,    -1,    19,    52,
+      21,    22,    23,    24,    57,    58,    59,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    39,    40,
+      41,    -1,    -1,    44,    45,    46,    47,    48,    -1,    -1,
+      -1,    52,    -1,    54,    -1,    17,    57,    19,    59,    21,
+      22,    23,    24,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    39,    40,    41,
+      -1,    -1,    44,    45,    46,    47,    48,    -1,    -1,    -1,
+      52,    -1,    54,    -1,    17,    57,    19,    59,    21,    22,
+      23,    24,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    39,    40,    41,    -1,
+      -1,    44,    45,    46,    47,    48,    -1,    -1,    -1,    52,
+      53,    -1,    -1,    17,    57,    19,    59,    21,    22,    23,
+      24,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    39,    40,    41,    -1,    -1,
+      44,    45,    46,    47,    48,    -1,    -1,    -1,    52,    53,
+      -1,    -1,    17,    57,    19,    59,    21,    22,    23,    24,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    36,    37,    38,    -1,    -1,    41,    42,
-      43,    44,    45,    -1,    -1,    -1,    49,    50,    -1,    -1,
-      14,    54,    16,    56,    18,    19,    20,    21,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    36,    37,    38,    -1,    -1,    41,    42,    43,
-      44,    45,    -1,    -1,    -1,    49,    -1,    51,    -1,    14,
-      54,    16,    56,    18,    19,    20,    21,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    36,    37,    38,    -1,    -1,    41,    42,    43,    44,
-      45,    14,    -1,    16,    49,    18,    19,    20,    21,    54,
-      55,    56,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    36,    37,    38,    -1,    -1,    41,    42,
-      43,    44,    45,    -1,    -1,    -1,    49,    -1,    51,    -1,
-      14,    54,    16,    56,    18,    19,    20,    21,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    36,    37,    38,    -1,    -1,    41,    42,    43,
-      44,    45,    -1,    -1,    -1,    49,    -1,    51,    -1,    14,
-      54,    16,    56,    18,    19,    20,    21,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    36,    37,    38,    -1,    -1,    41,    42,    43,    44,
-      45,    -1,    -1,    -1,    49,    50,    -1,    -1,    14,    54,
-      16,    56,    18,    19,    20,    21,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      36,    37,    38,    -1,    -1,    41,    42,    43,    44,    45,
-      -1,    -1,    -1,    49,    50,    -1,    -1,    14,    54,    16,
-      56,    18,    19,    20,    21,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    36,
-      37,    38,    -1,    -1,    41,    42,    43,    44,    45,    14,
-      -1,    16,    49,    18,    19,    -1,    -1,    54,    -1,    56,
-      -1,    -1,    -1,    -1,    -1,    14,    -1,    16,    -1,    18,
-      19,    36,    37,    38,    -1,    -1,    41,    42,    43,    44,
-      45,    -1,    -1,    -1,    49,    -1,    -1,    -1,    -1,    54,
-      -1,    56,    41,    42,    43,    44,    45,    -1,    -1,    -1,
-      49,    -1,    -1,    -1,    -1,    54,    -1,    56,    22,    23,
-      24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
-      -1,    35,    22,    23,    24,    25,    26,    27,    28,    29,
-      30,    31,    32,    33,    -1,    35,    50,    51,    -1,    -1,
-      -1,    55,    -1,    -1,    41,    42,    43,    44,    45,    -1,
-      50,    51,    49,    -1,    -1,    55,    -1,    54,    -1,    56,
-      22,    23,    24,    25,    26,    27,    28,    29,    30,    31,
-      -1,    33,    -1,    35
+      -1,    -1,    -1,    -1,    39,    40,    41,    -1,    -1,    44,
+      45,    46,    47,    48,    17,    -1,    19,    52,    21,    22,
+      -1,    -1,    57,    -1,    59,    -1,    -1,    -1,    -1,    -1,
+      17,    -1,    19,    -1,    21,    22,    39,    40,    41,    -1,
+      -1,    44,    45,    46,    47,    48,    -1,    -1,    -1,    52,
+      -1,    -1,    -1,    -1,    57,    -1,    59,    44,    45,    46,
+      47,    48,    -1,    -1,    -1,    52,    -1,    -1,    -1,    -1,
+      57,    -1,    59,    25,    26,    27,    28,    29,    30,    31,
+      32,    33,    34,    35,    36,    -1,    38,    25,    26,    27,
+      28,    29,    30,    31,    32,    33,    34,    35,    36,    -1,
+      38,    53,    54,    -1,    -1,    -1,    58,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    53,    54,    -1,    -1,    -1,
+      58
   };
 
   const unsigned char
   parser::yystos_[] =
   {
-       0,    58,     0,     3,     4,     5,     8,    10,    11,    12,
-      13,    22,    23,    41,    42,    47,    48,    49,    59,    61,
-      62,    63,    65,    66,    13,    60,    13,    13,    49,    49,
-      49,    61,    62,    62,    61,    61,    61,    61,    61,    51,
-      14,    16,    18,    19,    20,    21,    36,    37,    38,    41,
-      42,    43,    44,    45,    49,    51,    54,    56,    22,    23,
-      24,    25,    26,    27,    28,    29,    30,    31,    33,    52,
-      61,     9,    32,    49,    61,    61,    61,    62,    50,    61,
-      61,    61,    61,    61,    61,    61,    61,    61,    61,    61,
-      61,    61,    61,    61,    64,    61,    13,    61,    61,    61,
-      61,    61,    61,    61,    61,    61,    58,    51,    52,    61,
-      66,    60,    60,    50,    50,    51,    35,    32,    50,    55,
-      53,    58,    51,    50,    61,    61,    61,    53,    52,    51,
-      50,    58,    61,    53,    50
+       0,    61,     0,     3,     4,     5,     8,    10,    11,    12,
+      13,    14,    15,    16,    25,    26,    44,    45,    50,    51,
+      52,    62,    64,    65,    66,    68,    69,    12,    63,    12,
+      12,    52,    52,    52,    64,    65,    65,    64,    64,    64,
+      64,    64,    54,    17,    19,    21,    22,    23,    24,    39,
+      40,    41,    44,    45,    46,    47,    48,    52,    54,    57,
+      59,    25,    26,    27,    28,    29,    30,    31,    32,    33,
+      34,    36,    55,    64,     9,    35,    52,    64,    64,    64,
+      65,    53,    64,    64,    64,    64,    64,    64,    64,    64,
+      64,    64,    64,    64,    64,    64,    64,    67,    64,    12,
+      64,    64,    64,    64,    64,    64,    64,    64,    64,    61,
+      54,    55,    64,    69,    63,    63,    53,    53,    54,    38,
+      35,    53,    58,    56,    61,    54,    53,    64,    64,    64,
+      56,    55,    54,    53,    61,    64,    56,    53
   };
 
   const unsigned char
   parser::yyr1_[] =
   {
-       0,    57,    58,    58,    58,    58,    59,    59,    60,    60,
-      61,    61,    62,    62,    62,    62,    62,    62,    62,    62,
-      62,    62,    62,    62,    62,    62,    62,    63,    63,    63,
-      63,    63,    63,    63,    63,    63,    63,    63,    63,    63,
-      63,    63,    63,    63,    63,    63,    63,    63,    63,    63,
-      63,    64,    64,    65,    65,    65,    65,    66,    66,    66,
-      66,    66
+       0,    60,    61,    61,    61,    61,    62,    62,    63,    63,
+      64,    64,    65,    65,    65,    65,    65,    65,    65,    65,
+      65,    65,    65,    65,    65,    65,    65,    66,    66,    66,
+      66,    66,    66,    66,    66,    66,    66,    66,    66,    66,
+      66,    66,    66,    66,    66,    66,    66,    66,    66,    66,
+      66,    66,    66,    66,    67,    67,    68,    68,    68,    68,
+      69,    69,    69,    69,    69
   };
 
   const unsigned char
@@ -1564,11 +1705,11 @@ namespace yy {
   {
        0,     2,     0,     3,     3,     2,     2,     8,     1,     3,
        1,     1,     1,     3,     4,     3,     3,     3,     3,     3,
-       3,     3,     3,     2,     2,     2,     2,     0,     1,     2,
-       4,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     3,     3,     3,     3,     3,     2,     2,     2,     2,
-       3,     1,     3,     4,     4,     8,     6,     4,     3,     3,
-       5,     4
+       3,     3,     3,     2,     2,     2,     2,     0,     1,     1,
+       1,     1,     2,     4,     3,     3,     3,     3,     3,     3,
+       3,     3,     3,     3,     3,     3,     3,     3,     3,     2,
+       2,     2,     2,     3,     1,     3,     4,     4,     8,     6,
+       4,     3,     3,     5,     4
   };
 
 
@@ -1579,27 +1720,27 @@ namespace yy {
   const parser::yytname_[] =
   {
   "$end", "error", "$undefined", "VAR", "FUNCTION", "NEW", "DELETE",
-  "THROW", "IF", "ELSE", "WHILE", "FOR", "CONSTANT", "IDENTIFIER", "EQ",
-  "STEQ", "NEQ", "STNEQ", "LE", "GE", "LAND", "LOR", "ADDSELF", "SUBSELF",
-  "DEQ", "MEQ", "AEQ", "SEQ", "MODEQ", "ANDEQ", "OREQ", "XOREQ", "','",
-  "'='", "'?'", "':'", "'&'", "'|'", "'^'", "'>'", "'<'", "'-'", "'+'",
-  "'*'", "'/'", "'%'", "UMINUS", "'!'", "'~'", "'('", "')'", "';'", "'{'",
-  "'}'", "'['", "']'", "'.'", "$accept", "start", "statement", "define",
-  "expression", "lvalue", "rvalue", "arguments", "branch_head",
-  "conditional", YY_NULLPTR
+  "THROW", "IF", "ELSE", "WHILE", "FOR", "IDENTIFIER", "INT", "STRING",
+  "BOOL", "DOUBLE", "EQ", "STEQ", "NEQ", "STNEQ", "LE", "GE", "LAND",
+  "LOR", "ADDSELF", "SUBSELF", "DEQ", "MEQ", "AEQ", "SEQ", "MODEQ",
+  "ANDEQ", "OREQ", "XOREQ", "','", "'='", "'?'", "':'", "'&'", "'|'",
+  "'^'", "'>'", "'<'", "'-'", "'+'", "'*'", "'/'", "'%'", "UMINUS", "'!'",
+  "'~'", "'('", "')'", "';'", "'{'", "'}'", "'['", "']'", "'.'", "$accept",
+  "start", "statement", "define", "expression", "lvalue", "rvalue",
+  "arguments", "branch_head", "conditional", YY_NULLPTR
   };
 
 
   const unsigned short int
   parser::yyrline_[] =
   {
-       0,    62,    62,    63,    64,    67,    72,    73,    78,    87,
-      90,    90,    92,    97,   102,   106,   112,   118,   124,   130,
-     136,   142,   148,   154,   158,   162,   166,   172,   176,   180,
-     184,   200,   207,   217,   227,   237,   247,   257,   267,   277,
-     287,   297,   307,   317,   327,   337,   347,   355,   363,   371,
-     379,   382,   383,   397,   398,   399,   400,   402,   403,   404,
-     405,   406
+       0,    77,    77,    78,    81,    84,    89,    90,    95,   100,
+     103,   103,   105,   112,   117,   121,   126,   131,   136,   141,
+     146,   151,   156,   161,   166,   171,   176,   183,   188,   195,
+     202,   209,   216,   220,   225,   230,   246,   262,   278,   294,
+     310,   326,   342,   358,   374,   390,   406,   422,   438,   454,
+     467,   480,   493,   506,   509,   510,   524,   525,   526,   527,
+     529,   530,   531,   532,   533
   };
 
   // Print the state stack on the debug stream.
@@ -1643,16 +1784,16 @@ namespace yy {
      0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    47,     2,     2,     2,    45,    36,     2,
-      49,    50,    43,    42,    32,    41,    56,    44,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,    35,    51,
-      40,    33,    39,    34,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,    50,     2,     2,     2,    48,    39,     2,
+      52,    53,    46,    45,    35,    44,    59,    47,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,    38,    54,
+      43,    36,    42,    37,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,    54,     2,    55,    38,     2,     2,     2,     2,     2,
+       2,    57,     2,    58,    41,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    52,    37,    53,    48,     2,     2,     2,
+       2,     2,     2,    55,    40,    56,    51,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -1668,9 +1809,10 @@ namespace yy {
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    31,    46
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      49
     };
-    const unsigned int user_token_number_max_ = 287;
+    const unsigned int user_token_number_max_ = 290;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -1683,8 +1825,8 @@ namespace yy {
 
 
 } // yy
-#line 1687 "zScript.tab.cpp" // lalr1.cc:1167
-#line 409 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
+#line 1829 "zScript.tab.cpp" // lalr1.cc:1167
+#line 536 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
 
 
 yyFlexLexer *flexLexer;
@@ -1693,10 +1835,12 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    rootCode = new Global::Code();
-    currentCode = rootCode;
+    undefinedIdentifier = new QSet<const QByteArray>();
+    scopeList = new QList<Scope*>();
+    constantHash = new QHash<const QByteArray, Global::ZVariant*>();
+    currentScope = createScope();
 
-    rootCode->data->identifiersHash["console"] = new Global::ZVariant(new Global::ZConsole);
+//    currentScope->identifiers["console"] = &(new Global::ZVariant(new Global::ZConsole));
 
     if(argc > 1) {
         freopen(argv[1], "r", stdin);
@@ -1725,9 +1869,92 @@ int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)
     return flexLexer->yylex();
 }
 
+Global::ZVariant *getIdentifierAddress(const QByteArray &name)
+{
+    Scope *scope = currentScope;
+    Global::ZVariant **val = Q_NULLPTR;
+
+    while(scope) {
+        val = scope->identifiers.value(name);
+
+        if(val)
+            return *val;
+
+        scope = currentScope->parent;
+    }
+
+    if(!val) {
+        val = new Global::ZVariant*;
+    }
+
+    return *val;
+}
+
+Global::ZVariant *getConstantAddress(const QByteArray &name, Global::ZVariant::Type type)
+{
+    Global::ZVariant *val = constantHash->value(name);
+
+    if(!val) {
+        switch(type) {
+        case Global::ZVariant::Int:
+            val = new Global::ZVariant(name.toInt());
+            break;
+        case Global::ZVariant::Double:
+            val = new Global::ZVariant(name.toDouble());
+            break;
+        case Global::ZVariant::String:
+            val = new Global::ZVariant(QString(name));
+            break;
+        case Global::ZVariant::Bool:
+            val = new Global::ZVariant((bool)name.toInt());
+            break;
+        default:
+            val = new Global::ZVariant();
+            break;
+        }
+
+        (*constantHash)[name] = val;
+    }
+
+    return val;
+}
+
+Global::ZVariant *getConstantAddressByValue(const Global::ZVariant &value)
+{
+    return getConstantAddress(value.toString().toLatin1(), value.type());
+}
+
+Global::ZCode *createCode(const Global::ZCode::Action &action, Global::ZVariant *val)
+{
+    Global::ZCode *code = new Global::ZCode;
+
+    code->action = action;
+    code->target = val;
+
+    return code;
+}
+
+Scope *createScope(Scope *parent)
+{
+    Scope *scope = new Scope;
+
+    scope->parent = parent;
+    scopeList->append(scope);
+
+    return scope;
+}
+
 int yyFlexLexer::yywrap()
 {
-    rootCode->exec();
+    qDeleteAll(*scopeList);
 
-    return 1;
+    delete scopeList;
+    delete constantHash;
+    delete undefinedIdentifier;
+
+    for(const Global::ZCode *code : Global::codeList) {
+        qDebug() << *code;
+    }
+
+    return 0;
 }

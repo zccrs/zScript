@@ -43,15 +43,15 @@ ignore [ \t]
 "||"            { return TOKEN_PREFIX::LOR;}
 
 "true" {
-    yylval->value = new Global::ZVariant(true);
+    yylval->identifier = new QByteArray("1");
 
-    return TOKEN_PREFIX::CONSTANT;
+    return TOKEN_PREFIX::BOOL;
 }
 
 "false" {
-    yylval->value = new Global::ZVariant(false);
+    yylval->identifier = new QByteArray("0");
 
-    return TOKEN_PREFIX::CONSTANT;
+    return TOKEN_PREFIX::BOOL;
 }
 
 [\r\n] {
@@ -83,7 +83,9 @@ ignore [ \t]
 }
 
 ['"] {
-    QByteArray str;
+    yylval->identifier = new QByteArray();
+
+    QByteArray &str = *yylval->identifier;
 
     while(!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
@@ -103,9 +105,7 @@ ignore [ \t]
         }
     }
 
-    yylval->value = new Global::ZVariant(QString::fromLocal8Bit(str));
-
-    return TOKEN_PREFIX::CONSTANT;
+    return TOKEN_PREFIX::STRING;
 }
 
 "//" {
@@ -141,14 +141,14 @@ ignore [ \t]
 }
 
 {number} {
-    yylval->value = new Global::ZVariant(atoi(yytext));
+    yylval->identifier = new QByteArray(yytext);
 
-    return TOKEN_PREFIX::CONSTANT;
+    return TOKEN_PREFIX::INT;
 }
 
 {real} {
-    yylval->value = new Global::ZVariant(atof(yytext));
+    yylval->identifier = new QByteArray(yytext);
 
-    return TOKEN_PREFIX::CONSTANT;
+    return TOKEN_PREFIX::DOUBLE;
 }
 %%

@@ -4,7 +4,7 @@
 #include <QVariant>
 #include <QMetaMethod>
 #include <QMetaType>
-#include <QTimer>
+#include <QStack>
 
 #include <iostream>
 
@@ -289,70 +289,6 @@ QDebug operator<<(QDebug deg, const ZVariant &var)
     deg.nospace() << ")";
 
     return deg;
-}
-
-/// ZObject
-ZObject::ZObject(ZObject *parent)
-    : QObject(parent)
-{
-    /// call later
-
-    QMetaObject::invokeMethod(this, "initFunctionProperty", Qt::QueuedConnection);
-}
-
-ZVariant ZObject::property(const char *name) const
-{
-    return ZVariant(QObject::property(name));
-}
-
-void ZObject::setProperty(const char *name, const ZVariant &value)
-{
-    QObject::setProperty(name, value.toQVariant());
-}
-
-void ZObject::addFunctionProperty(const char *name)
-{
-    setProperty(name, new ZFunction(this, name, this));
-}
-
-void ZObject::initFunctionProperty()
-{
-    const QMetaObject *meta = this->metaObject();
-
-    int methodOffse = meta->methodOffset();
-    int methodCount = meta->methodCount();
-
-    for(int i = methodOffse; i < methodOffse + methodCount; ++i) {
-        const QMetaMethod &method = meta->method(i);
-
-        if(QByteArray(method.name()) == "call")
-            continue;
-
-        if(QByteArray(QMetaType::typeName(method.returnType())) == "QList<Global::ZVariant>"
-                && method.parameterCount() == 1
-                && method.parameterTypes().first() == "QList<ZVariant>") {
-            addFunctionProperty(method.name());
-        }
-    }
-}
-
-ZFunction::ZFunction(ZObject *target, const char *name, ZObject *parent)
-    : ZObject(parent)
-    , m_target(target)
-    , m_methodName(name)
-{
-
-}
-
-QList<ZVariant> ZFunction::call(const QList<ZVariant> &args) const
-{
-    QList<ZVariant> retVal;
-
-    QMetaObject::invokeMethod(m_target, m_methodName.constData(),
-//                                          Q_RETURN_ARG(QList<Global::ZVariant>, retVal),
-                              Q_ARG(const QList<ZVariant>, args));
-
-    return retVal;
 }
 
 /// global
@@ -703,167 +639,218 @@ ZVariant operator ~(const ZVariant &var)
     return ZVariant::NaN;
 }
 
-QByteArray readFile(const QString &fileName)
+/// ZObject
+ZObject::ZObject(ZObject *parent)
+    : QObject(parent)
 {
-    QFile file(fileName);
-    QByteArray re;
+    /// call later
 
-    if(file.open(QIODevice::ReadOnly)) {
-        re = file.readAll();
-        file.close();
+    QMetaObject::invokeMethod(this, "initFunctionProperty", Qt::QueuedConnection);
+}
+
+ZVariant ZObject::property(const char *name) const
+{
+    return ZVariant(QObject::property(name));
+}
+
+void ZObject::setProperty(const char *name, const ZVariant &value)
+{
+    QObject::setProperty(name, value.toQVariant());
+}
+
+void ZObject::addFunctionProperty(const char *name)
+{
+    setProperty(name, new ZFunction(this, name, this));
+}
+
+void ZObject::initFunctionProperty()
+{
+    const QMetaObject *meta = this->metaObject();
+
+    int methodOffse = meta->methodOffset();
+    int methodCount = meta->methodCount();
+
+    for(int i = methodOffse; i < methodOffse + methodCount; ++i) {
+        const QMetaMethod &method = meta->method(i);
+
+        if(QByteArray(method.name()) == "call")
+            continue;
+
+        if(QByteArray(QMetaType::typeName(method.returnType())) == "QList<Global::ZVariant>"
+                && method.parameterCount() == 1
+                && method.parameterTypes().first() == "QList<ZVariant>") {
+            addFunctionProperty(method.name());
+        }
     }
+}
 
-    return re;
+ZFunction::ZFunction(ZObject *target, const char *name, ZObject *parent)
+    : ZObject(parent)
+    , m_target(target)
+    , m_methodName(name)
+{
+
+}
+
+QList<ZVariant> ZFunction::call(const QList<ZVariant> &args) const
+{
+    QList<ZVariant> retVal;
+
+    QMetaObject::invokeMethod(m_target, m_methodName.constData(),
+//                                          Q_RETURN_ARG(QList<Global::ZVariant>, retVal),
+                              Q_ARG(const QList<ZVariant>, args));
+
+    return retVal;
 }
 
 Node::Node(OperatorType t, Node *l, Node *r)
-    :left(l), right(r), nodeType(t)
+    :/*left(l), right(r), */nodeType(t)
 {
 
 }
 
 Node::~Node()
 {
-    if(left)
-        delete left;
+//    if(left)
+//        delete left;
 
-    if(right)
-        delete right;
+//    if(right)
+//        delete right;
 
-    if(value)
-        delete value;
+//    if(value)
+//        delete value;
 }
 
 void Node::recursion()
 {
-    if(left)
-        left->codeEnv = codeEnv;
+//    if(left)
+//        left->codeEnv = codeEnv;
 
-    if(right)
-        right->codeEnv = codeEnv;
+//    if(right)
+//        right->codeEnv = codeEnv;
 
-    switch(nodeType) {
-    case Assign:
-        left->recursion();
+//    switch(nodeType) {
+//    case Assign:
+//        left->recursion();
 
-        if(left->value)
-            *left->value = right->recursionAndGetValue();
-        else
-            zError << "Undefined reference";
-        break;
-    case Add:
-        *value = left->recursionAndGetValue() + right->recursionAndGetValue();
-        break;
-    case Sub:
-        *value = left->recursionAndGetValue() - right->recursionAndGetValue();
-        break;
-    case Mul:
-        *value = left->recursionAndGetValue() * right->recursionAndGetValue();
-        break;
-    case Div:
-        *value = left->recursionAndGetValue() / right->recursionAndGetValue();
-        break;
-    case Abs:
-        *value = +right->recursionAndGetValue();
-        break;
-    case Minus:
-        *value = -right->recursionAndGetValue();
-        break;
-    case And:
-        *value = left->recursionAndGetValue() & right->recursionAndGetValue();
-        break;
-    case Or:
-        *value = left->recursionAndGetValue() | right->recursionAndGetValue();
-        break;
-    case Xor:
-        *value = left->recursionAndGetValue() ^ right->recursionAndGetValue();
-        break;
-    case Contrary:
-        *value = ~left->recursionAndGetValue();
-        break;
-    case Mod:
-        *value = left->recursionAndGetValue() % right->recursionAndGetValue();
-        break;
-    case Not:
-        *value = !left->recursionAndGetValue();
-        break;
-    case Less:
-        *value = left->recursionAndGetValue() < right->recursionAndGetValue();
-        break;
-    case Greater:
-        *value = left->recursionAndGetValue() > right->recursionAndGetValue();
-        break;
-    case New:
-        /// TODO
-        break;
-    case Delete:
-        /// TODO
-        break;
-    case Throw:
-        /// TODO
-        break;
-    case EQ:
-        *value = left->recursionAndGetValue() == right->recursionAndGetValue();
-        break;
-    case STEQ: {
-        const ZVariant &v1 = left->recursionAndGetValue();
-        const ZVariant &v2 = right->recursionAndGetValue();
+//        if(left->value)
+//            *left->value = right->recursionAndGetValue();
+//        else
+//            zError << "Undefined reference";
+//        break;
+//    case Add:
+//        *value = left->recursionAndGetValue() + right->recursionAndGetValue();
+//        break;
+//    case Sub:
+//        *value = left->recursionAndGetValue() - right->recursionAndGetValue();
+//        break;
+//    case Mul:
+//        *value = left->recursionAndGetValue() * right->recursionAndGetValue();
+//        break;
+//    case Div:
+//        *value = left->recursionAndGetValue() / right->recursionAndGetValue();
+//        break;
+//    case Abs:
+//        *value = +right->recursionAndGetValue();
+//        break;
+//    case Minus:
+//        *value = -right->recursionAndGetValue();
+//        break;
+//    case And:
+//        *value = left->recursionAndGetValue() & right->recursionAndGetValue();
+//        break;
+//    case Or:
+//        *value = left->recursionAndGetValue() | right->recursionAndGetValue();
+//        break;
+//    case Xor:
+//        *value = left->recursionAndGetValue() ^ right->recursionAndGetValue();
+//        break;
+//    case Contrary:
+//        *value = ~left->recursionAndGetValue();
+//        break;
+//    case Mod:
+//        *value = left->recursionAndGetValue() % right->recursionAndGetValue();
+//        break;
+//    case Not:
+//        *value = !left->recursionAndGetValue();
+//        break;
+//    case Less:
+//        *value = left->recursionAndGetValue() < right->recursionAndGetValue();
+//        break;
+//    case Greater:
+//        *value = left->recursionAndGetValue() > right->recursionAndGetValue();
+//        break;
+//    case New:
+//        /// TODO
+//        break;
+//    case Delete:
+//        /// TODO
+//        break;
+//    case Throw:
+//        /// TODO
+//        break;
+//    case EQ:
+//        *value = left->recursionAndGetValue() == right->recursionAndGetValue();
+//        break;
+//    case STEQ: {
+//        const ZVariant &v1 = left->recursionAndGetValue();
+//        const ZVariant &v2 = right->recursionAndGetValue();
 
-        *value = v1.type() == v2.type() && v1 == v2;
-        break;
-    }
-    case NEQ:
-        *value = left->recursionAndGetValue() != right->recursionAndGetValue();
-        break;
-    case STNEQ: {
-        const ZVariant &v1 = left->recursionAndGetValue();
-        const ZVariant &v2 = right->recursionAndGetValue();
+//        *value = v1.type() == v2.type() && v1 == v2;
+//        break;
+//    }
+//    case NEQ:
+//        *value = left->recursionAndGetValue() != right->recursionAndGetValue();
+//        break;
+//    case STNEQ: {
+//        const ZVariant &v1 = left->recursionAndGetValue();
+//        const ZVariant &v2 = right->recursionAndGetValue();
 
-        *value = v1.type() != v2.type() || v1 != v2;
-        break;
-    }
-    case LE:
-        *value = left->recursionAndGetValue() <= right->recursionAndGetValue();
-        break;
-    case GE:
-        *value = left->recursionAndGetValue() >= right->recursionAndGetValue();
-        break;
-    case LAnd:
-        *value = left->recursionAndGetValue() && right->recursionAndGetValue();
-        break;
-    case LOr:
-        *value = left->recursionAndGetValue() || right->recursionAndGetValue();
-        break;
-    case Get: {
-        ZObject *obj = left->recursionAndGetValue().toObject();
+//        *value = v1.type() != v2.type() || v1 != v2;
+//        break;
+//    }
+//    case LE:
+//        *value = left->recursionAndGetValue() <= right->recursionAndGetValue();
+//        break;
+//    case GE:
+//        *value = left->recursionAndGetValue() >= right->recursionAndGetValue();
+//        break;
+//    case LAnd:
+//        *value = left->recursionAndGetValue() && right->recursionAndGetValue();
+//        break;
+//    case LOr:
+//        *value = left->recursionAndGetValue() || right->recursionAndGetValue();
+//        break;
+//    case Get: {
+//        ZObject *obj = left->recursionAndGetValue().toObject();
 
-        *value = obj->property(right->value->toString().toLatin1().constData());
-        break;
-    }
-    case Comma: {
-        const ZVariant &left_value = left->recursionAndGetValue();
+//        *value = obj->property(right->value->toString().toLatin1().constData());
+//        break;
+//    }
+//    case Comma: {
+//        const ZVariant &left_value = left->recursionAndGetValue();
 
-        if(left_value.type() == ZVariant::List) {
-            *value = ZVariant(left_value.toList() << right->recursionAndGetValue());
-        } else {
-            *value = QList<ZVariant>() << left_value << right->recursionAndGetValue();
-        }
-        break;
-    }
-    case Call: {
-        const ZFunction *fun = qobject_cast<ZFunction*>(left->recursionAndGetValue().toObject());
+//        if(left_value.type() == ZVariant::List) {
+//            *value = ZVariant(left_value.toList() << right->recursionAndGetValue());
+//        } else {
+//            *value = QList<ZVariant>() << left_value << right->recursionAndGetValue();
+//        }
+//        break;
+//    }
+//    case Call: {
+//        const ZFunction *fun = qobject_cast<ZFunction*>(left->recursionAndGetValue().toObject());
 
-        if(fun) {
-            fun->call(right->recursionAndGetValue().toList());
-        }
-        break;
-    }
-    case Variant: {
-        value = codeEnv->variantValue(name);
-        break;
-    }
-    default: break;
-    }
+//        if(fun) {
+//            fun->call(right->recursionAndGetValue().toList());
+//        }
+//        break;
+//    }
+//    case Variant: {
+//        value = codeEnv->variantValue(name);
+//        break;
+//    }
+//    default: break;
+//    }
 }
 
 ZVariant CodeData::variantValue(const QByteArray &name) const
@@ -877,7 +864,7 @@ ZVariant CodeData::variantValue(const QByteArray &name) const
         code = code->parent.constData();
     } while(code);
 
-    return Q_NULLPTR;
+    return ZVariant();
 }
 
 Code::Code(Code *p)
@@ -890,7 +877,7 @@ Code::Code(Code *p)
 void Code::exec() const
 {
     for(Node *node : nodeList) {
-        node->codeEnv = const_cast<Code*>(this);
+//        node->codeEnv = const_cast<Code*>(this);
         node->recursion();
     }
 }
@@ -914,6 +901,17 @@ QList<ZVariant> ZConsole::log(const QList<ZVariant> &args) const
     zStandardPrint << args.last().toString().toStdString() << std::endl;
 
     return list;
+}
+
+QStack<ZVariant*> virtualStack;
+ZVariant virtualRegister;
+QList<ZCode*> codeList;
+
+QDebug operator<<(QDebug deg, const ZCode &var)
+{
+    deg << var.action << var.target;
+
+    return deg;
 }
 
 }/// namespace Global end

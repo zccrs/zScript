@@ -802,18 +802,18 @@ case 26:
 YY_RULE_SETUP
 #line 45 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
-    yylval->value = new Global::ZVariant(true);
+    yylval->identifier = new QByteArray("1");
 
-    return TOKEN_PREFIX::CONSTANT;
+    return TOKEN_PREFIX::BOOL;
 }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 51 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
-    yylval->value = new Global::ZVariant(false);
+    yylval->identifier = new QByteArray("0");
 
-    return TOKEN_PREFIX::CONSTANT;
+    return TOKEN_PREFIX::BOOL;
 }
 	YY_BREAK
 case 28:
@@ -858,7 +858,9 @@ case 31:
 YY_RULE_SETUP
 #line 85 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
-    QByteArray str;
+    yylval->identifier = new QByteArray();
+
+    QByteArray &str = *yylval->identifier;
 
     while(!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
@@ -878,9 +880,7 @@ YY_RULE_SETUP
         }
     }
 
-    yylval->value = new Global::ZVariant(QString::fromLocal8Bit(str));
-
-    return TOKEN_PREFIX::CONSTANT;
+    return TOKEN_PREFIX::STRING;
 }
 	YY_BREAK
 case 32:
@@ -925,18 +925,18 @@ case 34:
 YY_RULE_SETUP
 #line 143 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
-    yylval->value = new Global::ZVariant(atoi(yytext));
+    yylval->identifier = new QByteArray(yytext);
 
-    return TOKEN_PREFIX::CONSTANT;
+    return TOKEN_PREFIX::INT;
 }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 149 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
-    yylval->value = new Global::ZVariant(atof(yytext));
+    yylval->identifier = new QByteArray(yytext);
 
-    return TOKEN_PREFIX::CONSTANT;
+    return TOKEN_PREFIX::DOUBLE;
 }
 	YY_BREAK
 case 36:

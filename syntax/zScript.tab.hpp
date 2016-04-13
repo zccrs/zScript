@@ -124,13 +124,12 @@ namespace yy {
     /// Symbol semantic values.
     union semantic_type
     {
-    #line 26 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
+    #line 45 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
 
-    Global::ZVariant *value;
+    int valueType;
     QByteArray *identifier;
-    Global::Node *node;
 
-#line 134 "zScript.tab.hpp" // lalr1.cc:377
+#line 133 "zScript.tab.hpp" // lalr1.cc:377
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -159,27 +158,30 @@ namespace yy {
         ELSE = 264,
         WHILE = 265,
         FOR = 266,
-        CONSTANT = 267,
-        IDENTIFIER = 268,
-        EQ = 269,
-        STEQ = 270,
-        NEQ = 271,
-        STNEQ = 272,
-        LE = 273,
-        GE = 274,
-        LAND = 275,
-        LOR = 276,
-        ADDSELF = 277,
-        SUBSELF = 278,
-        DEQ = 279,
-        MEQ = 280,
-        AEQ = 281,
-        SEQ = 282,
-        MODEQ = 283,
-        ANDEQ = 284,
-        OREQ = 285,
-        XOREQ = 286,
-        UMINUS = 287
+        IDENTIFIER = 267,
+        INT = 268,
+        STRING = 269,
+        BOOL = 270,
+        DOUBLE = 271,
+        EQ = 272,
+        STEQ = 273,
+        NEQ = 274,
+        STNEQ = 275,
+        LE = 276,
+        GE = 277,
+        LAND = 278,
+        LOR = 279,
+        ADDSELF = 280,
+        SUBSELF = 281,
+        DEQ = 282,
+        MEQ = 283,
+        AEQ = 284,
+        SEQ = 285,
+        MODEQ = 286,
+        ANDEQ = 287,
+        OREQ = 288,
+        XOREQ = 289,
+        UMINUS = 290
       };
     };
 
@@ -484,12 +486,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 853,     ///< Last index in yytable_.
+      yylast_ = 880,     ///< Last index in yytable_.
       yynnts_ = 10,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 57  ///< Number of tokens.
+      yyntokens_ = 60  ///< Number of tokens.
     };
 
 
@@ -498,7 +500,7 @@ namespace yy {
 
 
 } // yy
-#line 502 "zScript.tab.hpp" // lalr1.cc:377
+#line 504 "zScript.tab.hpp" // lalr1.cc:377
 
 
 
