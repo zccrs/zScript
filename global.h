@@ -406,6 +406,8 @@ struct ZCode
         Unknow              //                              50
     };
 
+    static QString actionName(const Action &action);
+
     Action action = Unknow;
     ZVariant *target;
 };

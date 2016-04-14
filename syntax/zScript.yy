@@ -658,8 +658,12 @@ int yyFlexLexer::yywrap()
     delete constantHash;
     delete undefinedIdentifier;
 
+    int i = 0;
+
+    QString code_count = QString::number(Global::codeList.count());
+
     for(const Global::ZCode *code : Global::codeList) {
-        qDebug() << *code;
+        qDebug().noquote() << QString::asprintf(QString("%%1d:").arg(code_count.size()).toLatin1().constData(), ++i) << *code;
     }
 
     return 0;

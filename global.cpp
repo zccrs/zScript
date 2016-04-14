@@ -281,6 +281,7 @@ QDebug operator<<(QDebug deg, const ZVariant &var)
     case ZVariant::NaN:
     case ZVariant::Undefined:
         deg.nospace() << var.typeName();
+        break;
     default:
         deg.nospace() << var.toString();
         break;
@@ -703,7 +704,7 @@ QList<ZVariant> ZFunction::call(const QList<ZVariant> &args) const
     return retVal;
 }
 
-Node::Node(OperatorType t, Node *l, Node *r)
+Node::Node(OperatorType t, Node *, Node *)
     :/*left(l), right(r), */nodeType(t)
 {
 
@@ -903,13 +904,79 @@ QList<ZVariant> ZConsole::log(const QList<ZVariant> &args) const
     return list;
 }
 
+QString ZCode::actionName(const ZCode::Action &action)
+{
+    switch(action) {
+        case Assign:            return "=";
+        case Add:               return "+";
+        case Sub:               return "-";
+        case Mul:               return "*";
+        case Div:               return "/";
+        case Abs:               return "abs";
+        case Minus:             return "minus";
+        case And:               return "&";
+        case Or:                return "|";
+        case Xor:               return "^";
+        case Contrary:          return "~";
+        case Mod:               return "%";
+        case Not:               return "!";
+        case AddAssign:         return "+=";
+        case SubAssign:         return "-=";
+        case MulAssign:         return "*=";
+        case DivAssign:         return "/=";
+        case AndAssign:         return "&=";
+        case OrAssign:          return "|=";
+        case XorAssign:         return "^=";
+        case ContraryAssign:    return "~=";
+        case ModAssign:         return "%=";
+        case NotAssign:         return "!=";
+        case Less:              return "<";
+        case Greater:           return ">";
+        case New:               return "new";
+        case Delete:            return "delete";
+        case Throw:             return "throw";
+        case EQ:                return "==";
+        case STEQ:              return "===";
+        case NEQ:               return "!=";
+        case STNEQ:             return "!==";
+        case LE:                return "<=";
+        case GE:                return ">=";
+        case LAnd:              return "&&";
+        case LOr:               return "||";
+        case LAndAssign:        return "||=";
+        case LOrAssign:         return "&&=";
+        case PrefixAddSelf:     return "++(prefix)";
+        case PostfixAddSelf:    return "++(postfix)";
+        case PrefixSubSelf:     return "--(prefix)";
+        case PostfixSubSelf:    return "--(postfix)";
+        case Get:               return ".";
+        case Comma:             return ",";
+        case Call:              return "call";
+        case Push:              return "push";
+        case Pop:               return "pop";
+        case PopAll:            return "pop all";
+        case Variant:           return "variant";
+        case Constant:          return "constant";
+        case Unknow:            return "unknow";
+    }
+
+    return "";
+}
+
 QStack<ZVariant*> virtualStack;
 ZVariant virtualRegister;
 QList<ZCode*> codeList;
 
 QDebug operator<<(QDebug deg, const ZCode &var)
 {
-    deg << var.action << var.target;
+    QString actionName = ZCode::actionName(var.action);
+
+    deg << actionName.sprintf("%-10s", actionName.toLatin1().constData());
+
+    if(var.target)
+        deg << *var.target;
+    else
+        deg << var.target;
 
     return deg;
 }
