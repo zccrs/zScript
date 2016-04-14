@@ -25,6 +25,7 @@ ignore [ \t]
 "if"            { return TOKEN_PREFIX::IF;}
 "else"          { return TOKEN_PREFIX::ELSE;}
 "while"         { return TOKEN_PREFIX::WHILE;}
+"undefined"     { return TOKEN_PREFIX::UNDEFINED;}
 ("=="|"===")    { return TOKEN_PREFIX::EQ;}
 ("!="|"!==")    { return TOKEN_PREFIX::NEQ;}
 "<="            { return TOKEN_PREFIX::LE;}

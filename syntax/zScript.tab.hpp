@@ -158,30 +158,31 @@ namespace yy {
         ELSE = 264,
         WHILE = 265,
         FOR = 266,
-        IDENTIFIER = 267,
-        INT = 268,
-        STRING = 269,
-        BOOL = 270,
-        DOUBLE = 271,
-        EQ = 272,
-        STEQ = 273,
-        NEQ = 274,
-        STNEQ = 275,
-        LE = 276,
-        GE = 277,
-        LAND = 278,
-        LOR = 279,
-        ADDSELF = 280,
-        SUBSELF = 281,
-        DEQ = 282,
-        MEQ = 283,
-        AEQ = 284,
-        SEQ = 285,
-        MODEQ = 286,
-        ANDEQ = 287,
-        OREQ = 288,
-        XOREQ = 289,
-        UMINUS = 290
+        UNDEFINED = 267,
+        IDENTIFIER = 268,
+        INT = 269,
+        STRING = 270,
+        BOOL = 271,
+        DOUBLE = 272,
+        EQ = 273,
+        STEQ = 274,
+        NEQ = 275,
+        STNEQ = 276,
+        LE = 277,
+        GE = 278,
+        LAND = 279,
+        LOR = 280,
+        ADDSELF = 281,
+        SUBSELF = 282,
+        DEQ = 283,
+        MEQ = 284,
+        AEQ = 285,
+        SEQ = 286,
+        MODEQ = 287,
+        ANDEQ = 288,
+        OREQ = 289,
+        XOREQ = 290,
+        UMINUS = 291
       };
     };
 
@@ -486,12 +487,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 880,     ///< Last index in yytable_.
+      yylast_ = 923,     ///< Last index in yytable_.
       yynnts_ = 10,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 60  ///< Number of tokens.
+      yyntokens_ = 61  ///< Number of tokens.
     };
 
 
@@ -500,7 +501,7 @@ namespace yy {
 
 
 } // yy
-#line 504 "zScript.tab.hpp" // lalr1.cc:377
+#line 505 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

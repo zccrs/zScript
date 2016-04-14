@@ -48,7 +48,7 @@ QHash<const QByteArray, Global::ZVariant*> *constantHash = Q_NULLPTR;
 };
 
 /// keyword
-%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR
+%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR UNDEFINED
 
 /// identifier
 %token <identifier> IDENTIFIER INT STRING BOOL DOUBLE
@@ -180,7 +180,7 @@ lvalue:     IDENTIFIER {
             }
             ;
 
-rvalue:     {
+rvalue:     UNDEFINED {
                 $$ = ValueType::Constant;
 
                 Global::codeList << createCode(Global::ZCode::Push, getConstantAddress(QByteArray(), Global::ZVariant::Null));
