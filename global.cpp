@@ -904,7 +904,7 @@ QList<ZVariant> ZConsole::log(const QList<ZVariant> &args) const
     return list;
 }
 
-QString ZCode::actionName(const ZCode::Action &action)
+QString ZCode::actionName(quint8 action)
 {
     switch(action) {
         case Assign:            return "=";
@@ -955,17 +955,183 @@ QString ZCode::actionName(const ZCode::Action &action)
         case Push:              return "push";
         case Pop:               return "pop";
         case PopAll:            return "pop all";
-        case Variant:           return "variant";
-        case Constant:          return "constant";
         case Unknow:            return "unknow";
     }
 
     return "";
 }
 
-QStack<ZVariant*> virtualStack;
-ZVariant virtualRegister;
-QList<ZCode*> codeList;
+QStack<ZVariant*> ZCode::virtualStack;
+ZVariant ZCode::virtualRegister;
+QList<ZCode*> ZCode::codeList;
+
+int ZCode::exec(const QList<ZCode *> &codeList)
+{
+    for(ZCode *code : codeList) {
+        zDebug << *code;
+
+        switch(code->action) {
+        case Assign: {
+            ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.pop();
+
+            left_val = right_val;
+            virtualStack.push(&left_val);
+            break;
+        }
+        case Add:
+            virtualRegister = *virtualStack.pop() + *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case Sub:
+            virtualRegister = *virtualStack.pop() + *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case Mul:
+            virtualRegister = *virtualStack.pop() + *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case Div:
+            virtualRegister = *virtualStack.pop() + *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case Abs:
+            virtualRegister = + *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case Minus:
+            virtualRegister = - *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case And:
+            virtualRegister = *virtualStack.pop() & *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case Or:
+            virtualRegister = *virtualStack.pop() | *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case Xor:
+            virtualRegister = *virtualStack.pop() ^ *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case Contrary:
+            virtualRegister = ~ *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case Mod:
+            virtualRegister = *virtualStack.pop() % *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case Not:
+            virtualRegister = ! *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case Less:
+            virtualRegister = *virtualStack.pop() < *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case Greater:
+            virtualRegister = *virtualStack.pop() > *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case New:
+            /// TODO
+            break;
+        case Delete:
+            /// TODO
+            break;
+        case Throw:
+            /// TODO
+            break;
+        case EQ:
+            virtualRegister = *virtualStack.pop() == *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case STEQ: {
+            const ZVariant &v1 = *virtualStack.pop();
+            const ZVariant &v2 = *virtualStack.pop();
+
+            virtualRegister = v1.type() == v2.type() && v1 == v2;
+            virtualStack.push(&virtualRegister);
+            break;
+        }
+        case NEQ:
+            virtualRegister = *virtualStack.pop() != *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case STNEQ: {
+            const ZVariant &v1 = *virtualStack.pop();
+            const ZVariant &v2 = *virtualStack.pop();
+
+            virtualRegister = v1.type() != v2.type() || v1 != v2;
+            virtualStack.push(&virtualRegister);
+            break;
+        }
+        case LE:
+            virtualRegister = *virtualStack.pop() <= *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case GE:
+            virtualRegister = *virtualStack.pop() >= *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case LAnd:
+            virtualRegister = *virtualStack.pop() && *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case LOr:
+            virtualRegister = *virtualStack.pop() || *virtualStack.pop();
+            virtualStack.push(&virtualRegister);
+            break;
+        case Get: {
+            ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.pop();
+            ZObject *obj = left_val.toObject();
+
+            virtualRegister = obj->property(right_val.toString().toLatin1().constData());
+            virtualStack.push(&virtualRegister);
+            break;
+        }
+        case Comma: {
+//            const ZVariant &left_value = left->recursionAndGetValue();
+
+//            if(left_value.type() == ZVariant::List) {
+//                *value = ZVariant(left_value.toList() << right->recursionAndGetValue());
+//            } else {
+//                *value = QList<ZVariant>() << left_value << right->recursionAndGetValue();
+//            }
+            /// TODO
+            break;
+        }
+        case Call: {
+//            const ZFunction *fun = qobject_cast<ZFunction*>(left->recursionAndGetValue().toObject());
+
+//            if(fun) {
+//                fun->call(right->recursionAndGetValue().toList());
+//            }
+//            break;
+            /// TODO
+        }
+        case Push: {
+            ValueCode *valueCode = static_cast<ValueCode*>(code);
+            virtualStack.push(valueCode->value);
+            break;
+        }
+        case Pop: {
+            virtualStack.pop();
+            break;
+        }
+        case PopAll: {
+            virtualStack.clear();
+            break;
+        }
+        default: break;
+        }
+    }
+
+    return 0;
+}
 
 QDebug operator<<(QDebug deg, const ZCode &var)
 {
@@ -973,10 +1139,9 @@ QDebug operator<<(QDebug deg, const ZCode &var)
 
     deg << actionName.sprintf("%-10s", actionName.toLatin1().constData());
 
-    if(var.target)
-        deg << *var.target;
-    else
-        deg << var.target;
+    if(var.action == ZCode::Push) {
+        deg << *static_cast<const ValueCode*>(&var)->value;
+    }
 
     return deg;
 }

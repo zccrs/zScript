@@ -14,13 +14,13 @@
 int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location);
 
 inline Global::ZVariant *getIdentifierAddress(const QByteArray &name);
-inline Global::ZVariant *getConstantAddress(const QByteArray &name, Global::ZVariant::Type type);
+inline Global::ZVariant *getConstantAddress(const QByteArray &value, Global::ZVariant::Type type);
 inline Global::ZVariant *getConstantAddressByValue(const Global::ZVariant &value);
 inline Global::ZCode *createCode(const Global::ZCode::Action &action, Global::ZVariant *val = Q_NULLPTR);
 
 struct Scope{
     Scope *parent = Q_NULLPTR;
-    QHash<QByteArray, Global::ZVariant**> identifiers;
+    QHash<QByteArray, Global::ZVariant*> identifiers;
 };
 
 enum ValueType {
@@ -33,7 +33,11 @@ Scope *createScope(Scope *parent = Q_NULLPTR);
 Scope *currentScope = Q_NULLPTR;
 QSet<const QByteArray> *undefinedIdentifier = Q_NULLPTR;
 QList<Scope*> *scopeList = Q_NULLPTR;
-QHash<const QByteArray, Global::ZVariant*> *constantHash = Q_NULLPTR;
+QHash<const QByteArray, Global::ZVariant*> *stringConstantHash = Q_NULLPTR;
+QHash<const QByteArray, Global::ZVariant*> *numberConstantHash = Q_NULLPTR;
+Global::ZVariant constTrue(true);
+Global::ZVariant constFalse(false);
+Global::ZVariant constUndefined;
 
 %}
 
@@ -46,6 +50,8 @@ QHash<const QByteArray, Global::ZVariant*> *constantHash = Q_NULLPTR;
     int valueType;
     QByteArray *identifier;
 };
+
+%token QUIT;
 
 /// keyword
 %token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR UNDEFINED
@@ -74,12 +80,13 @@ QHash<const QByteArray, Global::ZVariant*> *constantHash = Q_NULLPTR;
 
 %%
 
-start:
+start:      | QUIT {YYABORT;zDebug << "quit";}
+            | start ';'
             | start statement ';' {
-                Global::codeList << createCode(Global::ZCode::PopAll);
+                //Global::ZCode::codeList << createCode(Global::ZCode::PopAll);
             }
             | start expression ';' {
-                Global::codeList << createCode(Global::ZCode::PopAll);
+                Global::ZCode::codeList << createCode(Global::ZCode::PopAll);
             }
             | start conditional {
                 //currentCode->nodeList << $2;
@@ -93,7 +100,11 @@ statement:  VAR define
             ;
 
 define:     IDENTIFIER {
-                undefinedIdentifier->remove(*$1);
+                if(undefinedIdentifier->contains(*$1)) {
+                    undefinedIdentifier->remove(*$1);
+                } else {
+                    currentScope->identifiers[*$1] = new Global::ZVariant(constUndefined);
+                }
 
                 delete $1;
             }
@@ -105,14 +116,14 @@ expression: lvalue | rvalue;
 lvalue:     IDENTIFIER {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::Push, getIdentifierAddress(*$1));
+                Global::ZCode::codeList << createCode(Global::ZCode::Push, getIdentifierAddress(*$1));
 
                 delete $1;
             }
             | lvalue '=' expression {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::Assign);
+                Global::ZCode::codeList << createCode(Global::ZCode::Assign);
             }
             | expression '[' expression ']' {
                 $$ = ValueType::Variant;
@@ -121,95 +132,95 @@ lvalue:     IDENTIFIER {
             | lvalue AEQ expression {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::AndAssign);
+                Global::ZCode::codeList << createCode(Global::ZCode::AndAssign);
             }
             | lvalue SEQ expression {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::SubAssign);
+                Global::ZCode::codeList << createCode(Global::ZCode::SubAssign);
             }
             | lvalue MEQ expression {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::MulAssign);
+                Global::ZCode::codeList << createCode(Global::ZCode::MulAssign);
             }
             | lvalue DEQ expression {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::DivAssign);
+                Global::ZCode::codeList << createCode(Global::ZCode::DivAssign);
             }
             | lvalue ANDEQ expression {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::AndAssign);
+                Global::ZCode::codeList << createCode(Global::ZCode::AndAssign);
             }
             | lvalue OREQ expression {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::OrAssign);
+                Global::ZCode::codeList << createCode(Global::ZCode::OrAssign);
             }
             | lvalue XOREQ expression {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::XorAssign);
+                Global::ZCode::codeList << createCode(Global::ZCode::XorAssign);
             }
             | lvalue MODEQ expression {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::ModAssign);
+                Global::ZCode::codeList << createCode(Global::ZCode::ModAssign);
             }
             | ADDSELF lvalue {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::PrefixAddSelf);
+                Global::ZCode::codeList << createCode(Global::ZCode::PrefixAddSelf);
             }
             | SUBSELF lvalue {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::PrefixSubSelf);
+                Global::ZCode::codeList << createCode(Global::ZCode::PrefixSubSelf);
             }
             | lvalue ADDSELF {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::PostfixAddSelf);
+                Global::ZCode::codeList << createCode(Global::ZCode::PostfixAddSelf);
             }
             | lvalue SUBSELF {
                 $$ = ValueType::Variant;
 
-                Global::codeList << createCode(Global::ZCode::PostfixSubSelf);
+                Global::ZCode::codeList << createCode(Global::ZCode::PostfixSubSelf);
             }
             ;
 
 rvalue:     UNDEFINED {
                 $$ = ValueType::Constant;
 
-                Global::codeList << createCode(Global::ZCode::Push, getConstantAddress(QByteArray(), Global::ZVariant::Null));
+                Global::ZCode::codeList << createCode(Global::ZCode::Push, getConstantAddress(QByteArray(), Global::ZVariant::Null));
             }
             | INT {
                 $$ = ValueType::Constant;
 
-                Global::codeList << createCode(Global::ZCode::Push, getConstantAddress(*$1, Global::ZVariant::Int));
+                Global::ZCode::codeList << createCode(Global::ZCode::Push, getConstantAddress(*$1, Global::ZVariant::Int));
 
                 delete $1;
             }
             | STRING {
                 $$ = ValueType::Constant;
 
-                Global::codeList << createCode(Global::ZCode::Push, getConstantAddress(*$1, Global::ZVariant::String));
+                Global::ZCode::codeList << createCode(Global::ZCode::Push, getConstantAddress(*$1, Global::ZVariant::String));
 
                 delete $1;
             }
             | DOUBLE {
                 $$ = ValueType::Constant;
 
-                Global::codeList << createCode(Global::ZCode::Push, getConstantAddress(*$1, Global::ZVariant::Double));
+                Global::ZCode::codeList << createCode(Global::ZCode::Push, getConstantAddress(*$1, Global::ZVariant::Double));
 
                 delete $1;
             }
             | BOOL {
                 $$ = ValueType::Constant;
 
-                Global::codeList << createCode(Global::ZCode::Push, getConstantAddress(*$1, Global::ZVariant::Bool));
+                Global::ZCode::codeList << createCode(Global::ZCode::Push, getConstantAddress(*$1, Global::ZVariant::Bool));
 
                 delete $1;
             }
@@ -220,287 +231,287 @@ rvalue:     UNDEFINED {
             | expression '(' arguments ')' {
                     $$ = ValueType::Variant;
 
-                    Global::codeList << createCode(Global::ZCode::Call);
+                    Global::ZCode::codeList << createCode(Global::ZCode::Call);
             }
             | expression '.' IDENTIFIER {
                     $$ = ValueType::Variant;
 
-                    Global::codeList << createCode(Global::ZCode::Get, getConstantAddress(*$3, Global::ZVariant::String));
+                    Global::ZCode::codeList << createCode(Global::ZCode::Get, getConstantAddress(*$3, Global::ZVariant::String));
             }
             | expression '+' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target + *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value + *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::Add);
+                        Global::ZCode::codeList << createCode(Global::ZCode::Add);
                     }
             }
             | expression '-' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target - *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value - *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::Sub);
+                        Global::ZCode::codeList << createCode(Global::ZCode::Sub);
                     }
             }
             | expression '*' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target * *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value * *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::Mul);
+                        Global::ZCode::codeList << createCode(Global::ZCode::Mul);
                     }
             }
             | expression '/' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target / *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value / *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::Div);
+                        Global::ZCode::codeList << createCode(Global::ZCode::Div);
                     }
             }
             | expression '&' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target & *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value & *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::And);
+                        Global::ZCode::codeList << createCode(Global::ZCode::And);
                     }
             }
             | expression '|' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target | *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value | *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::Or);
+                        Global::ZCode::codeList << createCode(Global::ZCode::Or);
                     }
             }
             | expression '^' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target ^ *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value ^ *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::Xor);
+                        Global::ZCode::codeList << createCode(Global::ZCode::Xor);
                     }
             }
             | expression '%' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target % *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value % *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::Mod);
+                        Global::ZCode::codeList << createCode(Global::ZCode::Mod);
                     }
             }
             | expression EQ expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target == *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value == *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::EQ);
+                        Global::ZCode::codeList << createCode(Global::ZCode::EQ);
                     }
             }
             | expression NEQ expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target != *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value != *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::NEQ);
+                        Global::ZCode::codeList << createCode(Global::ZCode::NEQ);
                     }
             }
             | expression LE expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target <= *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value <= *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::LE);
+                        Global::ZCode::codeList << createCode(Global::ZCode::LE);
                     }
             }
             | expression GE expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target >= *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value >= *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::GE);
+                        Global::ZCode::codeList << createCode(Global::ZCode::GE);
                     }
             }
             | expression LAND expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target && *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value && *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::LAnd);
+                        Global::ZCode::codeList << createCode(Global::ZCode::LAnd);
                     }
             }
             | expression LOR expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        Global::ZCode *pre_code = Global::codeList.takeLast();
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *pre_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.takeLast());
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(*pre_code->target || *last_code->target);
+                        last_code->value = getConstantAddressByValue(*pre_code->value || *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::LOr);
+                        Global::ZCode::codeList << createCode(Global::ZCode::LOr);
                     }
             }
             | '~' expression {
                     if($2 == ValueType::Constant) {
                         $$ = $2;
 
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(~ *last_code->target);
+                        last_code->value = getConstantAddressByValue(~ *last_code->value);
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::Contrary);
+                        Global::ZCode::codeList << createCode(Global::ZCode::Contrary);
                     }
                 }
             | '!' expression {
                     if($2 == ValueType::Constant) {
                         $$ = $2;
 
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(! *last_code->target);
+                        last_code->value = getConstantAddressByValue(! *last_code->value);
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::Not);
+                        Global::ZCode::codeList << createCode(Global::ZCode::Not);
                     }
                 }
             | '-' expression %prec UMINUS {
                     if($2 == ValueType::Constant) {
                         $$ = $2;
 
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(- *last_code->target);
+                        last_code->value = getConstantAddressByValue(- *last_code->value);
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::Minus);
+                        Global::ZCode::codeList << createCode(Global::ZCode::Minus);
                     }
                 }
             | '+' expression %prec UMINUS {
                     if($2 == ValueType::Constant) {
                         $$ = $2;
 
-                        Global::ZCode *last_code = Global::codeList.last();
+                        Global::ValueCode *last_code = static_cast<Global::ValueCode*>(Global::ZCode::codeList.last());
 
-                        last_code->target = getConstantAddressByValue(+ *last_code->target);
+                        last_code->value = getConstantAddressByValue(+ *last_code->value);
                     } else {
                         $$ = ValueType::Variant;
 
-                        Global::codeList << createCode(Global::ZCode::Abs);
+                        Global::ZCode::codeList << createCode(Global::ZCode::Abs);
                     }
                 }
             | '(' expression ')' { $$ = $2;}
@@ -536,6 +547,7 @@ conditional:branch_head '{' start '}'
 %%
 
 yyFlexLexer *flexLexer;
+bool quit = false;
 
 int main(int argc, char *argv[])
 {
@@ -543,10 +555,12 @@ int main(int argc, char *argv[])
 
     undefinedIdentifier = new QSet<const QByteArray>();
     scopeList = new QList<Scope*>();
-    constantHash = new QHash<const QByteArray, Global::ZVariant*>();
+    stringConstantHash = new QHash<const QByteArray, Global::ZVariant*>();
+    numberConstantHash = new QHash<const QByteArray, Global::ZVariant*>();
     currentScope = createScope();
 
-//    currentScope->identifiers["console"] = &(new Global::ZVariant(new Global::ZConsole));
+    Global::ZVariant *console = new  Global::ZVariant(new Global::ZConsole);
+    currentScope->identifiers["console"] = console;
 
     if(argc > 1) {
         freopen(argv[1], "r", stdin);
@@ -555,6 +569,8 @@ int main(int argc, char *argv[])
     flexLexer = new yyFlexLexer();
 
     yy::parser parser;
+
+//    parser.set_debug_level(1);
 
     QtConcurrent::run(QThreadPool::globalInstance(), &parser, &yy::parser::parse);
 
@@ -569,6 +585,9 @@ void yy::parser::error(const location_type& loc, const std::string& msg)
 
 int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)
 {
+    if(quit)
+        return yy::parser::token::yytokentype::QUIT;
+
     yylval = lval;
     yyloc = location;
 
@@ -578,51 +597,70 @@ int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)
 Global::ZVariant *getIdentifierAddress(const QByteArray &name)
 {
     Scope *scope = currentScope;
-    Global::ZVariant **val = Q_NULLPTR;
+    Global::ZVariant *val = Q_NULLPTR;
 
     while(scope) {
         val = scope->identifiers.value(name);
 
         if(val)
-            return *val;
+            return val;
 
         scope = currentScope->parent;
     }
 
     if(!val) {
-        val = new Global::ZVariant*;
-    }
+        *undefinedIdentifier << name;
 
-    return *val;
-}
-
-Global::ZVariant *getConstantAddress(const QByteArray &name, Global::ZVariant::Type type)
-{
-    Global::ZVariant *val = constantHash->value(name);
-
-    if(!val) {
-        switch(type) {
-        case Global::ZVariant::Int:
-            val = new Global::ZVariant(name.toInt());
-            break;
-        case Global::ZVariant::Double:
-            val = new Global::ZVariant(name.toDouble());
-            break;
-        case Global::ZVariant::String:
-            val = new Global::ZVariant(QString(name));
-            break;
-        case Global::ZVariant::Bool:
-            val = new Global::ZVariant((bool)name.toInt());
-            break;
-        default:
-            val = new Global::ZVariant();
-            break;
-        }
-
-        (*constantHash)[name] = val;
+        val = new Global::ZVariant(constUndefined);
     }
 
     return val;
+}
+
+Global::ZVariant *getConstantAddress(const QByteArray &value, Global::ZVariant::Type type)
+{
+    switch(type) {
+    case Global::ZVariant::Int: {
+        Global::ZVariant *val = numberConstantHash->value(value);
+
+        if(!val) {
+            (*numberConstantHash)[value] = val;
+        }
+
+        val = new Global::ZVariant(value.toInt());
+
+        return val;
+    }
+    case Global::ZVariant::Double: {
+        Global::ZVariant *val = numberConstantHash->value(value);
+
+        if(!val) {
+            (*numberConstantHash)[value] = val;
+        }
+
+        val = new Global::ZVariant(value.toDouble());
+
+        return val;
+    }
+    case Global::ZVariant::String: {
+        Global::ZVariant *val = stringConstantHash->value(value);
+
+        if(!val) {
+            (*stringConstantHash)[value] = val;
+        }
+
+        val = new Global::ZVariant(QString(value));
+
+        return val;
+    }
+    case Global::ZVariant::Bool:
+        if((bool)value.toInt())
+            return &constFalse;
+        else
+            return &constTrue;
+    default:
+        return &constUndefined;
+    }
 }
 
 Global::ZVariant *getConstantAddressByValue(const Global::ZVariant &value)
@@ -632,10 +670,18 @@ Global::ZVariant *getConstantAddressByValue(const Global::ZVariant &value)
 
 Global::ZCode *createCode(const Global::ZCode::Action &action, Global::ZVariant *val)
 {
+    if(action == Global::ZCode::Push) {
+        Global::ValueCode *code = new Global::ValueCode;
+
+        code->action = action;
+        code->value = val;
+
+        return code;
+    }
+
     Global::ZCode *code = new Global::ZCode;
 
     code->action = action;
-    code->target = val;
 
     return code;
 }
@@ -652,19 +698,29 @@ Scope *createScope(Scope *parent)
 
 int yyFlexLexer::yywrap()
 {
+    if(!undefinedIdentifier->isEmpty()) {
+        zError << "undefined reference";
+
+        for(const QByteArray &name : *undefinedIdentifier)
+            zPrint << name;
+    }
+
     qDeleteAll(*scopeList);
 
     delete scopeList;
-    delete constantHash;
+    delete stringConstantHash;
+    delete numberConstantHash;
     delete undefinedIdentifier;
 
     int i = 0;
 
-    QString code_count = QString::number(Global::codeList.count());
+    QString code_count = QString::number(Global::ZCode::codeList.count());
 
-    for(const Global::ZCode *code : Global::codeList) {
+    for(const Global::ZCode *code : Global::ZCode::codeList) {
         qDebug().noquote() << QString::asprintf(QString("%%1d:").arg(code_count.size()).toLatin1().constData(), ++i) << *code;
     }
 
-    return 0;
+    qApp->exit();
+
+    quick_exit(Global::ZCode::exec());
 }

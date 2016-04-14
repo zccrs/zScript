@@ -124,7 +124,7 @@ namespace yy {
     /// Symbol semantic values.
     union semantic_type
     {
-    #line 45 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
+    #line 49 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
 
     int valueType;
     QByteArray *identifier;
@@ -149,40 +149,41 @@ namespace yy {
     {
       enum yytokentype
       {
-        VAR = 258,
-        FUNCTION = 259,
-        NEW = 260,
-        DELETE = 261,
-        THROW = 262,
-        IF = 263,
-        ELSE = 264,
-        WHILE = 265,
-        FOR = 266,
-        UNDEFINED = 267,
-        IDENTIFIER = 268,
-        INT = 269,
-        STRING = 270,
-        BOOL = 271,
-        DOUBLE = 272,
-        EQ = 273,
-        STEQ = 274,
-        NEQ = 275,
-        STNEQ = 276,
-        LE = 277,
-        GE = 278,
-        LAND = 279,
-        LOR = 280,
-        ADDSELF = 281,
-        SUBSELF = 282,
-        DEQ = 283,
-        MEQ = 284,
-        AEQ = 285,
-        SEQ = 286,
-        MODEQ = 287,
-        ANDEQ = 288,
-        OREQ = 289,
-        XOREQ = 290,
-        UMINUS = 291
+        QUIT = 258,
+        VAR = 259,
+        FUNCTION = 260,
+        NEW = 261,
+        DELETE = 262,
+        THROW = 263,
+        IF = 264,
+        ELSE = 265,
+        WHILE = 266,
+        FOR = 267,
+        UNDEFINED = 268,
+        IDENTIFIER = 269,
+        INT = 270,
+        STRING = 271,
+        BOOL = 272,
+        DOUBLE = 273,
+        EQ = 274,
+        STEQ = 275,
+        NEQ = 276,
+        STNEQ = 277,
+        LE = 278,
+        GE = 279,
+        LAND = 280,
+        LOR = 281,
+        ADDSELF = 282,
+        SUBSELF = 283,
+        DEQ = 284,
+        MEQ = 285,
+        AEQ = 286,
+        SEQ = 287,
+        MODEQ = 288,
+        ANDEQ = 289,
+        OREQ = 290,
+        XOREQ = 291,
+        UMINUS = 292
       };
     };
 
@@ -487,12 +488,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 923,     ///< Last index in yytable_.
+      yylast_ = 926,     ///< Last index in yytable_.
       yynnts_ = 10,  ///< Number of nonterminal symbols.
-      yyfinal_ = 2, ///< Termination state number.
+      yyfinal_ = 3, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 61  ///< Number of tokens.
+      yyntokens_ = 62  ///< Number of tokens.
     };
 
 
@@ -501,7 +502,7 @@ namespace yy {
 
 
 } // yy
-#line 505 "zScript.tab.hpp" // lalr1.cc:377
+#line 506 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

@@ -398,28 +398,32 @@ struct ZCode
         Get,                // .                            42
         Comma,              // ,                            43
         Call,               // ()                           44
-        Push,               // push target value to stack   45
+        Push,       // push target value to stack   45
         Pop,                // pop stack                    46
         PopAll,             // clear stack                  47
-        Variant,            //                              48
-        Constant,           //                              49
-        Unknow              //                              50
+        Unknow              //                              48
     };
 
-    static QString actionName(const Action &action);
+    static QString actionName(quint8 action);
+    static int exec(const QList<ZCode*> &codeList);
+    inline static int exec()
+    {return exec(codeList);}
 
-    Action action = Unknow;
-    ZVariant *target;
+    quint8 action = Unknow;
+
+    static QStack<ZVariant*> virtualStack;
+    static ZVariant virtualRegister;
+    static QList<ZCode*> codeList;
+};
+
+struct ValueCode : public ZCode
+{
+    ZVariant *value = Q_NULLPTR;
 };
 
 QT_BEGIN_NAMESPACE
 Q_CORE_EXPORT QDebug operator<<(QDebug deg, const ZCode &var);
 QT_END_NAMESPACE
-
-extern QStack<ZVariant*> virtualStack;
-extern ZVariant virtualRegister;
-extern QList<ZCode*> codeList;
-
 }/// namespace Global end
 
 Q_DECLARE_METATYPE(Global::ZVariant)
