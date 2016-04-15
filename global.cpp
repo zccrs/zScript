@@ -2,7 +2,6 @@
 
 #include <QFile>
 #include <QVariant>
-#include <QMetaMethod>
 #include <QMetaType>
 #include <QStack>
 
@@ -646,9 +645,7 @@ ZVariant operator ~(const ZVariant &var)
 ZObject::ZObject(ZObject *parent)
     : QObject(parent)
 {
-    /// call later
 
-    QMetaObject::invokeMethod(this, "initFunctionProperty", Qt::QueuedConnection);
 }
 
 ZVariant ZObject::property(const char *name) const
@@ -661,47 +658,18 @@ void ZObject::setProperty(const char *name, const ZVariant &value)
     QObject::setProperty(name, value.toQVariant());
 }
 
-void ZObject::addFunctionProperty(const char *name)
-{
-    setProperty(name, new ZFunction(this, name, this));
-}
-
-void ZObject::initFunctionProperty()
-{
-    const QMetaObject *meta = this->metaObject();
-
-    int methodOffse = meta->methodOffset();
-    int methodCount = meta->methodCount();
-
-    for(int i = methodOffse; i < methodOffse + methodCount; ++i) {
-        const QMetaMethod &method = meta->method(i);
-
-        if(QByteArray(method.name()) == "call")
-            continue;
-
-        if(QByteArray(QMetaType::typeName(method.returnType())) == "QList<Global::ZVariant>"
-                && method.parameterCount() == 1
-                && method.parameterTypes().first() == "QList<ZVariant>") {
-            addFunctionProperty(method.name());
-        }
-    }
-}
-
-ZFunction::ZFunction(ZObject *target, const char *name, ZObject *parent)
+template<typename T, typename Fun>
+ZFunction::ZFunction(T target, Fun method, ZObject *parent)
     : ZObject(parent)
-    , m_target(target)
-    , m_methodName(name)
 {
-
+    connect(this, &ZFunction::callFun, target, method, Qt::DirectConnection);
 }
 
 QList<ZVariant> ZFunction::call(const QList<ZVariant> &args) const
 {
     QList<ZVariant> retVal;
 
-    QMetaObject::invokeMethod(m_target, m_methodName.constData(),
-//                                          Q_RETURN_ARG(QList<Global::ZVariant>, retVal),
-                              Q_ARG(const QList<ZVariant>, args));
+    emit callFun(retVal, args);
 
     return retVal;
 }
@@ -888,22 +856,22 @@ void Code::exec() const
 ZConsole::ZConsole(ZObject *parent)
     : ZObject(parent)
 {
-    qRegisterMetaType<QList<ZVariant>>("QList<ZVariant>");
+    Z_REGIST_SLOT(&ZConsole::log);
 }
 
-QList<ZVariant> ZConsole::log(const QList<ZVariant> &args) const
+void ZConsole::log(QList<ZVariant> &retVals, const QList<ZVariant> &args) const
 {
-    QList<ZVariant> list;
+    Q_UNUSED(retVals)
 
     if(args.isEmpty())
-        return list;
+        return;
 
     for(int i = 0; i < args.count() - 1; ++i)
         zStandardPrint << args.at(i).toString().toStdString() << " ";
 
     zStandardPrint << args.last().toString().toStdString() << std::endl;
 
-    return list;
+    return;
 }
 
 QString ZCode::actionName(quint8 action)

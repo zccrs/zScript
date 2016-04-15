@@ -13,6 +13,7 @@
 
 #include <QSharedDataPointer>
 #include <QObject>
+#include <QMetaMethod>
 #include <QDebug>
 
 namespace Global {
@@ -228,25 +229,24 @@ public:
 
 public slots:
     void setProperty(const char *name, const ZVariant &value);
-    void addFunctionProperty(const char *name);
-
-private slots:
-    void initFunctionProperty();
 };
+
+#define Z_REGIST_SLOT(Fun) \
+    setProperty(QString(#Fun).split("::").last().toLatin1().constData(), ZVariant(new ZFunction(this, Fun, this)))
 
 class ZFunction : public ZObject
 {
     Q_OBJECT
 
 public:
-    explicit ZFunction(ZObject *target, const char *name, ZObject *parent = 0);
+    template<typename T, typename Fun>
+    explicit ZFunction(T target, Fun method, ZObject *parent = 0);
 
 public slots:
     QList<ZVariant> call(const QList<ZVariant> &args) const;
 
-private:
-    ZObject *m_target;
-    QByteArray m_methodName;
+signals:
+    void callFun(QList<ZVariant> &retVals, const QList<ZVariant> &args) const;
 };
 
 struct Code;
@@ -346,7 +346,7 @@ public:
     explicit ZConsole(ZObject *parent = 0);
 
 public slots:
-    QList<ZVariant> log(const QList<ZVariant> &args) const;
+    void log(QList<ZVariant> &retVals, const QList<ZVariant> &args) const;
 };
 
 struct ZCode
