@@ -272,8 +272,10 @@ QDebug operator<<(QDebug deg, const ZVariant &var)
 
     switch(var.type()) {
     case ZVariant::Null:
+        deg.noquote() << "0x0";
+        break;
     case ZVariant::Object:
-        deg.nospace() << QByteArray::number(qlonglong(var.toObject()));
+        deg.nospace() << var.toObject();
         break;
     case ZVariant::List:
         deg.nospace() << var.toList();
@@ -968,8 +970,6 @@ QList<ZCode*> ZCode::codeList;
 int ZCode::exec(const QList<ZCode *> &codeList)
 {
     for(ZCode *code : codeList) {
-        zDebug << *code;
-
         switch(code->action) {
         case Assign: {
             ZVariant &right_val = *virtualStack.pop();
@@ -1093,24 +1093,24 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             virtualStack.push(&virtualRegister);
             break;
         }
-        case Comma: {
-//            const ZVariant &left_value = left->recursionAndGetValue();
-
-//            if(left_value.type() == ZVariant::List) {
-//                *value = ZVariant(left_value.toList() << right->recursionAndGetValue());
-//            } else {
-//                *value = QList<ZVariant>() << left_value << right->recursionAndGetValue();
-//            }
-            /// TODO
-            break;
-        }
         case Call: {
-//            const ZFunction *fun = qobject_cast<ZFunction*>(left->recursionAndGetValue().toObject());
+            QList<ZVariant> args;
 
-//            if(fun) {
-//                fun->call(right->recursionAndGetValue().toList());
-//            }
-//            break;
+            int argsCount = virtualStack.pop()->toInt();
+
+            args.reserve(argsCount);
+
+            for(int i = 0; i < argsCount; ++i) {
+                args.insert(0, *virtualStack.pop());
+            }
+
+            ZFunction *fun = qobject_cast<ZFunction*>(virtualStack.pop()->toObject());
+
+            if(fun) {
+                fun->call(args);
+            }
+
+            break;
             /// TODO
         }
         case Push: {

@@ -48,10 +48,9 @@ Global::ZVariant constUndefined;
 
 %union{
     int valueType;
+    int argsCount;
     QByteArray *identifier;
 };
-
-%token QUIT;
 
 /// keyword
 %token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR UNDEFINED
@@ -77,16 +76,22 @@ Global::ZVariant constUndefined;
 %left '(' ')'
 
 %type <valueType> expression lvalue rvalue
+%type <argsCount> arguments
 
 %%
 
-start:      | QUIT {YYABORT;zDebug << "quit";}
-            | start ';'
+start:
+            | start ';' {
+                if(Global::ZCode::codeList.count() > 1 && Global::ZCode::codeList.last()->action != Global::ZCode::PopAll)
+                    Global::ZCode::codeList << createCode(Global::ZCode::PopAll);
+            }
             | start statement ';' {
-                //Global::ZCode::codeList << createCode(Global::ZCode::PopAll);
+                if(Global::ZCode::codeList.count() > 1 && Global::ZCode::codeList.last()->action != Global::ZCode::PopAll)
+                    Global::ZCode::codeList << createCode(Global::ZCode::PopAll);
             }
             | start expression ';' {
-                Global::ZCode::codeList << createCode(Global::ZCode::PopAll);
+                if(Global::ZCode::codeList.count() > 1 && Global::ZCode::codeList.last()->action != Global::ZCode::PopAll)
+                    Global::ZCode::codeList << createCode(Global::ZCode::PopAll);
             }
             | start conditional {
                 //currentCode->nodeList << $2;
@@ -231,12 +236,14 @@ rvalue:     UNDEFINED {
             | expression '(' arguments ')' {
                     $$ = ValueType::Variant;
 
+                    Global::ZCode::codeList << createCode(Global::ZCode::Push, getConstantAddress(QByteArray::number($3), Global::ZVariant::Int));
                     Global::ZCode::codeList << createCode(Global::ZCode::Call);
             }
             | expression '.' IDENTIFIER {
                     $$ = ValueType::Variant;
 
-                    Global::ZCode::codeList << createCode(Global::ZCode::Get, getConstantAddress(*$3, Global::ZVariant::String));
+                    Global::ZCode::codeList << createCode(Global::ZCode::Push, getConstantAddress(*$3, Global::ZVariant::String));
+                    Global::ZCode::codeList << createCode(Global::ZCode::Get);
             }
             | expression '+' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
@@ -517,8 +524,8 @@ rvalue:     UNDEFINED {
             | '(' expression ')' { $$ = $2;}
             ;
 
-arguments:  expression
-            | arguments ',' expression/* {
+arguments:  expression {$$ = 1;}
+            | arguments ',' expression {$$ = $1 + 1;}/* {
                     if($1->nodeType == Global::Node::Constant
                             && $3->nodeType == Global::Node::Constant) {
                         $$ = new Global::Node(Global::Node::Constant);
@@ -585,9 +592,6 @@ void yy::parser::error(const location_type& loc, const std::string& msg)
 
 int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)
 {
-    if(quit)
-        return yy::parser::token::yytokentype::QUIT;
-
     yylval = lval;
     yyloc = location;
 
