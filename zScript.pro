@@ -12,6 +12,7 @@ TEMPLATE = app
 
 include($$PWD/lexical/lexical.pri)
 include($$PWD/syntax/syntax.pri)
-include($$PWD/common.pri)
+include($$PWD/common/common.pri)
+include($$PWD/base/base.pri)
 
 #DESTDIR = $$shadowed($$PWD/../bin)

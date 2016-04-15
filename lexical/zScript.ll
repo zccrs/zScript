@@ -1,6 +1,9 @@
 %{
 #include "zScript.tab.hpp"
-#include "global.h"
+#include "zglobal.h"
+
+#include <QByteArray>
+#include <QDebug>
 
 yy::parser::semantic_type *yylval = Q_NULLPTR;
 yy::parser::location_type *yyloc = Q_NULLPTR;
@@ -56,7 +59,7 @@ ignore [ \t]
 }
 
 [\r\n] {
-    while(yyin.rdbuf()->in_avail() && !yyin.eof() && !yyin.fail()) {
+    while(/*yyin.rdbuf()->in_avail() && */!yyin.eof() && !yyin.fail()) {
         char ch = yyin.peek();
 
         if(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {
@@ -69,7 +72,7 @@ ignore [ \t]
         }
     }
 
-    if(!yyin.rdbuf()->in_avail() || yyin.eof())
+    if(/*!yyin.rdbuf()->in_avail() || */yyin.eof())
         return ';';
 }
 
