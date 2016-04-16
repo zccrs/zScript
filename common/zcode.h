@@ -29,9 +29,9 @@ struct ZCode
         AndAssign,          // &=                           17
         OrAssign,           // |=                           18
         XorAssign,          // ^=                           19
-        ContraryAssign,     // ~=                           20
+        ContraryAssign,     // ~=                           20        remove
         ModAssign,          // %=                           21
-        NotAssign,          // !=                           22
+        NotAssign,          // !=                           22        remove
         Less,               // <                            23
         Greater,            // >                            24
         New,                // new                          25
@@ -52,7 +52,7 @@ struct ZCode
         PrefixSubSelf,      // --                           40
         PostfixSubSelf,     // --                           41
         Get,                // .                            42
-        Comma,              // ,                            43
+        Comma,              // ,                            43      remove
         Call,               // ()                           44
         Push,       // push target value to stack   45
         Pop,                // pop stack                    46

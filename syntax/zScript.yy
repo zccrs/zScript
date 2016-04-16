@@ -63,11 +63,11 @@ Z_USE_NAMESPACE
 
 ///     ==  ===    !=  !==  <= >= &&   ||   ++      --
 %token  EQ  STEQ  NEQ STNEQ LE GE LAND LOR ADDSELF SUBSELF
-///     /=  *=  +=  -=   %=    &=    |=   ^=
-%token  DEQ MEQ AEQ SEQ MODEQ ANDEQ OREQ XOREQ
+///         /=        *=        +=       -=         %=        &=       |=       ^=        ||=        &&=
+%token  DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
 
 %left ','
-%right '=' DEQ MEQ AEQ SEQ MODEQ ANDEQ OREQ XOREQ
+%right '=' DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
 %left '?' ':'
 %left LAND LOR
 %left '&' '|' '^'
@@ -137,45 +137,55 @@ lvalue:     IDENTIFIER {
                 $$ = ValueType::Variant;
                 /// TODO
             }
-            | lvalue AEQ expression {
+            | lvalue ADDASSIGN expression {
                 $$ = ValueType::Variant;
 
-                ZCode::codeList << createCode(ZCode::AndAssign);
+                ZCode::codeList << createCode(ZCode::AddAssign);
             }
-            | lvalue SEQ expression {
+            | lvalue SUBASSIGN expression {
                 $$ = ValueType::Variant;
 
                 ZCode::codeList << createCode(ZCode::SubAssign);
             }
-            | lvalue MEQ expression {
+            | lvalue MULASSIGN expression {
                 $$ = ValueType::Variant;
 
                 ZCode::codeList << createCode(ZCode::MulAssign);
             }
-            | lvalue DEQ expression {
+            | lvalue DIVASSIGN expression {
                 $$ = ValueType::Variant;
 
                 ZCode::codeList << createCode(ZCode::DivAssign);
             }
-            | lvalue ANDEQ expression {
+            | lvalue ANDASSIGN expression {
                 $$ = ValueType::Variant;
 
                 ZCode::codeList << createCode(ZCode::AndAssign);
             }
-            | lvalue OREQ expression {
+            | lvalue ORASSIGN expression {
                 $$ = ValueType::Variant;
 
                 ZCode::codeList << createCode(ZCode::OrAssign);
             }
-            | lvalue XOREQ expression {
+            | lvalue XORASSIGN expression {
                 $$ = ValueType::Variant;
 
                 ZCode::codeList << createCode(ZCode::XorAssign);
             }
-            | lvalue MODEQ expression {
+            | lvalue MODASSIGN expression {
                 $$ = ValueType::Variant;
 
                 ZCode::codeList << createCode(ZCode::ModAssign);
+            }
+            | lvalue LORASSIGN expression {
+                $$ = ValueType::Variant;
+
+                ZCode::codeList << createCode(ZCode::LOrAssign);
+            }
+            | lvalue LANDASSIGN expression {
+                $$ = ValueType::Variant;
+
+                ZCode::codeList << createCode(ZCode::LAndAssign);
             }
             | ADDSELF lvalue {
                 $$ = ValueType::Variant;
@@ -186,16 +196,6 @@ lvalue:     IDENTIFIER {
                 $$ = ValueType::Variant;
 
                 ZCode::codeList << createCode(ZCode::PrefixSubSelf);
-            }
-            | lvalue ADDSELF {
-                $$ = ValueType::Variant;
-
-                ZCode::codeList << createCode(ZCode::PostfixAddSelf);
-            }
-            | lvalue SUBSELF {
-                $$ = ValueType::Variant;
-
-                ZCode::codeList << createCode(ZCode::PostfixSubSelf);
             }
             ;
 
@@ -525,6 +525,16 @@ rvalue:     UNDEFINED {
                     }
                 }
             | '(' expression ')' { $$ = $2;}
+            | lvalue ADDSELF {
+                $$ = ValueType::Variant;
+
+                ZCode::codeList << createCode(ZCode::PostfixAddSelf);
+            }
+            | lvalue SUBSELF {
+                $$ = ValueType::Variant;
+
+                ZCode::codeList << createCode(ZCode::PostfixSubSelf);
+            }
             ;
 
 arguments:  expression {$$ = 1;}
@@ -665,9 +675,9 @@ ZVariant *getConstantAddress(const QByteArray &value, ZVariant::Type type)
     }
     case ZVariant::Bool:
         if((bool)value.toInt())
-            return &constFalse;
-        else
             return &constTrue;
+        else
+            return &constFalse;
     default:
         return &constUndefined;
     }

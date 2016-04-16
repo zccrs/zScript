@@ -175,15 +175,17 @@ namespace yy {
         LOR = 280,
         ADDSELF = 281,
         SUBSELF = 282,
-        DEQ = 283,
-        MEQ = 284,
-        AEQ = 285,
-        SEQ = 286,
-        MODEQ = 287,
-        ANDEQ = 288,
-        OREQ = 289,
-        XOREQ = 290,
-        UMINUS = 291
+        DIVASSIGN = 283,
+        MULASSIGN = 284,
+        ADDASSIGN = 285,
+        SUBASSIGN = 286,
+        MODASSIGN = 287,
+        ANDASSIGN = 288,
+        ORASSIGN = 289,
+        XORASSIGN = 290,
+        LANDASSIGN = 291,
+        LORASSIGN = 292,
+        UMINUS = 293
       };
     };
 
@@ -488,12 +490,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 926,     ///< Last index in yytable_.
+      yylast_ = 990,     ///< Last index in yytable_.
       yynnts_ = 10,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 61  ///< Number of tokens.
+      yyntokens_ = 63  ///< Number of tokens.
     };
 
 
@@ -502,7 +504,7 @@ namespace yy {
 
 
 } // yy
-#line 506 "zScript.tab.hpp" // lalr1.cc:377
+#line 508 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

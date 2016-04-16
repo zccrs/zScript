@@ -45,8 +45,8 @@ QString ZCode::actionName(quint8 action)
         case GE:                return ">=";
         case LAnd:              return "&&";
         case LOr:               return "||";
-        case LAndAssign:        return "||=";
-        case LOrAssign:         return "&&=";
+        case LAndAssign:        return "&&=";
+        case LOrAssign:         return "||=";
         case PrefixAddSelf:     return "++(prefix)";
         case PostfixAddSelf:    return "++(postfix)";
         case PrefixSubSelf:     return "--(prefix)";
@@ -83,10 +83,8 @@ int ZCode::exec(const QList<ZCode *> &codeList)
         switch(code->action) {
         case Assign: {
             ZVariant &right_val = *virtualStack.pop();
-            ZVariant &left_val = *virtualStack.pop();
 
-            left_val = right_val;
-            virtualStack.push(&left_val);
+            *virtualStack.top() = right_val;
             break;
         }
         case Add:
@@ -137,6 +135,54 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             temporaryList << ! *virtualStack.pop();
             virtualStack.push(&temporaryList.last());
             break;
+        case AddAssign: {
+            ZVariant &right_val = *virtualStack.pop();
+
+            *virtualStack.top() += right_val;
+            break;
+        }
+        case SubAssign: {
+            ZVariant &right_val = *virtualStack.pop();
+
+            *virtualStack.top() -= right_val;
+            break;
+        }
+        case MulAssign: {
+            ZVariant &right_val = *virtualStack.pop();
+
+            *virtualStack.top() *= right_val;
+            break;
+        }
+        case DivAssign: {
+            ZVariant &right_val = *virtualStack.pop();
+
+            *virtualStack.top() /= right_val;
+            break;
+        }
+        case AndAssign: {         // "&=";
+            ZVariant &right_val = *virtualStack.pop();
+
+            *virtualStack.top() &= right_val;
+            break;
+        }
+        case OrAssign: {          // "|=";
+            ZVariant &right_val = *virtualStack.pop();
+
+            *virtualStack.top() |= right_val;
+            break;
+        }
+        case XorAssign: {         // "^=";
+            ZVariant &right_val = *virtualStack.pop();
+
+            *virtualStack.top() ^= right_val;
+            break;
+        }
+        case ModAssign: {         // "%=";
+            ZVariant &right_val = *virtualStack.pop();
+
+            *virtualStack.top() %= right_val;
+            break;
+        }
         case Less:
             temporaryList << (*virtualStack.pop() < *virtualStack.pop());
             virtualStack.push(&temporaryList.last());
@@ -194,6 +240,46 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             temporaryList << (*virtualStack.pop() || *virtualStack.pop());
             virtualStack.push(&temporaryList.last());
             break;
+        case LAndAssign: {        // "&&=";
+            ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.top();
+
+            left_val = left_val && right_val;
+            break;
+        }
+        case LOrAssign: {         // "||=";
+            ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.top();
+
+            left_val = left_val || right_val;
+            break;
+        }
+        case PrefixAddSelf: {     // "++(prefix)";
+            ZVariant &left_val = *virtualStack.top();
+
+            left_val = 1 + left_val;
+            break;
+        }
+        case PostfixAddSelf: {   // "++(postfix)";
+            ZVariant &left_val = *virtualStack.pop();
+            temporaryList << left_val;
+            virtualStack.push(&temporaryList.last());
+            left_val = 1 + left_val;
+            break;
+        }
+        case PrefixSubSelf: {     // "--(prefix)";
+            ZVariant &left_val = *virtualStack.top();
+
+            left_val = -1 + left_val;
+            break;
+        }
+        case PostfixSubSelf: {   // "--(postfix)";
+            ZVariant &left_val = *virtualStack.pop();
+            temporaryList << left_val;
+            virtualStack.push(&temporaryList.last());
+            left_val = -1 + left_val;
+            break;
+        }
         case Get: {
             ZVariant &right_val = *virtualStack.pop();
             ZVariant &left_val = *virtualStack.pop();

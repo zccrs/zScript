@@ -33,18 +33,20 @@ ignore [ \t]
 ("!="|"!==")    { return TOKEN_PREFIX::NEQ;}
 "<="            { return TOKEN_PREFIX::LE;}
 ">="            { return TOKEN_PREFIX::GE;}
-"&="            { return TOKEN_PREFIX::ANDEQ;}
-"|="            { return TOKEN_PREFIX::OREQ;}
-"^="            { return TOKEN_PREFIX::XOREQ;}
-"%="            { return TOKEN_PREFIX::MODEQ;}
-"+="            { return TOKEN_PREFIX::AEQ;}
-"-="            { return TOKEN_PREFIX::SEQ;}
-"*="            { return TOKEN_PREFIX::MEQ;}
-"/="            { return TOKEN_PREFIX::DEQ;}
+"&="            { return TOKEN_PREFIX::ANDASSIGN;}
+"|="            { return TOKEN_PREFIX::ORASSIGN;}
+"^="            { return TOKEN_PREFIX::XORASSIGN;}
+"%="            { return TOKEN_PREFIX::MODASSIGN;}
+"+="            { return TOKEN_PREFIX::ADDASSIGN;}
+"-="            { return TOKEN_PREFIX::SUBASSIGN;}
+"*="            { return TOKEN_PREFIX::MULASSIGN;}
+"/="            { return TOKEN_PREFIX::DIVASSIGN;}
 "++"            { return TOKEN_PREFIX::ADDSELF;}
 "--"            { return TOKEN_PREFIX::SUBSELF;}
 "&&"            { return TOKEN_PREFIX::LAND;}
 "||"            { return TOKEN_PREFIX::LOR;}
+"&&="           { return TOKEN_PREFIX::LANDASSIGN;}
+"||="           { return TOKEN_PREFIX::LORASSIGN;}
 
 "true" {
     yylval->identifier = new QByteArray("1");
