@@ -6,6 +6,8 @@
 #include <QByteArray>
 #include <QDebug>
 
+#include <iostream>
+
 yy::parser::semantic_type *yylval = Q_NULLPTR;
 yy::parser::location_type *yyloc = Q_NULLPTR;
 
@@ -118,91 +120,13 @@ ignore [ \t]
     while(!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
 
-        if(ch == yytext[0] || ch == '\n' || ch == '\r')
+        if(ch == yytext[0])
             break;
 
-        if(ch == '\\') {
-            char next_ch = yyin.get();
-
-            switch(next_ch) {
-            case 'x':{
-                bool ok;
-
-                QByteArray hex;
-
-                hex.append(yyin.get());
-                hex.append(yyin.get());
-
-                str.append(hex.toUShort(&ok, 16));
-                // if(!ok)/// TODO
-                break;
-            }
-            case 'u': {
-                bool ok;
-
-                char next_ch = yyin.get();
-
-                if(next_ch == '{') {
-                    QByteArray hex;
-
-                    char ch = 0;
-
-                    while(!yyin.eof() && !yyin.fail()) {
-                        ch = yyin.get();
-
-                        if(ch == '}')
-                            break;
-
-                        hex.append(ch);
-                    }
-
-                    // if(ch != '}') TODO: parse error
-
-                    quint32 hex_int = hex.toInt(&ok, 16);
-
-                   // if(!ok)/// TODO
-
-                    str.append(QString::fromUcs4(&hex_int, 1));
-                } else {
-                    QByteArray hex;
-
-                    hex.append(next_ch);
-                    hex.append(yyin.get());
-                    hex.append(yyin.get());
-                    hex.append(yyin.get());
-
-                    str.append(hex.toInt(0, 16));
-                    // if(!ok)/// TODO
-                }
-                break;
-            }
-            case '\r':
-            case '\n':
-                break;
-            default: {
-                QChar ch(next_ch);
-
-                if(ch.isNumber()) {
-                    bool ok;
-
-                    QByteArray hex;
-
-                    hex.append(next_ch);
-                    hex.append(yyin.get());
-                    hex.append(yyin.get());
-
-                    str.append(hex.toUShort(&ok, 8));
-                    // if(!ok)/// TODO
-                } else {
-                    str.append(ZTool::charToEscape(next_ch));
-                }
-                break;
-            }
-            }
-        } else {
-            str.append(ch);
-        }
+        str.append(ch);
     }
+
+    str = ZTool::stringEscapeHandler(str);
 
     return TOKEN_PREFIX::STRING;
 }
