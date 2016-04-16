@@ -75,6 +75,8 @@ QHash<QByteArray, ZVariant*> ZCode::globalIdentifierHash;
 
 int ZCode::exec(const QList<ZCode *> &codeList)
 {
+    QList<ZVariant> temporaryList;
+
     for(ZCode *code : codeList) {
         zDebug << *code;
 
@@ -88,60 +90,60 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             break;
         }
         case Add:
-            virtualRegister = *virtualStack.pop() + *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << *virtualStack.pop() + *virtualStack.pop();
+            virtualStack.push(&temporaryList.last());
             break;
         case Sub:
-            virtualRegister = *virtualStack.pop() + *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << *virtualStack.pop() - *virtualStack.pop();
+            virtualStack.push(&temporaryList.last());
             break;
         case Mul:
-            virtualRegister = *virtualStack.pop() + *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << *virtualStack.pop() * *virtualStack.pop();
+            virtualStack.push(&temporaryList.last());
             break;
         case Div:
-            virtualRegister = *virtualStack.pop() + *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << *virtualStack.pop() / *virtualStack.pop();
+            virtualStack.push(&temporaryList.last());
             break;
         case Abs:
-            virtualRegister = + *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << + *virtualStack.pop();
+            virtualStack.push(&temporaryList.last());
             break;
         case Minus:
-            virtualRegister = - *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << - *virtualStack.pop();
+            virtualStack.push(&temporaryList.last());
             break;
         case And:
-            virtualRegister = *virtualStack.pop() & *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << *virtualStack.pop() & *virtualStack.pop();
+            virtualStack.push(&temporaryList.last());
             break;
         case Or:
-            virtualRegister = *virtualStack.pop() | *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << *virtualStack.pop() | *virtualStack.pop();
+            virtualStack.push(&temporaryList.last());
             break;
         case Xor:
-            virtualRegister = *virtualStack.pop() ^ *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << *virtualStack.pop() ^ *virtualStack.pop();
+            virtualStack.push(&temporaryList.last());
             break;
         case Contrary:
-            virtualRegister = ~ *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << ~ *virtualStack.pop();
+            virtualStack.push(&temporaryList.last());
             break;
         case Mod:
-            virtualRegister = *virtualStack.pop() % *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << *virtualStack.pop() % *virtualStack.pop();
+            virtualStack.push(&temporaryList.last());
             break;
         case Not:
-            virtualRegister = ! *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << ! *virtualStack.pop();
+            virtualStack.push(&temporaryList.last());
             break;
         case Less:
-            virtualRegister = *virtualStack.pop() < *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << (*virtualStack.pop() < *virtualStack.pop());
+            virtualStack.push(&temporaryList.last());
             break;
         case Greater:
-            virtualRegister = *virtualStack.pop() > *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << (*virtualStack.pop() > *virtualStack.pop());
+            virtualStack.push(&temporaryList.last());
             break;
         case New:
             /// TODO
@@ -153,52 +155,52 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             /// TODO
             break;
         case EQ:
-            virtualRegister = *virtualStack.pop() == *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << (*virtualStack.pop() == *virtualStack.pop());
+            virtualStack.push(&temporaryList.last());
             break;
         case STEQ: {
             const ZVariant &v1 = *virtualStack.pop();
             const ZVariant &v2 = *virtualStack.pop();
 
-            virtualRegister = v1.type() == v2.type() && v1 == v2;
-            virtualStack.push(&virtualRegister);
+            temporaryList << (v1.type() == v2.type() && v1 == v2);
+            virtualStack.push(&temporaryList.last());
             break;
         }
         case NEQ:
-            virtualRegister = *virtualStack.pop() != *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << (*virtualStack.pop() != *virtualStack.pop());
+            virtualStack.push(&temporaryList.last());
             break;
         case STNEQ: {
             const ZVariant &v1 = *virtualStack.pop();
             const ZVariant &v2 = *virtualStack.pop();
 
-            virtualRegister = v1.type() != v2.type() || v1 != v2;
-            virtualStack.push(&virtualRegister);
+            temporaryList << (v1.type() != v2.type() || v1 != v2);
+            virtualStack.push(&temporaryList.last());
             break;
         }
         case LE:
-            virtualRegister = *virtualStack.pop() <= *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << (*virtualStack.pop() <= *virtualStack.pop());
+            virtualStack.push(&temporaryList.last());
             break;
         case GE:
-            virtualRegister = *virtualStack.pop() >= *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << (*virtualStack.pop() >= *virtualStack.pop());
+            virtualStack.push(&temporaryList.last());
             break;
         case LAnd:
-            virtualRegister = *virtualStack.pop() && *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << (*virtualStack.pop() && *virtualStack.pop());
+            virtualStack.push(&temporaryList.last());
             break;
         case LOr:
-            virtualRegister = *virtualStack.pop() || *virtualStack.pop();
-            virtualStack.push(&virtualRegister);
+            temporaryList << (*virtualStack.pop() || *virtualStack.pop());
+            virtualStack.push(&temporaryList.last());
             break;
         case Get: {
             ZVariant &right_val = *virtualStack.pop();
             ZVariant &left_val = *virtualStack.pop();
             ZObject *obj = left_val.toObject();
 
-            virtualRegister = obj->property(right_val.toString().toLatin1().constData());
-            virtualStack.push(&virtualRegister);
+            temporaryList << obj->property(right_val.toString().toLatin1().constData());
+            virtualStack.push(&temporaryList.last());
             break;
         }
         case Call: {
@@ -227,11 +229,12 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             break;
         }
         case Pop: {
-            virtualStack.pop();
+            temporaryList.removeOne(*virtualStack.pop());
             break;
         }
         case PopAll: {
             virtualStack.clear();
+            temporaryList.clear();
             break;
         }
         default: break;
