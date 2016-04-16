@@ -9,7 +9,8 @@ Z_BEGIN_NAMESPACE
 QString ZCode::actionName(quint8 action)
 {
     switch(action) {
-        case Assign:            return "=";
+        case LeftAssign:        return "=(left)";
+        case RightAssign:       return "=(right)";
         case Add:               return "+";
         case Sub:               return "-";
         case Mul:               return "*";
@@ -81,10 +82,18 @@ int ZCode::exec(const QList<ZCode *> &codeList)
         zDebug << *code;
 
         switch(code->action) {
-        case Assign: {
+        case LeftAssign: {
             ZVariant &right_val = *virtualStack.pop();
 
             *virtualStack.top() = right_val;
+            break;
+        }
+        case RightAssign: {
+            ZVariant &left_val = *virtualStack.pop();
+            ZVariant &right_val = *virtualStack.pop();
+
+            left_val = right_val;
+            virtualStack.push(&left_val);
             break;
         }
         case Add:

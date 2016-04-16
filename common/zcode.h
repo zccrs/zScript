@@ -9,7 +9,8 @@ struct ZCode
 {
     enum Action
     {
-        Assign,             // =                            0
+        LeftAssign,         // =                            0
+        RightAssign,        // =
         Add,                // +                            1
         Sub,                // -                            2
         Mul,                // *                            3

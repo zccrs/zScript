@@ -116,6 +116,18 @@ define:     IDENTIFIER {
 
                 delete $1;
             }
+            | IDENTIFIER '=' expression {
+                if(undefinedIdentifier->contains(*$1)) {
+                    undefinedIdentifier->remove(*$1);
+                } else {
+                    currentScope->identifiers[*$1] = new ZVariant(constUndefined);
+                }
+
+                ZCode::codeList << createCode(ZCode::Push, getIdentifierAddress(*$1));
+                ZCode::codeList << createCode(ZCode::RightAssign);
+
+                delete $1;
+            }
             | define ',' define
             ;
 
@@ -131,7 +143,7 @@ lvalue:     IDENTIFIER {
             | lvalue '=' expression {
                 $$ = ValueType::Variant;
 
-                ZCode::codeList << createCode(ZCode::Assign);
+                ZCode::codeList << createCode(ZCode::LeftAssign);
             }
             | expression '[' expression ']' {
                 $$ = ValueType::Variant;
