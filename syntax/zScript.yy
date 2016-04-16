@@ -420,6 +420,40 @@ rvalue:     UNDEFINED {
                         ZCode::codeList << createCode(ZCode::NEQ);
                     }
             }
+            | expression STEQ expression {
+                    if($1 == ValueType::Constant && $3 == ValueType::Constant) {
+                        $$ = $1;
+
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCode::codeList.takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCode::codeList.last());
+
+                        last_code->value = getConstantAddressByValue(pre_code->value->type() == last_code->value->type()
+                                                                     && *pre_code->value == *last_code->value);
+
+                        delete pre_code;
+                    } else {
+                        $$ = ValueType::Variant;
+
+                        ZCode::codeList << createCode(ZCode::STEQ);
+                    }
+            }
+            | expression STNEQ expression {
+                    if($1 == ValueType::Constant && $3 == ValueType::Constant) {
+                        $$ = $1;
+
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCode::codeList.takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCode::codeList.last());
+
+                        last_code->value = getConstantAddressByValue(pre_code->value->type() == last_code->value->type()
+                                                                     && *pre_code->value != *last_code->value);
+
+                        delete pre_code;
+                    } else {
+                        $$ = ValueType::Variant;
+
+                        ZCode::codeList << createCode(ZCode::STNEQ);
+                    }
+            }
             | expression LE expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
@@ -686,7 +720,7 @@ ZVariant *getConstantAddress(const QByteArray &value, ZVariant::Type type)
         return val;
     }
     case ZVariant::Bool:
-        if((bool)value.toInt())
+        if(value == "true")
             return &constTrue;
         else
             return &constFalse;

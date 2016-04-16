@@ -1,6 +1,7 @@
 %{
 #include "zScript.tab.hpp"
 #include "zglobal.h"
+#include "ztool.h"
 
 #include <QByteArray>
 #include <QDebug>
@@ -29,8 +30,10 @@ ignore [ \t]
 "else"          { return TOKEN_PREFIX::ELSE;}
 "while"         { return TOKEN_PREFIX::WHILE;}
 "undefined"     { return TOKEN_PREFIX::UNDEFINED;}
-("=="|"===")    { return TOKEN_PREFIX::EQ;}
-("!="|"!==")    { return TOKEN_PREFIX::NEQ;}
+"=="            { return TOKEN_PREFIX::EQ;}
+"==="           { return TOKEN_PREFIX::STEQ;}
+"!="            { return TOKEN_PREFIX::NEQ;}
+"!=="           { return TOKEN_PREFIX::STNEQ;}
 "<="            { return TOKEN_PREFIX::LE;}
 ">="            { return TOKEN_PREFIX::GE;}
 "&="            { return TOKEN_PREFIX::ANDASSIGN;}
@@ -49,13 +52,13 @@ ignore [ \t]
 "||="           { return TOKEN_PREFIX::LORASSIGN;}
 
 "true" {
-    yylval->identifier = new QByteArray("1");
+    yylval->identifier = new QByteArray("true");
 
     return TOKEN_PREFIX::BOOL;
 }
 
 "false" {
-    yylval->identifier = new QByteArray("0");
+    yylval->identifier = new QByteArray("false");
 
     return TOKEN_PREFIX::BOOL;
 }
@@ -67,7 +70,9 @@ ignore [ \t]
         if(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {
             yyin.get();
             continue;
-        } else if(ch == ',' || ch == '}' || ch == ')' || ch == ']') {
+        } else if(ch == ',' || ch == '{' || ch == '}'
+                  || ch == '(' || ch == ')'
+                  || ch == '[' || ch == ']') {
             break;
         } else {
             return ';';
@@ -88,6 +93,23 @@ ignore [ \t]
     return TOKEN_PREFIX::IDENTIFIER;
 }
 
+(r\"|r\') {
+    yylval->identifier = new QByteArray();
+
+    QByteArray &str = *yylval->identifier;
+
+    while(!yyin.eof() && !yyin.fail()) {
+        char ch = yyin.get();
+
+        if(ch == yytext[1])
+            break;
+
+        str.append(ch);
+    }
+
+    return TOKEN_PREFIX::STRING;
+}
+
 ['"] {
     yylval->identifier = new QByteArray();
 
@@ -100,12 +122,83 @@ ignore [ \t]
             break;
 
         if(ch == '\\') {
-            if(yyin.eof() || yyin.fail())
-                break;
-
             char next_ch = yyin.get();
 
-            str.append(next_ch);
+            switch(next_ch) {
+            case 'x':{
+                bool ok;
+
+                QByteArray hex;
+
+                hex.append(yyin.get());
+                hex.append(yyin.get());
+
+                str.append(hex.toUShort(&ok, 16));
+                // if(!ok)/// TODO
+                break;
+            }
+            case 'u': {
+                bool ok;
+
+                char next_ch = yyin.get();
+
+                if(next_ch == '{') {
+                    QByteArray hex;
+
+                    char ch = 0;
+
+                    while(!yyin.eof() && !yyin.fail()) {
+                        ch = yyin.get();
+
+                        if(ch == '}')
+                            break;
+
+                        hex.append(ch);
+                    }
+
+                    // if(ch != '}') TODO: parse error
+
+                    quint32 hex_int = hex.toInt(&ok, 16);
+
+                   // if(!ok)/// TODO
+
+                    str.append(QString::fromUcs4(&hex_int, 1));
+                } else {
+                    QByteArray hex;
+
+                    hex.append(next_ch);
+                    hex.append(yyin.get());
+                    hex.append(yyin.get());
+                    hex.append(yyin.get());
+
+                    str.append(hex.toInt(0, 16));
+                    // if(!ok)/// TODO
+                }
+                break;
+            }
+            case '\r':
+            case '\n':
+                break;
+            default: {
+                QChar ch(next_ch);
+
+                if(ch.isNumber()) {
+                    bool ok;
+
+                    QByteArray hex;
+
+                    hex.append(next_ch);
+                    hex.append(yyin.get());
+                    hex.append(yyin.get());
+
+                    str.append(hex.toUShort(&ok, 8));
+                    // if(!ok)/// TODO
+                } else {
+                    str.append(ZTool::charToEscape(next_ch));
+                }
+                break;
+            }
+            }
         } else {
             str.append(ch);
         }

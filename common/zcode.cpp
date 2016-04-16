@@ -218,6 +218,9 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             const ZVariant &v2 = *virtualStack.pop();
 
             temporaryList << (v1.type() == v2.type() && v1 == v2);
+
+            zDebug << temporaryList.last();
+
             virtualStack.push(&temporaryList.last());
             break;
         }
