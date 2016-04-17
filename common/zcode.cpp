@@ -319,8 +319,12 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             ZFunction *fun = qobject_cast<ZFunction*>(virtualStack.pop()->toObject());
 
             if(fun) {
-                temporaryList << fun->call(args);
-                virtualStack.push(&temporaryList.last());
+                const QList<ZVariant> &list = fun->call(args);
+
+                for(const ZVariant &val : list) {
+                    temporaryList << val;
+                    virtualStack.push(&temporaryList.last());
+                }
             }
 
             break;

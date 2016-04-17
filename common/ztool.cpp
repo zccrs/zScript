@@ -185,10 +185,12 @@ QByteArray ZTool::stringEscapeHandler(QTextStream &stream, const char *endWith, 
     while(!stream.atEnd()) {
         char ch;
 
-        stream >> ch;
+        stream.device()->peek(&ch, 1);
 
-        if(endWith && ch == *endWith)
+        if(endWith && ch == *endWith) {
+            stream.device()->getChar(&ch);
             break;
+        }
 
         if(ch == '\n' || ch == '\r') {
             if(errorString)
@@ -200,13 +202,20 @@ QByteArray ZTool::stringEscapeHandler(QTextStream &stream, const char *endWith, 
         if(ch == '\\') {
             char next_ch;
 
-            stream >> next_ch;
+            stream.seek(stream.pos() + 1);
+
+            if(stream.device()->peek(&next_ch, 1) != 1) {
+                if(errorString)
+                    *errorString = QObject::tr("Should not end with: ") + ch;
+
+                return str;
+            }
+
+            stream.seek(stream.pos() - 1);
 
             switch(next_ch) {
             case 'x':{
-                qint64 pos = stream.pos() - 2;
-
-                stream.seek(pos);
+                qint64 pos = stream.pos();
 
                 str.append(utf8StringHandler(stream, errorString));
 
@@ -228,11 +237,18 @@ QByteArray ZTool::stringEscapeHandler(QTextStream &stream, const char *endWith, 
             case 'u': {
                 char next_ch;
 
-                stream >> next_ch;
+                stream.seek(stream.pos() + 2);
 
-                qint64 pos = stream.pos() - 3;
+                if(stream.device()->peek(&next_ch, 1) != 1) {
+                    if(errorString)
+                        *errorString = QObject::tr("Should not end with: ") + ch;
 
-                stream.seek(pos);
+                    return str;
+                }
+
+                stream.seek(stream.pos() - 2);
+
+                qint64 pos = stream.pos();
 
                 if(next_ch == '{') {
                     str.append(ucs4StringHandler(stream, errorString));
@@ -259,9 +275,7 @@ QByteArray ZTool::stringEscapeHandler(QTextStream &stream, const char *endWith, 
                 QChar ch(next_ch);
 
                 if(ch.isNumber()) {
-                    qint64 pos = stream.pos() - 1;
-
-                    stream.seek(stream.pos() - 1);
+                    qint64 pos = stream.pos();
 
                     str.append(octStringHandler(stream, errorString));
 
@@ -278,12 +292,14 @@ QByteArray ZTool::stringEscapeHandler(QTextStream &stream, const char *endWith, 
                         return str;
                     }
                 } else {
+                    stream.seek(stream.pos() + 2);
                     str.append(charToEscape(next_ch));
                 }
                 break;
             }
             }
         } else {
+            stream.seek(stream.pos() + 1);
             str.append(ch);
         }
     }
