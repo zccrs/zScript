@@ -204,9 +204,20 @@ QByteArray ZTool::stringEscapeHandler(QTextStream &stream, const char *endWith, 
 
             switch(next_ch) {
             case 'x':{
-                stream.seek(stream.pos() - 2);
+                qint64 pos = stream.pos() - 2;
+
+                stream.seek(pos);
 
                 str.append(utf8StringHandler(stream, errorString));
+
+                if(pos == stream.pos()) {
+                    if(errorString)
+                        *errorString = QObject::tr("The unexpected symbol: ") + next_ch;
+
+                    stream.seek(pos + 2);
+
+                    return str;
+                }
 
                 if(errorString && !errorString->isEmpty()) {
                     return str;
@@ -219,30 +230,49 @@ QByteArray ZTool::stringEscapeHandler(QTextStream &stream, const char *endWith, 
 
                 stream >> next_ch;
 
-                stream.seek(stream.pos() - 3);
+                qint64 pos = stream.pos() - 3;
+
+                stream.seek(pos);
 
                 if(next_ch == '{') {
                     str.append(ucs4StringHandler(stream, errorString));
-
-                    if(errorString && !errorString->isEmpty()) {
-                        return str;
-                    }
                 } else {
                     str.append(utf16StringHandler(stream, errorString));
-
-                    if(errorString && !errorString->isEmpty()) {
-                        return str;
-                    }
                 }
+
+                if(pos == stream.pos()) {
+                    if(errorString)
+                        *errorString = QObject::tr("The unexpected symbol: ") + next_ch;
+
+                    stream.seek(pos + 3);
+
+                    return str;
+                }
+
+                if(errorString && !errorString->isEmpty()) {
+                    return str;
+                }
+
                 break;
             }
             default: {
                 QChar ch(next_ch);
 
                 if(ch.isNumber()) {
+                    qint64 pos = stream.pos() - 1;
+
                     stream.seek(stream.pos() - 1);
 
                     str.append(octStringHandler(stream, errorString));
+
+                    if(pos == stream.pos()) {
+                        if(errorString)
+                            *errorString = QObject::tr("The unexpected symbol: ") + next_ch;
+
+                        stream.seek(pos + 1);
+
+                        return str;
+                    }
 
                     if(errorString && !errorString->isEmpty()) {
                         return str;
