@@ -16,3 +16,6 @@ include($$PWD/common/common.pri)
 include($$PWD/base/base.pri)
 
 #DESTDIR = $$shadowed($$PWD/../bin)
+
+SOURCES += \
+    main.cpp

@@ -3,6 +3,17 @@
 
 #include "zvariant.h"
 
+#include <QSet>
+
+class yyFlexLexer;
+
+namespace yy {
+class parser;
+}
+
+typedef yyFlexLexer YYFlexLexer;
+typedef yy::parser  YYParser;
+
 Z_BEGIN_NAMESPACE
 
 struct ZCode
@@ -62,23 +73,85 @@ struct ZCode
     };
 
     static QString actionName(quint8 action);
-    static void registerIdentifier(const QByteArray &name, ZVariant *variant);
 
     static int exec(const QList<ZCode*> &codeList);
-    inline static int exec()
-    {return exec(codeList);}
 
     quint8 action = Unknow;
 
     static QStack<ZVariant*> virtualStack;
     static ZVariant virtualRegister;
-    static QList<ZCode*> codeList;
-    static QHash<QByteArray, ZVariant*> globalIdentifierHash;
 };
 
 struct ValueCode : public ZCode
 {
     ZVariant *value = Q_NULLPTR;
+};
+
+class ZCodeParse
+{
+public:
+    ZCodeParse();
+    ~ZCodeParse();
+
+    struct Scope{
+        Scope *parent = Q_NULLPTR;
+        QHash<QByteArray, ZVariant*> identifiers;
+    };
+
+    inline static void registerIdentifier(const QByteArray &name, ZVariant *variant)
+    {globalIdentifierHash[name] = variant;}
+
+    /// from stdin get code
+    int eval();
+    int eval(const char *fileName, bool *ok = 0);
+    int eval(const QByteArray &code, bool *ok = 0);
+
+    inline int exec()
+    { return ZCode::exec(codeList);}
+
+    ZVariant *getIdentifierAddress(const QByteArray &name);
+
+    static ZVariant *getConstantAddress(const QByteArray &value, ZVariant::Type type);
+
+    static inline ZVariant *getConstantAddressByValue(const ZVariant &value)
+    { return getConstantAddress(value.toString().toLatin1(), value.type());}
+
+    inline void appendCode(const ZCode::Action &action, ZVariant *val = Q_NULLPTR)
+    { codeList << createCode(action, val);}
+
+    inline QList<ZCode*> &getCodeList()
+    { return codeList;}
+
+    inline YYFlexLexer *yyFlexLexer() const
+    { return m_yyFlexLexer;}
+
+    inline void addIdentifier(const QByteArray &name)
+    { undefinedIdentifier.remove(name); currentScope->identifiers[name] = new ZVariant(constUndefined);}
+
+    void beginScope();
+    void endScope();
+
+    static ZCodeParse *currentCodeParse;
+    static bool yywrap;
+
+    ZCodeParse *parent = Q_NULLPTR;
+private:
+    ZCode *createCode(const ZCode::Action &action, ZVariant *val = Q_NULLPTR);
+
+    YYFlexLexer *m_yyFlexLexer = Q_NULLPTR;
+    YYParser *m_yyParser = Q_NULLPTR;
+
+    QList<ZCode*> codeList;
+    Scope *currentScope = Q_NULLPTR;
+    QList<Scope*> scopeList;
+    QSet<const QByteArray> undefinedIdentifier;
+
+    static QHash<QByteArray, ZVariant*> globalIdentifierHash;
+    static QHash<const QByteArray, ZVariant*> stringConstantHash;
+    static QHash<const QByteArray, ZVariant*> numberConstantHash;
+    static ZVariant constTrue;
+    static ZVariant constFalse;
+    static ZVariant constUndefined;
 };
 
 Z_END_NAMESPACE

@@ -1,10 +1,19 @@
 #include "zcode.h"
 #include "zobject.h"
 
+#include "zScript.tab.hpp"
+#include "FlexLexer.h"
+
 #include <QDebug>
 #include <QStack>
+#include <QTemporaryFile>
+
+#include <unistd.h>
 
 Z_BEGIN_NAMESPACE
+
+QStack<ZVariant*> ZCode::virtualStack;
+ZVariant ZCode::virtualRegister;
 
 QString ZCode::actionName(quint8 action)
 {
@@ -63,16 +72,6 @@ QString ZCode::actionName(quint8 action)
 
     return "";
 }
-
-void ZCode::registerIdentifier(const QByteArray &name, ZVariant *variant)
-{
-    globalIdentifierHash[name] = variant;
-}
-
-QStack<ZVariant*> ZCode::virtualStack;
-ZVariant ZCode::virtualRegister;
-QList<ZCode*> ZCode::codeList;
-QHash<QByteArray, ZVariant*> ZCode::globalIdentifierHash;
 
 int ZCode::exec(const QList<ZCode *> &codeList)
 {
@@ -298,6 +297,11 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             ZObject *obj = left_val.toObject();
 
             temporaryList << obj->property(right_val.toString().toLatin1().constData());
+
+            if(!temporaryList.last().toQVariant().isValid()) {
+                zError << "no such property exists: " << right_val.toString();
+            }
+
             virtualStack.push(&temporaryList.last());
             break;
         }
@@ -315,7 +319,8 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             ZFunction *fun = qobject_cast<ZFunction*>(virtualStack.pop()->toObject());
 
             if(fun) {
-                fun->call(args);
+                temporaryList << fun->call(args);
+                virtualStack.push(&temporaryList.last());
             }
 
             break;
@@ -351,6 +356,208 @@ int ZCode::exec(const QList<ZCode *> &codeList)
     return 0;
 }
 
+
+ZCodeParse *ZCodeParse::currentCodeParse = Q_NULLPTR;
+bool ZCodeParse::yywrap = true;
+QHash<QByteArray, ZVariant*> ZCodeParse::globalIdentifierHash;
+QHash<const QByteArray, ZVariant*> ZCodeParse::stringConstantHash;
+QHash<const QByteArray, ZVariant*> ZCodeParse::numberConstantHash;
+ZVariant ZCodeParse::constTrue(true);
+ZVariant ZCodeParse::constFalse(false);
+ZVariant ZCodeParse::constUndefined;
+
+ZCodeParse::ZCodeParse()
+{
+    parent = currentCodeParse;
+
+    currentCodeParse = this;
+}
+
+ZCodeParse::~ZCodeParse()
+{
+    currentCodeParse = Q_NULLPTR;
+
+    qDeleteAll(scopeList);
+    qDeleteAll(codeList);
+
+    currentCodeParse = parent;
+}
+
+int ZCodeParse::eval()
+{
+    m_yyFlexLexer = new YYFlexLexer();
+
+    if(parent) {
+        m_yyFlexLexer = parent->m_yyFlexLexer;
+        m_yyParser = parent->m_yyParser;
+
+        yywrap = false;
+    } else {
+        m_yyFlexLexer = new YYFlexLexer;
+        m_yyParser = new YYParser;
+
+        m_yyParser->set_debug_level(QByteArray(getenv("DEBUG_PARSE_LEVEL")).toInt());
+    }
+
+    beginScope();
+
+    m_yyParser->parse();
+
+    qDeleteAll(scopeList);
+    scopeList.clear();
+
+    if(!undefinedIdentifier.isEmpty()) {
+        zError << "undefined reference";
+
+        for(const QByteArray &name : undefinedIdentifier)
+            zPrint << name;
+    }
+
+    int result = exec();
+
+    if(!parent) {
+        delete m_yyFlexLexer;
+        delete m_yyParser;
+    }
+
+    return result;
+}
+
+int ZCodeParse::eval(const char *fileName, bool *ok)
+{
+    FILE *fd = freopen(fileName, "r", stdin);
+
+    if(ok)
+        *ok = bool(fd);
+
+    return eval();
+}
+
+int ZCodeParse::eval(const QByteArray &code, bool *ok)
+{
+    QTemporaryFile file;
+
+    if(file.open()) {
+        write(file.handle(), code.constData(), code.size());
+
+        return eval(file.fileName().toLatin1().constData(), ok);
+    }
+
+    if(ok)
+        *ok = false;
+
+    return -1;
+}
+
+ZVariant *ZCodeParse::getIdentifierAddress(const QByteArray &name)
+{
+    ZVariant *val = Q_NULLPTR;
+    Scope *scope = currentScope;
+
+    while(scope) {
+        val = scope->identifiers.value(name);
+
+        if(val)
+            return val;
+
+        scope = currentScope->parent;
+    }
+
+    if(!val) {
+        val = globalIdentifierHash.value(name);
+
+        if(!val) {
+            undefinedIdentifier << name;
+
+            val = new ZVariant(constUndefined);
+        }
+    }
+
+    return val;
+}
+
+ZVariant *ZCodeParse::getConstantAddress(const QByteArray &value, ZVariant::Type type)
+{
+    switch(type) {
+    case ZVariant::Int: {
+        ZVariant *val = numberConstantHash.value(value);
+
+        if(!val) {
+            numberConstantHash[value] = val;
+        }
+
+        val = new ZVariant(value.toInt());
+
+        return val;
+    }
+    case ZVariant::Double: {
+        ZVariant *val = numberConstantHash.value(value);
+
+        if(!val) {
+            numberConstantHash[value] = val;
+        }
+
+        val = new ZVariant(value.toDouble());
+
+        return val;
+    }
+    case ZVariant::String: {
+        ZVariant *val = stringConstantHash.value(value);
+
+        if(!val) {
+            stringConstantHash[value] = val;
+        }
+
+        val = new ZVariant(QString(value));
+
+        return val;
+    }
+    case ZVariant::Bool:
+        if(value == "true")
+            return &constTrue;
+        else
+            return &constFalse;
+    default:
+        return &constUndefined;
+    }
+}
+
+ZCode *ZCodeParse::createCode(const ZCode::Action &action, ZVariant *val)
+{
+    if(action == ZCode::Push) {
+        ValueCode *code = new ValueCode;
+
+        code->action = action;
+        code->value = val;
+
+        return code;
+    }
+
+    ZCode *code = new ZCode;
+
+    code->action = action;
+
+    return code;
+}
+
+void ZCodeParse::beginScope()
+{
+    Scope *scope = new Scope;
+
+    scopeList << scope;
+
+    scope->parent = currentScope;
+
+    currentScope = scope;
+}
+
+void ZCodeParse::endScope()
+{
+    currentScope = currentScope->parent;
+}
+
+Z_END_NAMESPACE
+
 QT_BEGIN_NAMESPACE
 QDebug operator<<(QDebug deg, const ZCode &var)
 {
@@ -365,5 +572,3 @@ QDebug operator<<(QDebug deg, const ZCode &var)
     return deg;
 }
 QT_END_NAMESPACE
-
-Z_END_NAMESPACE

@@ -1,7 +1,7 @@
 #ifndef BASE_H
 #define BASE_H
 
-namespace Base {
+namespace ZBase {
 void initGlobalIdentifier();
 }
 

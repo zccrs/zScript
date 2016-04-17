@@ -1,11 +1,12 @@
-#include "base.h"
+#include "zbase.h"
 #include "zcode.h"
-
 #include "zconsole.h"
+#include "zsystem.h"
 
-namespace Base {
+namespace ZBase {
 void initGlobalIdentifier()
 {
-    ZCode::registerIdentifier("console", new ZVariant(new ZConsole));
+    ZCodeParse::registerIdentifier("console", new ZVariant(new ZConsole));
+    ZCodeParse::registerIdentifier("sys", new ZVariant(new ZSystem));
 }
 }

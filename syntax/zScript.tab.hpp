@@ -124,7 +124,7 @@ namespace yy {
     /// Symbol semantic values.
     union semantic_type
     {
-    #line 52 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
+    #line 24 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
 
     int valueType;
     int argsCount;
