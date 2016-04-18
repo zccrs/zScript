@@ -88,6 +88,7 @@ ZVariant::ZVariant(const QList<ZVariant> &val)
 }
 
 ZVariant::ZVariant(const ZVariant::ZGroup &group)
+    : data(new VariantData)
 {
     data->variant = QVariant::fromValue(group);
     data->type = Group;
@@ -234,7 +235,25 @@ QString ZVariant::toString() const
 
 QList<ZVariant> ZVariant::toList() const
 {
+    if(type() == Group) {
+        QList<ZVariant> list;
+
+        for(const ZVariant *val : toGroup()) {
+            list << *val;
+        }
+
+        return list;
+    }
+
     return qvariant_cast<QList<ZVariant>>(data->variant);
+}
+
+ZVariant::ZGroup ZVariant::toGroup() const
+{
+    if(type() == Group)
+        return qvariant_cast<ZGroup>(data->variant);
+
+    return ZGroup() << const_cast<ZVariant*>(this);
 }
 
 ZObject *ZVariant::toObject() const
@@ -259,6 +278,7 @@ QDebug operator<<(QDebug deg, const ZVariant &var)
         deg.nospace() << var.toObject();
         break;
     case ZVariant::List:
+    case ZVariant::Group:
         deg.nospace() << var.toList();
         break;
     case ZVariant::NaN:

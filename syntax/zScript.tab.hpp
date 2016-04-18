@@ -124,7 +124,7 @@ namespace yy {
     /// Symbol semantic values.
     union semantic_type
     {
-    #line 24 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
+    #line 25 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
 
     int valueType;
     int argsCount;
@@ -490,7 +490,7 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1322,     ///< Last index in yytable_.
+      yylast_ = 1194,     ///< Last index in yytable_.
       yynnts_ = 12,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,

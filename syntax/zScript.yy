@@ -1,3 +1,4 @@
+
 %{
 #include "zcode.h"
 #include "lex.yy.cpp"
@@ -96,15 +97,22 @@ define:     IDENTIFIER {
 
 expression: lvalue | rvalue;
 
-group_exp:  {$$ = 0;}
+group_exp:  expression ',' expression {$$ = 2;}
             | group_exp ',' expression {
                 $$ = $1 + 1;
             }
-            ;
 
-group_lval: {$$ = 0;}
+//group_rval: rvalue ',' rvalue {
+//                $$ = 2;
+
+//                zDebug << $$ << "group_rval=====================";
+//            }
+//            ;
+
+group_lval: lvalue ',' lvalue {$$ = 2;}
             | group_lval ',' lvalue {
                 $$ = $1 + 1;
+                zDebug << $$ << "group_lval=====================";
             }
             ;
 
@@ -571,8 +579,9 @@ rvalue:     UNDEFINED {
             ;
 
 arguments:  {$$ = 0;}
-            | expression {$$ = 1;}
-            | group_exp {$$ = $1;}
+            | expression {
+                $$ = 1;
+            }
             ;
 
 branch_head:IF '(' expression ')'
@@ -592,6 +601,8 @@ void yy::parser::error(const location_type& loc, const std::string& msg)
 {
     std::cerr << "from " << loc.begin.line << " line, " << loc.begin.column << " column "
               << "to " << loc.end.line << " line, " << loc.end.column << " column, " << msg << std::endl;
+
+    quick_exit(-1);
 }
 
 int yyFlexLexer::yywrap()

@@ -305,6 +305,22 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             virtualStack.push(&temporaryList.last());
             break;
         }
+        case Join: {     /// join to ZGroup
+            ZVariant::ZGroup group;
+
+            int argsCount = virtualStack.pop()->toInt();
+
+            group.reserve(argsCount);
+
+            for(int i = 0; i< argsCount; ++i) {
+                group.insert(0, virtualStack.pop());
+            }
+
+            temporaryList << std::move(group);
+
+            virtualStack.push(&temporaryList.last());
+            break;
+        }
         case Call: {
             QList<ZVariant> args;
 
@@ -313,18 +329,29 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             args.reserve(argsCount);
 
             for(int i = 0; i < argsCount; ++i) {
-                args.insert(0, *virtualStack.pop());
+                const ZVariant *val = virtualStack.pop();
+
+                if(val->type() == ZVariant::Group) {
+                    args = val->toList() + args;
+                } else {
+                    args.insert(0, *val);
+                }
             }
 
             ZFunction *fun = qobject_cast<ZFunction*>(virtualStack.pop()->toObject());
 
             if(fun) {
                 const QList<ZVariant> &list = fun->call(args);
+                ZVariant::ZGroup group;
 
                 for(const ZVariant &val : list) {
                     temporaryList << val;
-                    virtualStack.push(&temporaryList.last());
+                    group << &temporaryList.last();
                 }
+
+                temporaryList << group;
+
+                virtualStack.push(&temporaryList.last());
             }
 
             break;

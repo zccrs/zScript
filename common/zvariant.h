@@ -53,13 +53,44 @@ public:
     bool toBool() const;
     QString toString() const;
     QList<ZVariant> toList() const;
+    ZGroup toGroup() const;
     ZObject *toObject() const;
     QVariant toQVariant() const;
 
     inline ZVariant& operator=(const ZVariant &other)
-    { data = other.data; return *this;}
+    {
+        if(type() == Group) {
+            const ZGroup &other_group = other.toGroup();
+            const ZGroup &this_group = toGroup();
+
+            int min = qMin(other_group.count(), this_group.count());
+
+            for(int i = 0; i < min; ++i) {
+                *this_group[i] = *other_group[i];
+            }
+        } else {
+            data = other.data;
+        }
+
+        return *this;
+    }
     inline ZVariant& operator=(ZVariant &&other)
-    { qSwap(data, other.data); return *this;}
+    {
+        if(type() == Group) {
+            const ZGroup &other_group = other.toGroup();
+            const ZGroup &this_group = toGroup();
+
+            int min = qMin(other_group.count(), this_group.count());
+
+            for(int i = 0; i < min; ++i) {
+                *this_group[i] = *other_group[i];
+            }
+        } else {
+            qSwap(data, other.data);
+        }
+
+        return *this;
+    }
     inline bool operator==(const ZVariant &v) const
     { return data->variant == v.data->variant; }
     inline bool operator!=(const ZVariant &v) const
