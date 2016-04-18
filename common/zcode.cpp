@@ -62,7 +62,7 @@ QString ZCode::actionName(quint8 action)
         case PrefixSubSelf:     return "--(prefix)";
         case PostfixSubSelf:    return "--(postfix)";
         case Get:               return ".";
-        case Comma:             return ",";
+        case Join:              return ",";
         case Call:              return "call";
         case Push:              return "push";
         case Pop:               return "pop";

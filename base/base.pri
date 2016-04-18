@@ -7,5 +7,5 @@ HEADERS += \
 
 SOURCES += \
     $$PWD/zconsole.cpp \
-    $$PWD/base.cpp \
-    $$PWD/zsystem.cpp
+    $$PWD/zsystem.cpp \
+    $$PWD/zbase.cpp

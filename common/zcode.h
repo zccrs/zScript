@@ -64,7 +64,7 @@ struct ZCode
         PrefixSubSelf,      // --                           40
         PostfixSubSelf,     // --                           41
         Get,                // .                            42
-        Comma,              // ,                            43      remove
+        Join,               // ,                            43     join variant
         Call,               // ()                           44
         Push,       // push target value to stack   45
         Pop,                // pop stack                    46

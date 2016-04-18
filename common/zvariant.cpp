@@ -9,16 +9,12 @@ Z_BEGIN_NAMESPACE
 ZVariant::ZVariant(ZVariant::Type type)
     : data(new VariantData)
 {
-    qRegisterMetaType<ZVariant>("ZVariant");
-
     data->type = type;
 }
 
 ZVariant::ZVariant(int val)
     : data(new VariantData)
 {
-    qRegisterMetaType<ZVariant>("ZVariant");
-
     data->variant = val;
     data->type = Int;
 }
@@ -26,8 +22,6 @@ ZVariant::ZVariant(int val)
 ZVariant::ZVariant(double val)
     : data(new VariantData)
 {
-    qRegisterMetaType<ZVariant>("ZVariant");
-
     data->variant = val;
     data->type = Double;
 }
@@ -35,8 +29,6 @@ ZVariant::ZVariant(double val)
 ZVariant::ZVariant(bool val)
     : data(new VariantData)
 {
-    qRegisterMetaType<ZVariant>("ZVariant");
-
     data->variant = val;
     data->type = Bool;
 }
@@ -44,8 +36,6 @@ ZVariant::ZVariant(bool val)
 ZVariant::ZVariant(const char *val)
     : data(new VariantData)
 {
-    qRegisterMetaType<ZVariant>("ZVariant");
-
     data->variant = val;
     data->type = String;
 }
@@ -64,8 +54,6 @@ ZVariant::ZVariant(ZVariant &&other)
 ZVariant::ZVariant(const QString &val)
     : data(new VariantData)
 {
-    qRegisterMetaType<ZVariant>("ZVariant");
-
     data->variant = val;
     data->type = String;
 }
@@ -73,27 +61,14 @@ ZVariant::ZVariant(const QString &val)
 ZVariant::ZVariant(QLatin1String val)
     : data(new VariantData)
 {
-    qRegisterMetaType<ZVariant>("ZVariant");
-
     data->variant = val;
     data->type = String;
-}
-
-ZVariant::ZVariant(const QList<ZVariant> &val)
-    : data(new VariantData)
-{
-    qRegisterMetaType<ZVariant>("ZVariant");
-
-    data->variant = QVariant::fromValue(val);
-    data->type = List;
 }
 
 template <typename T>
 ZVariant::ZVariant(const QList<T> &val)
     : data(new VariantData)
 {
-    qRegisterMetaType<ZVariant>("ZVariant");
-
     QList<ZVariant> list;
 
     list.reserve(val.size());
@@ -105,11 +80,22 @@ ZVariant::ZVariant(const QList<T> &val)
     data->type = List;
 }
 
+ZVariant::ZVariant(const QList<ZVariant> &val)
+    : data(new VariantData)
+{
+    data->variant = QVariant::fromValue(val);
+    data->type = List;
+}
+
+ZVariant::ZVariant(const ZVariant::ZGroup &group)
+{
+    data->variant = QVariant::fromValue(group);
+    data->type = Group;
+}
+
 ZVariant::ZVariant(ZObject * const object)
     : data(new VariantData)
 {
-    qRegisterMetaType<ZVariant>("ZVariant");
-
     data->variant = QVariant::fromValue(object);
     data->type = object ? Object : Null;
 }

@@ -6,6 +6,8 @@
 
 void begin(const char *fileName)
 {
+    qRegisterMetaType<ZVariant>("ZVariant");
+
     ZBase::initGlobalIdentifier();
 
     ZCodeParse codeParse;

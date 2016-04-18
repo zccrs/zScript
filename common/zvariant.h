@@ -22,8 +22,11 @@ public:
         Object = QMetaType::PointerToQObject,
         Undefined = QMetaType::UnknownType,
         NaN = QMetaType::User + 1,
-        Null = QMetaType::User + 2
+        Null = QMetaType::User + 2,
+        Group = QMetaType::User + 3
     };
+
+    typedef QList<ZVariant*> ZGroup;
 
     ZVariant(Type type = Undefined);
     ZVariant(int val);
@@ -37,6 +40,7 @@ public:
     template <typename T>
     ZVariant(const QList<T> &val);
     ZVariant(const QList<ZVariant> &val);
+    ZVariant(const ZGroup &group);
     ZVariant(ZObject * const object);
     ZVariant(const QVariant &val);
     ~ZVariant();
@@ -211,5 +215,6 @@ ZVariant operator ~(const ZVariant &var);
 Z_END_NAMESPACE
 
 Q_DECLARE_METATYPE(ZVariant)
+Q_DECLARE_METATYPE(ZVariant::ZGroup)
 
 #endif // ZVARIANT_H

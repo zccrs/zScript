@@ -51,7 +51,7 @@ Z_USE_NAMESPACE
 %left '(' ')'
 
 %type <valueType> expression lvalue rvalue
-%type <argsCount> arguments
+%type <argsCount> arguments group_exp group_lval
 
 %%
 
@@ -95,6 +95,18 @@ define:     IDENTIFIER {
             ;
 
 expression: lvalue | rvalue;
+
+group_exp:  {$$ = 0;}
+            | group_exp ',' expression {
+                $$ = $1 + 1;
+            }
+            ;
+
+group_lval: {$$ = 0;}
+            | group_lval ',' lvalue {
+                $$ = $1 + 1;
+            }
+            ;
 
 lvalue:     IDENTIFIER {
                 $$ = ValueType::Variant;
@@ -171,6 +183,12 @@ lvalue:     IDENTIFIER {
                 $$ = ValueType::Variant;
 
                 ZCodeParse::currentCodeParse->appendCode(ZCode::PrefixSubSelf);
+            }
+            | group_lval {
+                $$ = ValueType::Variant;
+
+                ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::getConstantAddress(QByteArray::number($1), ZVariant::Int));
+                ZCodeParse::currentCodeParse->appendCode(ZCode::Join);
             }
             ;
 
@@ -544,21 +562,17 @@ rvalue:     UNDEFINED {
 
                 ZCodeParse::currentCodeParse->appendCode(ZCode::PostfixSubSelf);
             }
+            | group_exp {
+                $$ = ValueType::Variant;
+
+                ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::getConstantAddress(QByteArray::number($1), ZVariant::Int));
+                ZCodeParse::currentCodeParse->appendCode(ZCode::Join);
+            }
             ;
 
-arguments:  expression {$$ = 1;}
-            | arguments ',' expression {$$ = $1 + 1;}/* {
-                    if($1->nodeType == Node::Constant
-                            && $3->nodeType == Node::Constant) {
-                        $$ = new Node(Node::Constant);
-                        QList<ZVariant> value;
-                        value << *$1->value << *$3->value;
-                        $$->value = new ZVariant(value);
-                    } else {
-                        $$ = new Node(Node::Comma, $1, $3);
-                        $$->value = new ZVariant();
-                    }
-            }*/
+arguments:  {$$ = 0;}
+            | expression {$$ = 1;}
+            | group_exp {$$ = $1;}
             ;
 
 branch_head:IF '(' expression ')'
@@ -572,7 +586,6 @@ conditional:branch_head '{' start '}'
             | conditional ELSE '{' start '}'
             | conditional ELSE expression ';'
             ;
-
 %%
 
 void yy::parser::error(const location_type& loc, const std::string& msg)
