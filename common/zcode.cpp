@@ -390,9 +390,9 @@ int ZCode::exec(const QList<ZCode *> &codeList)
 
 ZCodeParse *ZCodeParse::currentCodeParse = Q_NULLPTR;
 bool ZCodeParse::yywrap = true;
-QHash<QByteArray, ZVariant*> ZCodeParse::globalIdentifierHash;
-QHash<const QByteArray, ZVariant*> ZCodeParse::stringConstantHash;
-QHash<const QByteArray, ZVariant*> ZCodeParse::numberConstantHash;
+QHash<const QByteArray, ZVariant*> ZCodeParse::globalIdentifierHash;
+QMap<QByteArray, ZVariant*> ZCodeParse::stringConstantMap;
+QMap<QByteArray, ZVariant*> ZCodeParse::numberConstantMap;
 ZVariant ZCodeParse::constTrue(true);
 ZVariant ZCodeParse::constFalse(false);
 ZVariant ZCodeParse::constUndefined;
@@ -511,35 +511,32 @@ ZVariant *ZCodeParse::getConstantAddress(const QByteArray &value, ZVariant::Type
 {
     switch(type) {
     case ZVariant::Int: {
-        ZVariant *val = numberConstantHash.value(value);
+        ZVariant *val = numberConstantMap.value(value);
 
         if(!val) {
-            numberConstantHash[value] = val;
+            val = new ZVariant(value.toInt());
+            numberConstantMap[value] = val;
         }
-
-        val = new ZVariant(value.toInt());
 
         return val;
     }
     case ZVariant::Double: {
-        ZVariant *val = numberConstantHash.value(value);
+        ZVariant *val = numberConstantMap.value(value);
 
         if(!val) {
-            numberConstantHash[value] = val;
+            val = new ZVariant(value.toDouble());
+            numberConstantMap[value] = val;
         }
-
-        val = new ZVariant(value.toDouble());
 
         return val;
     }
     case ZVariant::String: {
-        ZVariant *val = stringConstantHash.value(value);
+        ZVariant *val = stringConstantMap.value(value);
 
         if(!val) {
-            stringConstantHash[value] = val;
+            val = new ZVariant(QString(value));
+            stringConstantMap[value] = val;
         }
-
-        val = new ZVariant(QString(value));
 
         return val;
     }

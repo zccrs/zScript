@@ -146,9 +146,9 @@ private:
     QList<Scope*> scopeList;
     QSet<const QByteArray> undefinedIdentifier;
 
-    static QHash<QByteArray, ZVariant*> globalIdentifierHash;
-    static QHash<const QByteArray, ZVariant*> stringConstantHash;
-    static QHash<const QByteArray, ZVariant*> numberConstantHash;
+    static QHash<const QByteArray, ZVariant*> globalIdentifierHash;
+    static QMap<QByteArray, ZVariant*> stringConstantMap;
+    static QMap<QByteArray, ZVariant*> numberConstantMap;
     static ZVariant constTrue;
     static ZVariant constFalse;
     static ZVariant constUndefined;
