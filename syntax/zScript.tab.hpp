@@ -185,7 +185,8 @@ namespace yy {
         XORASSIGN = 290,
         LANDASSIGN = 291,
         LORASSIGN = 292,
-        UMINUS = 293
+        COMMA = 293,
+        UMINUS = 294
       };
     };
 
@@ -490,12 +491,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1194,     ///< Last index in yytable_.
+      yylast_ = 1121,     ///< Last index in yytable_.
       yynnts_ = 12,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 63  ///< Number of tokens.
+      yyntokens_ = 64  ///< Number of tokens.
     };
 
 
@@ -504,7 +505,7 @@ namespace yy {
 
 
 } // yy
-#line 508 "zScript.tab.hpp" // lalr1.cc:377
+#line 509 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

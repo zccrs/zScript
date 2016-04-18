@@ -41,6 +41,7 @@ Z_USE_NAMESPACE
 
 %left ','
 %right '=' DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
+%left COMMA
 %left '?' ':'
 %left LAND LOR
 %left '&' '|' '^'
@@ -95,26 +96,18 @@ define:     IDENTIFIER {
             | define ',' define
             ;
 
-expression: lvalue | rvalue;
+group_lval: lvalue ',' lvalue %prec COMMA {$$ = 2;}
+            | group_lval ',' lvalue %prec COMMA {
+                $$ = $1 + 1;
+            }
+            ;
 
 group_exp:  expression ',' expression {$$ = 2;}
             | group_exp ',' expression {
                 $$ = $1 + 1;
             }
 
-//group_rval: rvalue ',' rvalue {
-//                $$ = 2;
-
-//                zDebug << $$ << "group_rval=====================";
-//            }
-//            ;
-
-group_lval: lvalue ',' lvalue {$$ = 2;}
-            | group_lval ',' lvalue {
-                $$ = $1 + 1;
-                zDebug << $$ << "group_lval=====================";
-            }
-            ;
+expression: lvalue | rvalue;
 
 lvalue:     IDENTIFIER {
                 $$ = ValueType::Variant;

@@ -66,8 +66,13 @@ public:
             int min = qMin(other_group.count(), this_group.count());
 
             for(int i = 0; i < min; ++i) {
-                *this_group[i] = *other_group[i];
+                this_group[i]->data = other_group[i]->data;
             }
+        } else if(other.type() == Group) {
+            const ZGroup &other_group = other.toGroup();
+
+            if(!other_group.isEmpty())
+                data = other_group.first()->data;
         } else {
             data = other.data;
         }
@@ -83,8 +88,13 @@ public:
             int min = qMin(other_group.count(), this_group.count());
 
             for(int i = 0; i < min; ++i) {
-                *this_group[i] = *other_group[i];
+                qSwap(this_group[i]->data, other_group[i]->data);
             }
+        } else if(other.type() == Group) {
+            const ZGroup &other_group = other.toGroup();
+
+            if(!other_group.isEmpty())
+                qSwap(data, other_group.first()->data);
         } else {
             qSwap(data, other.data);
         }
