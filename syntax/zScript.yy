@@ -34,7 +34,7 @@ Z_USE_NAMESPACE
 /// identifier
 %token <identifier> IDENTIFIER INT STRING BOOL DOUBLE
 
-///     ==  ===    !=  !==  <= >= &&   ||   ++      --
+///     ==  ===    !=  !==  <= >=  &&   ||   ++      --
 %token  EQ  STEQ  NEQ STNEQ LE GE LAND LOR ADDSELF SUBSELF
 ///         /=        *=        +=       -=         %=        &=       |=       ^=        ||=        &&=
 %token  DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
@@ -42,14 +42,15 @@ Z_USE_NAMESPACE
 %left ','
 %right '=' DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
 %left COMMA
-%left '?' ':'
+%left '.'
+%right '?' ':'
 %left LAND LOR
 %left '&' '|' '^'
 %left EQ NEQ
 %left '>' '<' GE LE
 %left '-' '+'
 %left '*' '/' '%'
-%right UMINUS ADDSELF SUBSELF '!' '~'
+%left UMINUS ADDSELF SUBSELF '!' '~'
 %left '(' ')'
 
 %type <valueType> expression lvalue rvalue

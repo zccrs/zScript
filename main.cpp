@@ -3,10 +3,12 @@
 
 #include <QCoreApplication>
 #include <QtConcurrent/QtConcurrentRun>
+#include <QStack>
 
 void begin(const char *fileName)
 {
     qRegisterMetaType<ZVariant>("ZVariant");
+    ZCode::virtualStack.reserve(50);
 
     ZBase::initGlobalIdentifier();
 

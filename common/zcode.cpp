@@ -77,6 +77,8 @@ int ZCode::exec(const QList<ZCode *> &codeList)
 {
     QList<ZVariant> temporaryList;
 
+    temporaryList.reserve(10);
+
     for(ZCode *code : codeList) {
         zDebug << *code;
 
