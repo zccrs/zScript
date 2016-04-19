@@ -160,33 +160,34 @@ namespace yy {
         WHILE = 265,
         FOR = 266,
         UNDEFINED = 267,
-        IDENTIFIER = 268,
-        INT = 269,
-        STRING = 270,
-        BOOL = 271,
-        DOUBLE = 272,
-        EQ = 273,
-        STEQ = 274,
-        NEQ = 275,
-        STNEQ = 276,
-        LE = 277,
-        GE = 278,
-        LAND = 279,
-        LOR = 280,
-        ADDSELF = 281,
-        SUBSELF = 282,
-        DIVASSIGN = 283,
-        MULASSIGN = 284,
-        ADDASSIGN = 285,
-        SUBASSIGN = 286,
-        MODASSIGN = 287,
-        ANDASSIGN = 288,
-        ORASSIGN = 289,
-        XORASSIGN = 290,
-        LANDASSIGN = 291,
-        LORASSIGN = 292,
-        COMMA = 293,
-        UMINUS = 294
+        GOTO = 268,
+        IDENTIFIER = 269,
+        INT = 270,
+        STRING = 271,
+        BOOL = 272,
+        DOUBLE = 273,
+        EQ = 274,
+        STEQ = 275,
+        NEQ = 276,
+        STNEQ = 277,
+        LE = 278,
+        GE = 279,
+        LAND = 280,
+        LOR = 281,
+        ADDSELF = 282,
+        SUBSELF = 283,
+        DIVASSIGN = 284,
+        MULASSIGN = 285,
+        ADDASSIGN = 286,
+        SUBASSIGN = 287,
+        MODASSIGN = 288,
+        ANDASSIGN = 289,
+        ORASSIGN = 290,
+        XORASSIGN = 291,
+        LANDASSIGN = 292,
+        LORASSIGN = 293,
+        COMMA = 294,
+        UMINUS = 295
       };
     };
 
@@ -505,7 +506,7 @@ namespace yy {
 
 
 } // yy
-#line 509 "zScript.tab.hpp" // lalr1.cc:377
+#line 510 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

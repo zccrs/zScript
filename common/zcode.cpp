@@ -67,6 +67,7 @@ QString ZCode::actionName(quint8 action)
         case Push:              return "push";
         case Pop:               return "pop";
         case PopAll:            return "pop all";
+        case Goto:              return "goto";
         case Unknow:            return "unknow";
     }
 
@@ -79,7 +80,9 @@ int ZCode::exec(const QList<ZCode *> &codeList)
 
     temporaryList.reserve(10);
 
-    for(ZCode *code : codeList) {
+    for(int i = 0; i < codeList.count(); ++i) {
+        ZCode *code = codeList.value(i);
+
         zDebug << *code;
 
         switch(code->action) {
@@ -373,6 +376,10 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             temporaryList.clear();
             break;
         }
+        case Goto: {
+            i = static_cast<ValueCode*>(code)->value->toInt();
+            break;
+        }
         default: break;
         }
 
@@ -412,6 +419,7 @@ ZCodeParse::~ZCodeParse()
 
     qDeleteAll(scopeList);
     qDeleteAll(codeList);
+    qDeleteAll(gotoLabelMap);
 
     currentCodeParse = parent;
 }
@@ -438,6 +446,7 @@ int ZCodeParse::eval()
 
     qDeleteAll(scopeList);
     scopeList.clear();
+    gotoLabelMap.clear();
 
     if(!undefinedIdentifier.isEmpty()) {
         zError << "undefined reference";
@@ -554,7 +563,7 @@ ZVariant *ZCodeParse::getConstantAddress(const QByteArray &value, ZVariant::Type
 
 ZCode *ZCodeParse::createCode(const ZCode::Action &action, ZVariant *val)
 {
-    if(action == ZCode::Push) {
+    if(val) {
         ValueCode *code = new ValueCode;
 
         code->action = action;

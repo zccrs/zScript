@@ -66,10 +66,11 @@ struct ZCode
         Get,                // .                            42
         Join,               // ,                            43     join variant
         Call,               // ()                           44
-        Push,       // push target value to stack   45
+        Push,               // push target value to stack   45
         Pop,                // pop stack                    46
         PopAll,             // clear stack                  47
-        Unknow              //                              48
+        Goto,               // goto code index              48
+        Unknow              //                              49
     };
 
     static QString actionName(quint8 action);
@@ -119,6 +120,19 @@ public:
     inline void appendCode(const ZCode::Action &action, ZVariant *val = Q_NULLPTR)
     { codeList << createCode(action, val);}
 
+    inline ZVariant *getGotoLabel(const QByteArray &name)
+    {
+        ZVariant *val = gotoLabelMap.value(name);
+
+        if(!val) {
+            val = new ZVariant(constUndefined);
+
+            gotoLabelMap[name] = val;
+        }
+
+        return val;
+    }
+
     inline QList<ZCode*> &getCodeList()
     { return codeList;}
 
@@ -134,17 +148,19 @@ public:
     static ZCodeParse *currentCodeParse;
     static bool yywrap;
 
-    ZCodeParse *parent = Q_NULLPTR;
 private:
     ZCode *createCode(const ZCode::Action &action, ZVariant *val = Q_NULLPTR);
 
     YYFlexLexer *m_yyFlexLexer = Q_NULLPTR;
     YYParser *m_yyParser = Q_NULLPTR;
 
+    ZCodeParse *parent = Q_NULLPTR;
+
     QList<ZCode*> codeList;
     Scope *currentScope = Q_NULLPTR;
     QList<Scope*> scopeList;
     QSet<const QByteArray> undefinedIdentifier;
+    QMap<QByteArray, ZVariant*> gotoLabelMap;
 
     static QHash<const QByteArray, ZVariant*> globalIdentifierHash;
     static QMap<QByteArray, ZVariant*> stringConstantMap;

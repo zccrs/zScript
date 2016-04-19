@@ -17,7 +17,7 @@ yy::parser::location_type *yyloc = Q_NULLPTR;
 identifier [a-zA-Z_][a-zA-Z0-9_]*
 number [1-9][0-9]*
 real ({number}|0)\.[0-9]+
-operator [-+*/=!<>,;{}\(\)\[\]&\|\^%~.]
+operator [-+*/=!<>,;{}\(\)\[\]&\|\^%~.?:]
 ignore [ \t]
 
 %%
@@ -32,6 +32,7 @@ ignore [ \t]
 "else"          { return TOKEN_PREFIX::ELSE;}
 "while"         { return TOKEN_PREFIX::WHILE;}
 "undefined"     { return TOKEN_PREFIX::UNDEFINED;}
+"goto"          { return TOKEN_PREFIX::GOTO;}
 "=="            { return TOKEN_PREFIX::EQ;}
 "==="           { return TOKEN_PREFIX::STEQ;}
 "!="            { return TOKEN_PREFIX::NEQ;}

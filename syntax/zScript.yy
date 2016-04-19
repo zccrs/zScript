@@ -29,7 +29,7 @@ Z_USE_NAMESPACE
 };
 
 /// keyword
-%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR UNDEFINED
+%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR UNDEFINED GOTO
 
 /// identifier
 %token <identifier> IDENTIFIER INT STRING BOOL DOUBLE
@@ -43,7 +43,7 @@ Z_USE_NAMESPACE
 %right '=' DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
 %left COMMA
 %left '.'
-%right '?' ':'
+//%right '?' ':'
 %left LAND LOR
 %left '&' '|' '^'
 %left EQ NEQ
@@ -52,6 +52,7 @@ Z_USE_NAMESPACE
 %left '*' '/' '%'
 %left UMINUS ADDSELF SUBSELF '!' '~'
 %left '(' ')'
+%left ':'
 
 %type <valueType> expression lvalue rvalue
 %type <argsCount> arguments group_exp group_lval
@@ -59,6 +60,11 @@ Z_USE_NAMESPACE
 %%
 
 start:
+            | start GOTO IDENTIFIER ';' {
+                ZCodeParse::currentCodeParse->appendCode(ZCode::Goto, ZCodeParse::currentCodeParse->getGotoLabel(*$3));
+
+                delete $3;
+            }
             | start ';' {
                 if(ZCodeParse::currentCodeParse->getCodeList().count() > 1 && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
                     ZCodeParse::currentCodeParse->appendCode(ZCode::PopAll);
@@ -77,6 +83,11 @@ start:
             ;
 
 statement:  VAR define
+            | IDENTIFIER ':' {
+                *ZCodeParse::currentCodeParse->getGotoLabel(*$1) = ZCodeParse::currentCodeParse->getCodeList().count() - 1;
+
+                delete $1;
+            }
             | FUNCTION IDENTIFIER '(' define ')' '{' start '}' {
                 /// TODO
             }
