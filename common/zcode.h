@@ -70,7 +70,8 @@ struct ZCode
         Pop,                // pop stack                    46
         PopAll,             // clear stack                  47
         Goto,               // goto code index              48
-        Unknow              //                              49
+        If,                 // if                           49
+        Unknow              //                              50
     };
 
     static QString actionName(quint8 action);

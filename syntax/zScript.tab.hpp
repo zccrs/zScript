@@ -127,7 +127,7 @@ namespace yy {
     #line 25 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
 
     int valueType;
-    int argsCount;
+    int count;
     QByteArray *identifier;
 
 #line 134 "zScript.tab.hpp" // lalr1.cc:377
@@ -492,12 +492,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1062,     ///< Last index in yytable_.
-      yynnts_ = 12,  ///< Number of nonterminal symbols.
+      yylast_ = 1096,     ///< Last index in yytable_.
+      yynnts_ = 13,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 64  ///< Number of tokens.
+      yyntokens_ = 65  ///< Number of tokens.
     };
 
 

@@ -87,11 +87,11 @@ ZVariant::ZVariant(const QList<ZVariant> &val)
     data->type = List;
 }
 
-ZVariant::ZVariant(const ZVariant::ZGroup &group)
+ZVariant::ZVariant(const ZVariant::ZTuple &group)
     : data(new VariantData)
 {
     data->variant = QVariant::fromValue(group);
-    data->type = Group;
+    data->type = Tuple;
 }
 
 ZVariant::ZVariant(ZObject * const object)
@@ -157,10 +157,31 @@ ZVariant::Type ZVariant::type() const
 
 const char *ZVariant::typeName() const
 {
-    if(data->type == NaN)
-        return "NaN";
-    else if(data->type == Undefined)
-        return "Undefined";
+    switch (data->type) {
+    case Int:
+        return "int";
+    case Double:
+        return "double";
+    case Bool:
+        return "boolean";
+    case String:
+        return "string";
+    case List:
+        return "list";
+    case Object:
+        return "object";
+    case Undefined:
+        return "undefined";
+    case NaN:
+        return "number";
+    case Null:
+        return "object";
+    case Tuple:
+        return "tuple";
+    default:
+        return "unknow";
+        break;
+    }
 
     return data->variant.typeName();
 }
@@ -226,6 +247,32 @@ QString ZVariant::toString() const
     case NaN:
     case Undefined:
         return QString(typeName());
+    case Tuple: {
+        QString str = "(";
+        const ZTuple &tuple = toTuple();
+
+        for(int i = 0; i < tuple.count() - 1; ++i) {
+            str.append(tuple.value(i)->toString()).append(", ");
+        }
+
+        if(tuple.isEmpty())
+            return str.append(")");
+
+        return str.append(tuple.last()->toString()).append(")");
+    }
+    case List: {
+        QString str = "[";
+        const QList<ZVariant> &list = toList();
+
+        for(int i = 0; i < list.count() - 1; ++i) {
+            str.append(list.value(i).toString()).append(", ");
+        }
+
+        if(list.isEmpty())
+            return str.append("]");
+
+        return str.append(list.last().toString()).append("]");
+    }
     default:
         break;
     }
@@ -235,10 +282,10 @@ QString ZVariant::toString() const
 
 QList<ZVariant> ZVariant::toList() const
 {
-    if(type() == Group) {
+    if(type() == Tuple) {
         QList<ZVariant> list;
 
-        for(const ZVariant *val : toGroup()) {
+        for(const ZVariant *val : toTuple()) {
             list << *val;
         }
 
@@ -248,12 +295,12 @@ QList<ZVariant> ZVariant::toList() const
     return qvariant_cast<QList<ZVariant>>(data->variant);
 }
 
-ZVariant::ZGroup ZVariant::toGroup() const
+ZVariant::ZTuple ZVariant::toTuple() const
 {
-    if(type() == Group)
-        return qvariant_cast<ZGroup>(data->variant);
+    if(type() == Tuple)
+        return qvariant_cast<ZTuple>(data->variant);
 
-    return ZGroup() << const_cast<ZVariant*>(this);
+    return ZTuple() << const_cast<ZVariant*>(this);
 }
 
 ZObject *ZVariant::toObject() const
@@ -268,18 +315,11 @@ QVariant ZVariant::toQVariant() const
 
 QDebug operator<<(QDebug deg, const ZVariant &var)
 {
-    deg.nospace() << "Variant(" << var.typeName() << ",";
+    deg.nospace() << "Variant(" << var.typeName() << ", ";
 
     switch(var.type()) {
-    case ZVariant::Null:
-        deg.noquote() << "0x0";
-        break;
     case ZVariant::Object:
         deg.nospace() << var.toObject();
-        break;
-    case ZVariant::List:
-    case ZVariant::Group:
-        deg.nospace() << var.toList();
         break;
     case ZVariant::NaN:
     case ZVariant::Undefined:

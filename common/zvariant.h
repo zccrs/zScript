@@ -23,10 +23,10 @@ public:
         Undefined = QMetaType::UnknownType,
         NaN = QMetaType::User + 1,
         Null = QMetaType::User + 2,
-        Group = QMetaType::User + 3
+        Tuple = QMetaType::User + 3
     };
 
-    typedef QList<ZVariant*> ZGroup;
+    typedef QList<ZVariant*> ZTuple;
 
     ZVariant(Type type = Undefined);
     ZVariant(int val);
@@ -40,7 +40,7 @@ public:
     template <typename T>
     ZVariant(const QList<T> &val);
     ZVariant(const QList<ZVariant> &val);
-    ZVariant(const ZGroup &group);
+    ZVariant(const ZTuple &group);
     ZVariant(ZObject * const object);
     ZVariant(const QVariant &val);
     ~ZVariant();
@@ -53,23 +53,23 @@ public:
     bool toBool() const;
     QString toString() const;
     QList<ZVariant> toList() const;
-    ZGroup toGroup() const;
+    ZTuple toTuple() const;
     ZObject *toObject() const;
     QVariant toQVariant() const;
 
     inline ZVariant& operator=(const ZVariant &other)
     {
-        if(type() == Group) {
-            const ZGroup &other_group = other.toGroup();
-            const ZGroup &this_group = toGroup();
+        if(type() == Tuple) {
+            const ZTuple &other_group = other.toTuple();
+            const ZTuple &this_group = toTuple();
 
             int min = qMin(other_group.count(), this_group.count());
 
             for(int i = 0; i < min; ++i) {
                 this_group[i]->data = other_group[i]->data;
             }
-        } else if(other.type() == Group) {
-            const ZGroup &other_group = other.toGroup();
+        } else if(other.type() == Tuple) {
+            const ZTuple &other_group = other.toTuple();
 
             if(!other_group.isEmpty())
                 data = other_group.first()->data;
@@ -81,17 +81,17 @@ public:
     }
     inline ZVariant& operator=(ZVariant &&other)
     {
-        if(type() == Group) {
-            const ZGroup &other_group = other.toGroup();
-            const ZGroup &this_group = toGroup();
+        if(type() == Tuple) {
+            const ZTuple &other_group = other.toTuple();
+            const ZTuple &this_group = toTuple();
 
             int min = qMin(other_group.count(), this_group.count());
 
             for(int i = 0; i < min; ++i) {
                 qSwap(this_group[i]->data, other_group[i]->data);
             }
-        } else if(other.type() == Group) {
-            const ZGroup &other_group = other.toGroup();
+        } else if(other.type() == Tuple) {
+            const ZTuple &other_group = other.toTuple();
 
             if(!other_group.isEmpty())
                 qSwap(data, other_group.first()->data);
@@ -256,6 +256,6 @@ ZVariant operator ~(const ZVariant &var);
 Z_END_NAMESPACE
 
 Q_DECLARE_METATYPE(ZVariant)
-Q_DECLARE_METATYPE(ZVariant::ZGroup)
+Q_DECLARE_METATYPE(ZVariant::ZTuple)
 
 #endif // ZVARIANT_H

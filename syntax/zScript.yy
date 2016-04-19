@@ -24,7 +24,7 @@ Z_USE_NAMESPACE
 
 %union{
     int valueType;
-    int argsCount;
+    int count;
     QByteArray *identifier;
 };
 
@@ -39,9 +39,11 @@ Z_USE_NAMESPACE
 ///         /=        *=        +=       -=         %=        &=       |=       ^=        ||=        &&=
 %token  DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
 
+%left ';'
 %left ','
 %right '=' DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
 %left COMMA
+%left VAR
 %left '.'
 //%right '?' ':'
 %left LAND LOR
@@ -55,25 +57,25 @@ Z_USE_NAMESPACE
 %left ':'
 
 %type <valueType> expression lvalue rvalue
-%type <argsCount> arguments group_exp group_lval
+%type <count> arguments tuple_exp tuple_lval branch_head
 
 %%
 
 start:
-            | start GOTO IDENTIFIER ';' {
+            | start GOTO IDENTIFIER ends {
                 ZCodeParse::currentCodeParse->appendCode(ZCode::Goto, ZCodeParse::currentCodeParse->getGotoLabel(*$3));
 
                 delete $3;
             }
-            | start ';' {
+            | start ends {
                 if(ZCodeParse::currentCodeParse->getCodeList().count() > 1 && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
                     ZCodeParse::currentCodeParse->appendCode(ZCode::PopAll);
             }
-            | start statement ';' {
+            | start statement ends {
                 if(ZCodeParse::currentCodeParse->getCodeList().count() > 1 && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
                     ZCodeParse::currentCodeParse->appendCode(ZCode::PopAll);
             }
-            | start expression ';' {
+            | start expression ends {
                 if(ZCodeParse::currentCodeParse->getCodeList().count() > 1 && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
                     ZCodeParse::currentCodeParse->appendCode(ZCode::PopAll);
             }
@@ -81,6 +83,8 @@ start:
                 //currentCode->nodeList << $2;
             }
             ;
+
+ends:       ';'|'\n'
 
 statement:  VAR define
             | IDENTIFIER ':' {
@@ -108,18 +112,19 @@ define:     IDENTIFIER {
             | define ',' define
             ;
 
-group_lval: lvalue ',' lvalue %prec COMMA {$$ = 2;}
-            | group_lval ',' lvalue %prec COMMA {
+tuple_lval: lvalue ',' lvalue %prec COMMA {$$ = 2;}
+            | tuple_lval ',' lvalue %prec COMMA {
                 $$ = $1 + 1;
             }
             ;
 
-group_exp:  expression ',' expression {$$ = 2;}
-            | group_exp ',' expression {
+tuple_exp:  expression ',' expression {$$ = 2;}
+            | tuple_lval ',' expression {$$ = $1 + 1;}
+            | tuple_exp ',' expression {
                 $$ = $1 + 1;
             }
 
-expression: lvalue | rvalue;
+expression: lvalue | rvalue %prec UMINUS;
 
 lvalue:     IDENTIFIER {
                 $$ = ValueType::Variant;
@@ -136,6 +141,12 @@ lvalue:     IDENTIFIER {
             | expression '[' expression ']' {
                 $$ = ValueType::Variant;
                 /// TODO
+            }
+            | expression '.' IDENTIFIER {
+                $$ = ValueType::Variant;
+
+                ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::getConstantAddress(*$3, ZVariant::String));
+                ZCodeParse::currentCodeParse->appendCode(ZCode::Get);
             }
             | lvalue ADDASSIGN expression {
                 $$ = ValueType::Variant;
@@ -197,7 +208,7 @@ lvalue:     IDENTIFIER {
 
                 ZCodeParse::currentCodeParse->appendCode(ZCode::PrefixSubSelf);
             }
-            | group_lval {
+            | tuple_lval {
                 $$ = ValueType::Variant;
 
                 ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::getConstantAddress(QByteArray::number($1), ZVariant::Int));
@@ -247,12 +258,6 @@ rvalue:     UNDEFINED {
 
                     ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::getConstantAddress(QByteArray::number($3), ZVariant::Int));
                     ZCodeParse::currentCodeParse->appendCode(ZCode::Call);
-            }
-            | expression '.' IDENTIFIER {
-                    $$ = ValueType::Variant;
-
-                    ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::getConstantAddress(*$3, ZVariant::String));
-                    ZCodeParse::currentCodeParse->appendCode(ZCode::Get);
             }
             | expression '+' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
@@ -575,7 +580,7 @@ rvalue:     UNDEFINED {
 
                 ZCodeParse::currentCodeParse->appendCode(ZCode::PostfixSubSelf);
             }
-            | group_exp {
+            | tuple_exp {
                 $$ = ValueType::Variant;
 
                 ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::getConstantAddress(QByteArray::number($1), ZVariant::Int));
@@ -589,13 +594,22 @@ arguments:  {$$ = 0;}
             }
             ;
 
-branch_head:IF '(' expression ')'
-            | WHILE '(' expression ')'
-            | FOR '(' expression ';' expression ';' expression ')'
-            | FOR '(' lvalue ':' expression ')';
+branch_head:IF '(' expression ')' {
+                $$ = ZCodeParse::currentCodeParse->getCodeList().count() - 1;
+
+                ZCodeParse::currentCodeParse->appendCode(ZCode::If, ZCodeParse::currentCodeParse->getConstantAddress("", ZVariant::Undefined));
+            }
+            | WHILE '(' expression ')' {$$ = ZCodeParse::currentCodeParse->getCodeList().count() - 1;}
+            | FOR '(' expression ';' expression ';' expression ')' {$$ = ZCodeParse::currentCodeParse->getCodeList().count() - 1;}
+            | FOR '(' lvalue ':' expression ')'{$$ = ZCodeParse::currentCodeParse->getCodeList().count() - 1;};
 
 conditional:branch_head '{' start '}'
-            | branch_head expression ';'
+            | branch_head expression ';' {
+                int fromIndex = ZCodeParse::currentCodeParse->getCodeList().count();
+                ZVariant *toIndex = ZCodeParse::currentCodeParse->getConstantAddress(QByteArray::number(fromIndex), ZVariant::Int);
+
+                static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().value($1))->value = toIndex;
+            }
             | conditional ELSE conditional
             | conditional ELSE '{' start '}'
             | conditional ELSE expression ';'

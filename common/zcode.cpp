@@ -311,7 +311,7 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             break;
         }
         case Join: {     /// join to ZGroup
-            ZVariant::ZGroup group;
+            ZVariant::ZTuple group;
 
             int argsCount = virtualStack.pop()->toInt();
 
@@ -336,7 +336,7 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             for(int i = 0; i < argsCount; ++i) {
                 const ZVariant *val = virtualStack.pop();
 
-                if(val->type() == ZVariant::Group) {
+                if(val->type() == ZVariant::Tuple) {
                     args = val->toList() + args;
                 } else {
                     args.insert(0, *val);
@@ -347,7 +347,7 @@ int ZCode::exec(const QList<ZCode *> &codeList)
 
             if(fun) {
                 const QList<ZVariant> &list = fun->call(args);
-                ZVariant::ZGroup group;
+                ZVariant::ZTuple group;
 
                 for(const ZVariant &val : list) {
                     temporaryList << val;

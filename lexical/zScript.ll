@@ -66,24 +66,25 @@ ignore [ \t]
     return TOKEN_PREFIX::BOOL;
 }
 
-[\r\n] {
-    while(/*yyin.rdbuf()->in_avail() && */!yyin.eof() && !yyin.fail()) {
-        char ch = yyin.peek();
+(\n|\r|\r\n) {
+//    while(/*yyin.rdbuf()->in_avail() && */!yyin.eof() && !yyin.fail()) {
+//        char ch = yyin.peek();
 
-        if(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {
-            yyin.get();
-            continue;
-        } else if(ch == ',' || ch == '{' || ch == '}'
-                  || ch == '(' || ch == ')'
-                  || ch == '[' || ch == ']') {
-            break;
-        } else {
-            return ';';
-        }
-    }
+//        if(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {
+//            yyin.get();
+//            continue;
+//        } else if(ch == ',' || ch == '{' || ch == '}'
+//                  || ch == '(' || ch == ')'
+//                  || ch == '[' || ch == ']') {
+//            break;
+//        } else {
+//            return ';';
+//        }
+//    }
 
-    if(/*!yyin.rdbuf()->in_avail() || */yyin.eof())
-        return ';';
+//    if(/*!yyin.rdbuf()->in_avail() || */yyin.eof())
+//        return ';';
+        return '\n';
 }
 
 {operator} {
