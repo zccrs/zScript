@@ -68,6 +68,7 @@ QString ZCode::actionName(quint8 action)
         case Pop:               return "pop";
         case PopAll:            return "pop all";
         case Goto:              return "goto";
+        case If:                return "if";
         case Unknow:            return "unknow";
     }
 
@@ -377,7 +378,13 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             break;
         }
         case Goto: {
-            i = static_cast<ValueCode*>(code)->value->toInt();
+            i = static_cast<ValueCode*>(code)->value->toInt() - 1;
+            break;
+        }
+        case If: {
+            if(!virtualStack.pop()->toBool())
+                i = static_cast<ValueCode*>(code)->value->toInt() - 1;
+
             break;
         }
         default: break;

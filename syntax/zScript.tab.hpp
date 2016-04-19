@@ -187,7 +187,8 @@ namespace yy {
         LANDASSIGN = 292,
         LORASSIGN = 293,
         COMMA = 294,
-        UMINUS = 295
+        UMINUS = 295,
+        PROMOTION = 296
       };
     };
 
@@ -368,7 +369,7 @@ namespace yy {
   static const signed char yypgoto_[];
 
   // YYDEFGOTO[NTERM-NUM].
-  static const signed char yydefgoto_[];
+  static const short int yydefgoto_[];
 
   // YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
   // positive, shift that token.  If negative, reduce the rule whose
@@ -492,12 +493,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1096,     ///< Last index in yytable_.
-      yynnts_ = 13,  ///< Number of nonterminal symbols.
+      yylast_ = 857,     ///< Last index in yytable_.
+      yynnts_ = 15,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 65  ///< Number of tokens.
+      yyntokens_ = 66  ///< Number of tokens.
     };
 
 
@@ -506,7 +507,7 @@ namespace yy {
 
 
 } // yy
-#line 510 "zScript.tab.hpp" // lalr1.cc:377
+#line 511 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

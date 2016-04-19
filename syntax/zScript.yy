@@ -40,10 +40,10 @@ Z_USE_NAMESPACE
 %token  DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
 
 %left ';'
+%left VAR IF
 %left ','
 %right '=' DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
 %left COMMA
-%left VAR
 %left '.'
 //%right '?' ':'
 %left LAND LOR
@@ -53,46 +53,50 @@ Z_USE_NAMESPACE
 %left '-' '+'
 %left '*' '/' '%'
 %left UMINUS ADDSELF SUBSELF '!' '~'
+%left PROMOTION
 %left '(' ')'
 %left ':'
 
 %type <valueType> expression lvalue rvalue
-%type <count> arguments tuple_exp tuple_lval branch_head
+%type <count> arguments tuple_exp tuple_lval branch_head branch_body
 
 %%
 
-start:
-            | start GOTO IDENTIFIER ends {
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Goto, ZCodeParse::currentCodeParse->getGotoLabel(*$3));
+start:      | start code | start '\n'
 
-                delete $3;
+code:       GOTO IDENTIFIER ends {
+                ZCodeParse::currentCodeParse->appendCode(ZCode::Goto, ZCodeParse::currentCodeParse->getGotoLabel(*$2));
+
+                delete $2;
             }
-            | start ends {
-                if(ZCodeParse::currentCodeParse->getCodeList().count() > 1 && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
+            | conditional {
+                if(ZCodeParse::currentCodeParse->getCodeList().count() > 1
+                        && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
                     ZCodeParse::currentCodeParse->appendCode(ZCode::PopAll);
             }
-            | start statement ends {
-                if(ZCodeParse::currentCodeParse->getCodeList().count() > 1 && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
+            | statement ends {
+                if(ZCodeParse::currentCodeParse->getCodeList().count() > 1
+                        && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
                     ZCodeParse::currentCodeParse->appendCode(ZCode::PopAll);
             }
-            | start expression ends {
-                if(ZCodeParse::currentCodeParse->getCodeList().count() > 1 && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
+            | expression ends {
+                if(ZCodeParse::currentCodeParse->getCodeList().count() > 1
+                        && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
                     ZCodeParse::currentCodeParse->appendCode(ZCode::PopAll);
             }
-            | start conditional {
-                //currentCode->nodeList << $2;
-            }
+            | ';'
+            | '{' start '}'
             ;
 
 ends:       ';'|'\n'
 
 statement:  VAR define
             | IDENTIFIER ':' {
-                *ZCodeParse::currentCodeParse->getGotoLabel(*$1) = ZCodeParse::currentCodeParse->getCodeList().count() - 1;
+                *ZCodeParse::currentCodeParse->getGotoLabel(*$1) = ZCodeParse::currentCodeParse->getCodeList().count();
 
                 delete $1;
             }
-            | FUNCTION IDENTIFIER '(' define ')' '{' start '}' {
+            | FUNCTION IDENTIFIER '(' define ')' '{' code '}' {
                 /// TODO
             }
             ;
@@ -124,7 +128,7 @@ tuple_exp:  expression ',' expression {$$ = 2;}
                 $$ = $1 + 1;
             }
 
-expression: lvalue | rvalue %prec UMINUS;
+expression: lvalue | rvalue %prec PROMOTION;
 
 lvalue:     IDENTIFIER {
                 $$ = ValueType::Variant;
@@ -595,25 +599,37 @@ arguments:  {$$ = 0;}
             ;
 
 branch_head:IF '(' expression ')' {
-                $$ = ZCodeParse::currentCodeParse->getCodeList().count() - 1;
+                $$ = ZCodeParse::currentCodeParse->getCodeList().count();
 
                 ZCodeParse::currentCodeParse->appendCode(ZCode::If, ZCodeParse::currentCodeParse->getConstantAddress("", ZVariant::Undefined));
             }
             | WHILE '(' expression ')' {$$ = ZCodeParse::currentCodeParse->getCodeList().count() - 1;}
-            | FOR '(' expression ';' expression ';' expression ')' {$$ = ZCodeParse::currentCodeParse->getCodeList().count() - 1;}
-            | FOR '(' lvalue ':' expression ')'{$$ = ZCodeParse::currentCodeParse->getCodeList().count() - 1;};
+            | FOR '(' expression ends expression ends expression ')' {$$ = ZCodeParse::currentCodeParse->getCodeList().count() - 1;}
+            | FOR '(' lvalue ':' expression ')'{$$ = ZCodeParse::currentCodeParse->getCodeList().count() - 1;}
+            | branch_head '\n'
+            ;
 
-conditional:branch_head '{' start '}'
-            | branch_head expression ';' {
-                int fromIndex = ZCodeParse::currentCodeParse->getCodeList().count();
-                ZVariant *toIndex = ZCodeParse::currentCodeParse->getConstantAddress(QByteArray::number(fromIndex), ZVariant::Int);
+branch_body :branch_head code {
+                int index = ZCodeParse::currentCodeParse->getCodeList().count();
+
+                ZCodeParse::currentCodeParse->appendCode(ZCode::Action::Goto,
+                                                         ZCodeParse::getConstantAddress(QByteArray::number(index++), ZVariant::Int));
+
+                ZVariant *toIndex = ZCodeParse::currentCodeParse->getConstantAddress(QByteArray::number(index), ZVariant::Int);
+
+                static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().value($1))->value = toIndex;
+
+                $$ = ZCodeParse::currentCodeParse->getCodeList().count() - 1;
+            }
+            ;
+
+conditional:branch_body
+            | branch_body ELSE code {
+                int index = ZCodeParse::currentCodeParse->getCodeList().count();
+                ZVariant *toIndex = ZCodeParse::currentCodeParse->getConstantAddress(QByteArray::number(index), ZVariant::Int);
 
                 static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().value($1))->value = toIndex;
             }
-            | conditional ELSE conditional
-            | conditional ELSE '{' start '}'
-            | conditional ELSE expression ';'
-            ;
 %%
 
 void yy::parser::error(const location_type& loc, const std::string& msg)
