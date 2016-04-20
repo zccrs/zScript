@@ -84,7 +84,7 @@ int ZCode::exec(const QList<ZCode *> &codeList)
     for(int i = 0; i < codeList.count(); ++i) {
         ZCode *code = codeList.value(i);
 
-        zDebug << *code;
+        zDebug << i <<*code;
 
         switch(code->action) {
         case LeftAssign: {
@@ -223,8 +223,6 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             const ZVariant &v2 = *virtualStack.pop();
 
             temporaryList << (v1.type() == v2.type() && v1 == v2);
-
-            zDebug << temporaryList.last();
 
             virtualStack.push(&temporaryList.last());
             break;
