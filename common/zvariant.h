@@ -253,6 +253,28 @@ inline ZVariant &operator --(ZVariant &var)
 
 ZVariant operator ~(const ZVariant &var);
 
+class ZSharedVariant : public ZVariant, public QSharedData
+{
+public:
+    inline ZSharedVariant(const ZSharedVariant& other)
+        : ZVariant(other), QSharedData(other){}
+    inline ZSharedVariant(ZSharedVariant &&other)
+        : ZVariant(other), QSharedData(other){}
+    inline ZSharedVariant(const ZVariant &variant)
+        : ZVariant(variant){}
+    inline ZSharedVariant(ZVariant &&variant)
+        : ZVariant(variant){}
+
+    inline ZSharedVariant& operator =(const ZSharedVariant &other)
+    { ZVariant::operator =(other); return *this;}
+    inline ZSharedVariant& operator =(ZSharedVariant &&other)
+    { ZVariant::operator =(other); return *this;}
+    inline ZSharedVariant& operator =(const ZVariant &other)
+    { ZVariant::operator =(other); return *this;}
+    inline ZSharedVariant& operator =(ZVariant &&other)
+    { ZVariant::operator =(other); return *this;}
+};
+
 Z_END_NAMESPACE
 
 Q_DECLARE_METATYPE(ZVariant)

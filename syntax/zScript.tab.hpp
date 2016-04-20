@@ -124,12 +124,12 @@ namespace yy {
     /// Symbol semantic values.
     union semantic_type
     {
-    #line 25 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
+    #line 28 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
 
     int valueType;
     int count;
     QByteArray *identifier;
-    ZVariant **value;
+    ZSharedVariantPointer *value;
 
 #line 135 "zScript.tab.hpp" // lalr1.cc:377
     };

@@ -6,7 +6,7 @@
 namespace ZBase {
 void initGlobalIdentifier()
 {
-    ZCodeParse::registerIdentifier("console", new ZVariant(new ZConsole));
-    ZCodeParse::registerIdentifier("sys", new ZVariant(new ZSystem));
+    ZCodeParse::registerIdentifier("console", new ZSharedVariant(new ZConsole));
+    ZCodeParse::registerIdentifier("sys", new ZSharedVariant(new ZSystem));
 }
 }

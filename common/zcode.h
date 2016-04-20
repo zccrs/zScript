@@ -13,6 +13,7 @@ class parser;
 
 typedef yyFlexLexer YYFlexLexer;
 typedef yy::parser  YYParser;
+typedef QSharedDataPointer<ZSharedVariant> ZSharedVariantPointer;
 
 Z_BEGIN_NAMESPACE
 
@@ -80,13 +81,12 @@ struct ZCode
 
     quint8 action = Unknow;
 
-    static QStack<ZVariant*> virtualStack;
-    static ZVariant virtualRegister;
+    static QStack<ZSharedVariant*> virtualStack;
 };
 
 struct ValueCode : public ZCode
 {
-    ZVariant *value = Q_NULLPTR;
+    ZSharedVariantPointer *value = Q_NULLPTR;
 };
 
 class ZCodeParse
@@ -95,12 +95,21 @@ public:
     ZCodeParse();
     ~ZCodeParse();
 
-    struct Scope{
-        Scope *parent = Q_NULLPTR;
-        QHash<QByteArray, ZVariant*> identifiers;
+    struct CodeBlock{
+        enum Type {
+            Normal,
+            Function,
+            While,
+            If
+        };
+
+        quint8 type = Normal;
+        CodeBlock *parent = Q_NULLPTR;
+        QHash<QByteArray, ZSharedVariantPointer*> identifiers;
+        QMap<QByteArray, ZSharedVariantPointer*> undefinedIdentifier;
     };
 
-    inline static void registerIdentifier(const QByteArray &name, ZVariant *variant)
+    inline static void registerIdentifier(const QByteArray &name, ZSharedVariant *variant)
     {globalIdentifierHash[name] = variant;}
 
     /// from stdin get code
@@ -111,22 +120,28 @@ public:
     inline int exec()
     { return ZCode::exec(codeList);}
 
-    ZVariant *getIdentifierAddress(const QByteArray &name);
+    ZSharedVariantPointer *getIdentifierAddress(const QByteArray &name);
 
-    static ZVariant *getConstantAddress(const QByteArray &value, ZVariant::Type type);
+    static ZSharedVariant *getConstantAddress(const QByteArray &value, ZVariant::Type type);
 
-    static inline ZVariant *getConstantAddressByValue(const ZVariant &value)
+    static inline ZSharedVariant *getConstantAddressByValue(const ZVariant &value)
     { return getConstantAddress(value.toString().toLatin1(), value.type());}
 
-    inline void appendCode(const ZCode::Action &action, ZVariant *val = Q_NULLPTR)
+    inline void appendCode(const ZCode::Action &action)
+    { codeList << createCode(action, Q_NULLPTR);}
+
+    inline void appendCode(const ZCode::Action &action, ZSharedVariant *val)
+    { codeList << createCode(action, new ZSharedVariantPointer(val));}
+
+    inline void appendCode(const ZCode::Action &action, ZSharedVariantPointer *val)
     { codeList << createCode(action, val);}
 
-    inline ZVariant *getGotoLabel(const QByteArray &name)
+    inline ZSharedVariant *getGotoLabel(const QByteArray &name)
     {
-        ZVariant *val = gotoLabelMap.value(name);
+        ZSharedVariant *val = gotoLabelMap.value(name);
 
         if(!val) {
-            val = new ZVariant(constUndefined);
+            val = new ZSharedVariant(constUndefined);
 
             gotoLabelMap[name] = val;
         }
@@ -141,16 +156,24 @@ public:
     { return m_yyFlexLexer;}
 
     inline void addIdentifier(const QByteArray &name)
-    { undefinedIdentifier.remove(name); currentScope->identifiers[name] = new ZVariant(constUndefined);}
+    {
+        ZSharedVariantPointer *val = currentCodeBlock->undefinedIdentifier.take(name);
 
-    void beginScope();
-    void endScope();
+        if(!val) {
+            val = new ZSharedVariantPointer(&constUndefined);
+        }
+
+        currentCodeBlock->identifiers[name] = val;
+    }
+
+    void beginCodeBlock();
+    void endCodeBlock();
 
     static ZCodeParse *currentCodeParse;
     static bool yywrap;
 
 private:
-    ZCode *createCode(const ZCode::Action &action, ZVariant *val = Q_NULLPTR);
+    ZCode *createCode(const ZCode::Action &action, ZSharedVariantPointer *val = Q_NULLPTR);
 
     YYFlexLexer *m_yyFlexLexer = Q_NULLPTR;
     YYParser *m_yyParser = Q_NULLPTR;
@@ -158,17 +181,16 @@ private:
     ZCodeParse *parent = Q_NULLPTR;
 
     QList<ZCode*> codeList;
-    Scope *currentScope = Q_NULLPTR;
-    QList<Scope*> scopeList;
-    QSet<const QByteArray> undefinedIdentifier;
-    QMap<QByteArray, ZVariant*> gotoLabelMap;
+    CodeBlock *currentCodeBlock = Q_NULLPTR;
+    QList<CodeBlock*> codeBlockList;
+    QMap<QByteArray, ZSharedVariant*> gotoLabelMap;
 
-    static QHash<const QByteArray, ZVariant*> globalIdentifierHash;
-    static QMap<QByteArray, ZVariant*> stringConstantMap;
-    static QMap<QByteArray, ZVariant*> numberConstantMap;
-    static ZVariant constTrue;
-    static ZVariant constFalse;
-    static ZVariant constUndefined;
+    static QHash<const QByteArray, ZSharedVariant*> globalIdentifierHash;
+    static QMap<QByteArray, ZSharedVariant*> stringConstantMap;
+    static QMap<QByteArray, ZSharedVariant*> numberConstantMap;
+    static ZSharedVariant constTrue;
+    static ZSharedVariant constFalse;
+    static ZSharedVariant constUndefined;
 };
 
 Z_END_NAMESPACE
