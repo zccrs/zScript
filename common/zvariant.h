@@ -57,16 +57,11 @@ public:
     ZObject *toObject() const;
     QVariant toQVariant() const;
 
-    inline void depthCopyAssign(const ZVariant &other)
+    inline void depthCopyAssign(const ZVariant &other) const
     {
+        VariantData *data = const_cast<VariantData*>(this->data.constData());
+
         data->variant = other.data->variant;
-        data->type = other.data->type;
-    }
-
-    inline void depthCopyAssign(ZVariant &&other)
-    {
-        qSwap(data->variant, other.data->variant);
-
         data->type = other.data->type;
     }
 
@@ -114,8 +109,7 @@ public:
 
         return *this;
     }
-    inline ZVariant& operator=(const ZVariant *other)
-    { depthCopyAssign(*other); return *this;}
+
     inline bool operator==(const ZVariant &v) const
     { return data->variant == v.data->variant; }
     inline bool operator!=(const ZVariant &v) const
@@ -273,14 +267,16 @@ ZVariant operator ~(const ZVariant &var);
 class ZSharedVariant : public ZVariant, public QSharedData
 {
 public:
+    inline ZSharedVariant(Type type = Undefined)
+        : ZVariant(type), QSharedData(){}
     inline ZSharedVariant(const ZSharedVariant& other)
         : ZVariant(other), QSharedData(other){}
     inline ZSharedVariant(ZSharedVariant &&other)
         : ZVariant(other), QSharedData(other){}
     inline ZSharedVariant(const ZVariant &variant)
-        : ZVariant(variant){}
+        : ZVariant(variant), QSharedData(){}
     inline ZSharedVariant(ZVariant &&variant)
-        : ZVariant(variant){}
+        : ZVariant(variant), QSharedData(){}
 
     inline ZSharedVariant& operator =(const ZSharedVariant &other)
     { ZVariant::operator =(other); return *this;}

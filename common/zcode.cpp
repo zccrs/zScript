@@ -87,16 +87,16 @@ int ZCode::exec(const QList<ZCode *> &codeList)
 
         switch(code->action) {
         case LeftAssign: {
-            ZVariant *right_val = virtualStack.pop();
+            const ZVariant &right_val = *virtualStack.pop();
 
-            *virtualStack.top() = right_val;
+            virtualStack.top()->depthCopyAssign(right_val);
             break;
         }
         case RightAssign: {
             ZVariant &left_val = *virtualStack.pop();
-            ZVariant *right_val = virtualStack.pop();
+            const ZVariant &right_val = *virtualStack.pop();
 
-            left_val = right_val;
+            left_val.depthCopyAssign(right_val);
             virtualStack.push(&left_val);
             break;
         }
@@ -502,7 +502,7 @@ ZSharedVariantPointer ZCodeParse::getIdentifierAddress(const QByteArray &name)
     if(val)
         return val;
 
-    val = new ZSharedVariant(constUndefined);
+    val = new ZSharedVariant();
 
     currentCodeBlock->undefinedIdentifier[name] = val;
 
@@ -570,12 +570,14 @@ ZCode *ZCodeParse::createCode(const ZCode::Action &action, const ZSharedVariantP
     return code;
 }
 
-void ZCodeParse::beginCodeBlock()
+void ZCodeParse::beginCodeBlock(CodeBlock::Type type)
 {
     CodeBlock *block = new CodeBlock;
 
     codeBlockList << block;
 
+    block->type = type;
+    block->beginCodeIndex = codeList.count();
     block->parent = currentCodeBlock;
 
     currentCodeBlock = block;
@@ -591,7 +593,7 @@ void ZCodeParse::endCodeBlock()
             ZSharedVariantPointer val = block->identifiers.value(name);
 
             if(val) {
-                val_pointer->depthCopyAssign(*val.constData());
+                *val_pointer.data() = *val.constData();
                 break;
             }
 
@@ -602,7 +604,7 @@ void ZCodeParse::endCodeBlock()
             ZSharedVariant *val = globalIdentifierHash.value(name);
 
             if(val) {
-                val_pointer->depthCopyAssign(*val);
+                *val_pointer.data() = *val;
             } else {
                 zError << "undefined reference:" << name;
             }

@@ -48,7 +48,7 @@ enum ValueType {
 };
 
 /// if current code block belong be which is true else is false.
-bool isWhileCodeBlock = false;
+int forCycieBeginCodeIndex = 0;
 
 Z_USE_NAMESPACE
 
@@ -630,8 +630,8 @@ namespace yy {
 #line 631 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 14:
-#line 99 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 13:
+#line 98 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 *ZCodeParse::currentCodeParse->getGotoLabel(*(yystack_[1].value.identifier)) = ZCodeParse::currentCodeParse->getCodeList().count();
 
@@ -640,26 +640,18 @@ namespace yy {
 #line 641 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 15:
-#line 104 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                /// TODO
-            }
-#line 649 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 16:
-#line 109 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 14:
+#line 112 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeParse::currentCodeParse->addIdentifier(*(yystack_[0].value.identifier));
 
                 delete (yystack_[0].value.identifier);
             }
-#line 659 "zScript.tab.cpp" // lalr1.cc:859
+#line 651 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 17:
-#line 114 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 15:
+#line 117 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeParse::currentCodeParse->addIdentifier(*(yystack_[2].value.identifier));
                 ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::currentCodeParse->getIdentifierAddress(*(yystack_[2].value.identifier)));
@@ -667,45 +659,45 @@ namespace yy {
 
                 delete (yystack_[2].value.identifier);
             }
-#line 671 "zScript.tab.cpp" // lalr1.cc:859
+#line 663 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 19:
-#line 124 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 17:
+#line 127 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {(yylhs.value.count) = 2;}
+#line 669 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 18:
+#line 128 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.count) = (yystack_[2].value.count) + 1;
+            }
 #line 677 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
+  case 19:
+#line 133 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {(yylhs.value.count) = 2;}
+#line 683 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
   case 20:
-#line 125 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                (yylhs.value.count) = (yystack_[2].value.count) + 1;
-            }
-#line 685 "zScript.tab.cpp" // lalr1.cc:859
+#line 134 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {(yylhs.value.count) = (yystack_[2].value.count) + 1;}
+#line 689 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 21:
-#line 130 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {(yylhs.value.count) = 2;}
-#line 691 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 22:
-#line 131 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {(yylhs.value.count) = (yystack_[2].value.count) + 1;}
-#line 697 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 23:
-#line 132 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 135 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.count) = (yystack_[2].value.count) + 1;
             }
-#line 705 "zScript.tab.cpp" // lalr1.cc:859
+#line 697 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 26:
-#line 138 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 24:
+#line 141 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -713,11 +705,19 @@ namespace yy {
 
                 delete (yystack_[0].value.identifier);
             }
+#line 709 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 25:
+#line 148 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.valueType) = ValueType::Variant;
+            }
 #line 717 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 27:
-#line 145 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 26:
+#line 151 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -726,8 +726,8 @@ namespace yy {
 #line 727 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 28:
-#line 150 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 27:
+#line 156 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
                 /// TODO
@@ -735,8 +735,8 @@ namespace yy {
 #line 736 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 29:
-#line 154 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 28:
+#line 160 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -746,8 +746,8 @@ namespace yy {
 #line 747 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 30:
-#line 160 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 29:
+#line 166 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -756,8 +756,8 @@ namespace yy {
 #line 757 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 31:
-#line 165 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 30:
+#line 171 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -766,8 +766,8 @@ namespace yy {
 #line 767 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 32:
-#line 170 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 31:
+#line 176 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -776,8 +776,8 @@ namespace yy {
 #line 777 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 33:
-#line 175 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 32:
+#line 181 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -786,8 +786,8 @@ namespace yy {
 #line 787 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 34:
-#line 180 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 33:
+#line 186 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -796,8 +796,8 @@ namespace yy {
 #line 797 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 35:
-#line 185 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 34:
+#line 191 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -806,8 +806,8 @@ namespace yy {
 #line 807 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 36:
-#line 190 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 35:
+#line 196 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -816,8 +816,8 @@ namespace yy {
 #line 817 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 37:
-#line 195 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 36:
+#line 201 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -826,8 +826,8 @@ namespace yy {
 #line 827 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 38:
-#line 200 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 37:
+#line 206 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -836,8 +836,8 @@ namespace yy {
 #line 837 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 39:
-#line 205 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 38:
+#line 211 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -846,8 +846,8 @@ namespace yy {
 #line 847 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 40:
-#line 210 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 39:
+#line 216 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -856,8 +856,8 @@ namespace yy {
 #line 857 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 41:
-#line 215 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 40:
+#line 221 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -866,8 +866,8 @@ namespace yy {
 #line 867 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 42:
-#line 220 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 41:
+#line 226 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -877,8 +877,8 @@ namespace yy {
 #line 878 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 43:
-#line 228 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 42:
+#line 234 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Constant;
 
@@ -887,8 +887,8 @@ namespace yy {
 #line 888 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 44:
-#line 233 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 43:
+#line 239 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Constant;
 
@@ -899,8 +899,8 @@ namespace yy {
 #line 900 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 45:
-#line 240 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 44:
+#line 246 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Constant;
 
@@ -911,8 +911,8 @@ namespace yy {
 #line 912 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 46:
-#line 247 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 45:
+#line 253 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Constant;
 
@@ -923,8 +923,8 @@ namespace yy {
 #line 924 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 47:
-#line 254 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 46:
+#line 260 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Constant;
 
@@ -935,8 +935,8 @@ namespace yy {
 #line 936 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 48:
-#line 261 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 47:
+#line 267 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 /// TODO
                 (yylhs.value.valueType) = ValueType::Constant;
@@ -944,8 +944,8 @@ namespace yy {
 #line 945 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 49:
-#line 265 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 48:
+#line 271 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     (yylhs.value.valueType) = ValueType::Variant;
 
@@ -955,8 +955,8 @@ namespace yy {
 #line 956 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 50:
-#line 271 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 49:
+#line 277 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -976,8 +976,8 @@ namespace yy {
 #line 977 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 51:
-#line 287 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 50:
+#line 293 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -997,8 +997,8 @@ namespace yy {
 #line 998 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 52:
-#line 303 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 51:
+#line 309 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1018,8 +1018,8 @@ namespace yy {
 #line 1019 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 53:
-#line 319 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 52:
+#line 325 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1039,8 +1039,8 @@ namespace yy {
 #line 1040 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 54:
-#line 335 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 53:
+#line 341 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1060,8 +1060,8 @@ namespace yy {
 #line 1061 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 55:
-#line 351 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 54:
+#line 357 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1081,8 +1081,8 @@ namespace yy {
 #line 1082 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 56:
-#line 367 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 55:
+#line 373 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1102,8 +1102,8 @@ namespace yy {
 #line 1103 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 57:
-#line 383 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 56:
+#line 389 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1123,8 +1123,50 @@ namespace yy {
 #line 1124 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
+  case 57:
+#line 405 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+
+                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value > *last_code->value);
+
+                        delete pre_code;
+                    } else {
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        ZCodeParse::currentCodeParse->appendCode(ZCode::Greater);
+                    }
+            }
+#line 1145 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
   case 58:
-#line 399 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 421 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                    if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
+                        (yylhs.value.valueType) = (yystack_[2].value.valueType);
+
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+
+                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value < *last_code->value);
+
+                        delete pre_code;
+                    } else {
+                        (yylhs.value.valueType) = ValueType::Variant;
+
+                        ZCodeParse::currentCodeParse->appendCode(ZCode::Less);
+                    }
+            }
+#line 1166 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 59:
+#line 437 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1141,11 +1183,11 @@ namespace yy {
                         ZCodeParse::currentCodeParse->appendCode(ZCode::EQ);
                     }
             }
-#line 1145 "zScript.tab.cpp" // lalr1.cc:859
+#line 1187 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 59:
-#line 415 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 60:
+#line 453 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1162,11 +1204,11 @@ namespace yy {
                         ZCodeParse::currentCodeParse->appendCode(ZCode::NEQ);
                     }
             }
-#line 1166 "zScript.tab.cpp" // lalr1.cc:859
+#line 1208 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 60:
-#line 431 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 61:
+#line 469 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1184,11 +1226,11 @@ namespace yy {
                         ZCodeParse::currentCodeParse->appendCode(ZCode::STEQ);
                     }
             }
-#line 1188 "zScript.tab.cpp" // lalr1.cc:859
+#line 1230 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 61:
-#line 448 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 62:
+#line 486 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1206,11 +1248,11 @@ namespace yy {
                         ZCodeParse::currentCodeParse->appendCode(ZCode::STNEQ);
                     }
             }
-#line 1210 "zScript.tab.cpp" // lalr1.cc:859
+#line 1252 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 62:
-#line 465 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 63:
+#line 503 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1227,11 +1269,11 @@ namespace yy {
                         ZCodeParse::currentCodeParse->appendCode(ZCode::LE);
                     }
             }
-#line 1231 "zScript.tab.cpp" // lalr1.cc:859
+#line 1273 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 63:
-#line 481 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 64:
+#line 519 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1248,11 +1290,11 @@ namespace yy {
                         ZCodeParse::currentCodeParse->appendCode(ZCode::GE);
                     }
             }
-#line 1252 "zScript.tab.cpp" // lalr1.cc:859
+#line 1294 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 64:
-#line 497 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 65:
+#line 535 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1269,11 +1311,11 @@ namespace yy {
                         ZCodeParse::currentCodeParse->appendCode(ZCode::LAnd);
                     }
             }
-#line 1273 "zScript.tab.cpp" // lalr1.cc:859
+#line 1315 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 65:
-#line 513 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 66:
+#line 551 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
@@ -1290,11 +1332,11 @@ namespace yy {
                         ZCodeParse::currentCodeParse->appendCode(ZCode::LOr);
                     }
             }
-#line 1294 "zScript.tab.cpp" // lalr1.cc:859
+#line 1336 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 66:
-#line 529 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 67:
+#line 567 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[0].value.valueType);
@@ -1308,11 +1350,11 @@ namespace yy {
                         ZCodeParse::currentCodeParse->appendCode(ZCode::Contrary);
                     }
                 }
-#line 1312 "zScript.tab.cpp" // lalr1.cc:859
+#line 1354 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 67:
-#line 542 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 68:
+#line 580 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[0].value.valueType);
@@ -1326,11 +1368,11 @@ namespace yy {
                         ZCodeParse::currentCodeParse->appendCode(ZCode::Not);
                     }
                 }
-#line 1330 "zScript.tab.cpp" // lalr1.cc:859
+#line 1372 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 68:
-#line 555 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 69:
+#line 593 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[0].value.valueType);
@@ -1344,11 +1386,11 @@ namespace yy {
                         ZCodeParse::currentCodeParse->appendCode(ZCode::Minus);
                     }
                 }
-#line 1348 "zScript.tab.cpp" // lalr1.cc:859
+#line 1390 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 69:
-#line 568 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 70:
+#line 606 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[0].value.valueType);
@@ -1362,106 +1404,148 @@ namespace yy {
                         ZCodeParse::currentCodeParse->appendCode(ZCode::Abs);
                     }
                 }
-#line 1366 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 70:
-#line 581 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    { (yylhs.value.valueType) = (yystack_[1].value.valueType);}
-#line 1372 "zScript.tab.cpp" // lalr1.cc:859
+#line 1408 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 71:
-#line 582 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 619 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    { (yylhs.value.valueType) = (yystack_[1].value.valueType);}
+#line 1414 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 72:
+#line 620 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeParse::currentCodeParse->appendCode(ZCode::PostfixAddSelf);
             }
-#line 1382 "zScript.tab.cpp" // lalr1.cc:859
+#line 1424 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 72:
-#line 587 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 73:
+#line 625 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeParse::currentCodeParse->appendCode(ZCode::PostfixSubSelf);
             }
-#line 1392 "zScript.tab.cpp" // lalr1.cc:859
+#line 1434 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 73:
-#line 592 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 74:
+#line 630 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::createConstant(QByteArray::number((yystack_[0].value.count)), ZVariant::Int));
                 ZCodeParse::currentCodeParse->appendCode(ZCode::Join);
             }
-#line 1403 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 74:
-#line 600 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {(yylhs.value.count) = 0;}
-#line 1409 "zScript.tab.cpp" // lalr1.cc:859
+#line 1445 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 75:
-#line 601 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                (yylhs.value.count) = 1;
-            }
-#line 1417 "zScript.tab.cpp" // lalr1.cc:859
+#line 638 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {(yylhs.value.count) = 0;}
+#line 1451 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 76:
-#line 606 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {(yylhs.value.value) = Q_NULLPTR;}
-#line 1423 "zScript.tab.cpp" // lalr1.cc:859
+#line 639 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.count) = 1;
+            }
+#line 1459 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 77:
-#line 607 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {(yylhs.value.value) = Q_NULLPTR;}
-#line 1429 "zScript.tab.cpp" // lalr1.cc:859
+#line 644 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.value) = Q_NULLPTR;
+
+                ZCodeParse::currentCodeParse->beginCodeBlock(ZCodeParse::CodeBlock::If);
+                ZCodeParse::currentCodeParse->appendCode(ZCode::If, ZCodeParse::currentCodeParse->createConstant("", ZVariant::Undefined));
+
+                (yylhs.value.value) = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
+            }
+#line 1472 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 78:
-#line 608 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {(yylhs.value.value) = Q_NULLPTR;}
-#line 1435 "zScript.tab.cpp" // lalr1.cc:859
+#line 652 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                ZCodeParse::currentCodeParse->beginCodeBlock(ZCodeParse::CodeBlock::While);
+            }
+#line 1480 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 79:
-#line 609 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {(yylhs.value.value) = Q_NULLPTR;}
-#line 1441 "zScript.tab.cpp" // lalr1.cc:859
+#line 654 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                ZCodeParse::currentCodeParse->appendCode(ZCode::If, ZCodeParse::currentCodeParse->createConstant("", ZVariant::Undefined));
+
+                (yylhs.value.value) = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
+            }
+#line 1490 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 80:
+#line 659 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                ZCodeParse::currentCodeParse->beginCodeBlock(ZCodeParse::CodeBlock::While);
+            }
+#line 1498 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 81:
-#line 613 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 661 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeParse::currentCodeParse->appendCode(ZCode::If, ZCodeParse::currentCodeParse->createConstant("", ZVariant::Undefined));
-                (yystack_[0].value.value) = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
+
+                forCycieBeginCodeIndex = ZCodeParse::currentCodeParse->getCodeList().count() - 1;
             }
-#line 1450 "zScript.tab.cpp" // lalr1.cc:859
+#line 1508 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 82:
-#line 616 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 665 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                int index = ZCodeParse::currentCodeParse->getCodeList().count();
-
-                *(yystack_[2].value.value) = ZCodeParse::createConstant(QByteArray::number(index), ZVariant::Int);
-                (yylhs.value.value) = (yystack_[2].value.value);
+                (yylhs.value.value) = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().value(forCycieBeginCodeIndex))->value;
             }
-#line 1461 "zScript.tab.cpp" // lalr1.cc:859
+#line 1516 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 87:
-#line 627 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 83:
+#line 668 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.value) = Q_NULLPTR;
+
+                ZCodeParse::currentCodeParse->beginCodeBlock(ZCodeParse::CodeBlock::While);
+            }
+#line 1526 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 85:
+#line 676 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                if(ZCodeParse::currentCodeParse->getCodeBlock()->type == ZCodeParse::CodeBlock::While) {
+                    int index = ZCodeParse::currentCodeParse->getCodeBlock()->beginCodeIndex;
+
+                    ZCodeParse::currentCodeParse->appendCode(ZCode::Goto, ZCodeParse::currentCodeParse->createConstant(QByteArray::number(index), ZVariant::Int));
+                }
+
+                int index = ZCodeParse::currentCodeParse->getCodeList().count();
+
+                *(yystack_[1].value.value) = ZCodeParse::createConstant(QByteArray::number(index), ZVariant::Int);
+                (yylhs.value.value) = (yystack_[1].value.value);
+
+                ZCodeParse::currentCodeParse->endCodeBlock();
+            }
+#line 1545 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 90:
+#line 695 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeParse::currentCodeParse->appendCode(ZCode::Action::Goto,
                                              ZCodeParse::createConstant("", ZVariant::Undefined));
@@ -1472,20 +1556,20 @@ namespace yy {
 
                 (yystack_[0].value.value) = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
             }
-#line 1476 "zScript.tab.cpp" // lalr1.cc:859
+#line 1560 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
-  case 88:
-#line 636 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+  case 91:
+#line 704 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                  int index = ZCodeParse::currentCodeParse->getCodeList().count();
                 *(yystack_[2].value.value) = ZCodeParse::createConstant(QByteArray::number(index), ZVariant::Int);
             }
-#line 1485 "zScript.tab.cpp" // lalr1.cc:859
+#line 1569 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
 
-#line 1489 "zScript.tab.cpp" // lalr1.cc:859
+#line 1573 "zScript.tab.cpp" // lalr1.cc:859
             default:
               break;
             }
@@ -1651,292 +1735,308 @@ namespace yy {
   }
 
 
-  const signed char parser::yypact_ninf_ = -84;
+  const signed char parser::yypact_ninf_ = -70;
 
-  const signed char parser::yytable_ninf_ = -42;
+  const signed char parser::yytable_ninf_ = -41;
 
   const short int
   parser::yypact_[] =
   {
-     -84,    87,   -84,    -4,     0,     9,   -40,   -29,   -28,   -84,
-      17,   -27,   -84,   -84,   -84,   -84,   225,   225,   -84,   225,
-     225,   225,   225,   225,   -84,   -84,   -84,   -37,    -8,    -6,
-     312,   405,   -84,   -26,     4,   -25,   -84,    -2,    -3,   -18,
-     -84,   225,   225,   225,   -37,   -84,   -84,   588,   742,   757,
-      61,    61,    61,    61,   358,   147,   -84,   -84,   -84,   225,
-     225,   225,   225,   225,   225,   225,   225,   225,   225,   225,
-      27,   225,   225,   225,   225,   225,   225,   225,   225,   225,
-     225,   -84,   -84,   -84,   225,   225,   225,   225,   225,   225,
-     225,   225,   225,   225,   225,   225,   -84,   208,   -84,   -84,
-     -84,   208,   225,    -4,    -4,   404,   450,   312,   359,   -84,
-     -84,   -84,   634,   -11,   634,   249,   588,   249,   588,   700,
-     700,   644,   644,   634,   -84,   690,   690,   690,   704,   704,
-      61,    61,    61,   588,   -17,   265,   634,   634,   634,   634,
-     634,   634,   634,   634,   634,   634,   -11,   634,   -84,   -84,
-     634,   -84,   -31,   -84,   -84,   225,   225,   -84,   -84,     5,
-     312,   496,   208,   225,   -84,     3,   542,   -84,   -84
+     -70,    91,   -70,    -1,     3,   -49,   -70,   -39,   -70,     4,
+     -38,   -70,   -70,   -70,   -70,   289,   289,   -70,   289,   289,
+     289,   289,   289,   -70,   -70,   -70,   -70,   -19,   -17,   376,
+     423,   -70,   212,     5,   -41,   -70,   -16,   -13,   -70,   289,
+     -30,   289,   -31,   -70,   -70,   652,   819,   834,    70,    70,
+      70,    70,   422,   151,   289,   289,   289,   289,   289,   289,
+     289,   289,   289,   289,   -70,   289,    15,   289,   289,   289,
+     289,   289,   289,   289,   289,   289,   289,   289,   -70,   289,
+     -70,   -70,   -70,   289,   289,   289,   289,   289,   289,   289,
+     289,   289,   289,   289,   289,   -70,   -70,   -70,   -70,   -70,
+     272,   289,    -1,   468,   289,   376,   330,   -70,   -70,   -70,
+     698,   -12,   698,   781,   652,   781,   652,    63,    63,   744,
+     744,   698,   -70,   762,   762,   762,    63,    63,    73,    73,
+      70,    70,    70,   652,   -28,   329,   698,   698,   698,   698,
+     698,   698,   698,   698,   698,   698,   -12,   698,   -70,   698,
+     -70,   -70,   514,   -70,   289,   -70,   -70,   -70,   289,   560,
+     376,   -70,   -70,   289,   606,   -70
   };
 
   const unsigned char
   parser::yydefact_[] =
   {
-       2,     0,     1,     0,     0,     0,     0,     0,     0,    43,
-       0,    26,    44,    45,    47,    46,     0,     0,     9,     0,
-       0,     0,     0,     0,     4,     2,     3,     0,    42,    73,
-       0,    24,    25,    81,    86,    87,     6,    16,    13,     0,
-      48,     0,     0,     0,     0,    14,    26,     0,    24,    24,
-      68,    69,    67,    66,     0,     0,    11,    12,     7,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,    74,
-       0,     8,    71,    72,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,    80,     0,    84,    83,
-      85,     0,     0,     0,     0,     0,     0,     0,    24,     5,
-      70,    10,    22,    20,    23,    58,    60,    59,    61,    62,
-      63,    64,    65,    21,    29,    54,    55,    56,    51,    50,
-      52,    53,    57,    75,     0,     0,    33,    32,    30,    31,
-      37,    34,    35,    36,    39,    38,    19,    27,    82,    88,
-      17,    18,     0,    76,    77,     0,     0,    49,    28,     0,
-       0,     0,     0,     0,    79,     0,     0,    15,    78
+       2,     0,     1,     0,     0,     0,    78,     0,    42,     0,
+      24,    43,    44,    46,    45,     0,     0,     9,     0,     0,
+       0,     0,     0,     4,     2,     3,     7,    41,    74,     0,
+      22,    23,     0,    89,    90,     6,    14,    25,    47,     0,
+       0,     0,     0,    13,    24,     0,    22,    22,    69,    70,
+      68,    67,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,    11,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    75,    12,     0,
+       8,    72,    73,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    84,    85,    87,    86,    88,
+       0,     0,     0,     0,     0,     0,    22,     5,    71,    10,
+      20,    18,    21,    59,    61,    60,    62,    63,    64,    65,
+      66,    19,    28,    53,    54,    55,    57,    58,    50,    49,
+      51,    52,    56,    76,     0,     0,    32,    31,    29,    30,
+      36,    33,    34,    35,    38,    37,    17,    26,    91,    15,
+      16,    77,     0,    80,     0,    48,    27,    79,     0,     0,
+       0,    83,    81,     0,     0,    82
   };
 
   const signed char
   parser::yypgoto_[] =
   {
-     -84,    57,   -82,   -22,   -84,   -83,   -84,   -84,   -16,    -5,
-     -84,   -84,   -84,   -84,   -84,   -84,   -84,   -84
+     -70,     8,   -20,   -40,   -70,   -69,   -70,   -70,   -15,    -5,
+     -70,   -70,   -70,   -70,   -70,   -70,   -70,   -70,   -70,   -70
   };
 
   const short int
   parser::yydefgoto_[] =
   {
-      -1,     1,    26,    58,    27,    38,    28,    29,    30,    31,
-      32,   134,    33,    34,    97,    35,    36,   101
+      -1,     1,    25,    80,    26,    37,    27,    28,    29,    30,
+      31,   134,    32,    40,   158,   163,    33,    34,    35,   100
   };
 
   const short int
   parser::yytable_[] =
   {
-      47,    47,    56,    50,    51,    52,    53,    54,    81,   103,
-      37,    48,    49,    98,    39,   148,    82,    83,    41,   149,
-     151,   152,   109,    40,    57,   105,   106,   107,   159,    42,
-      43,    44,    59,    45,    60,    96,   100,   103,   108,   102,
-     104,   124,   157,   112,   114,   115,   116,   117,   118,   119,
-     120,   121,   122,   123,   113,   125,   126,   127,   128,   129,
-     130,   131,   132,   133,   135,    99,   167,   162,   136,   137,
-     138,   139,   140,   141,   142,   143,   144,   145,    47,   147,
-     165,    62,    55,    64,     0,   155,   150,     2,     0,   146,
-       3,     4,     5,     0,     0,     6,     0,     7,     8,     9,
-      10,    11,    12,    13,    14,    15,     0,     0,     0,     0,
-       0,     0,     0,     0,    16,    17,     0,     0,     0,    79,
-       0,     0,     0,     0,     0,    80,    18,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,    19,    20,   163,   160,
-     161,     0,    21,    22,     0,    23,     0,   166,    24,    25,
-       3,     4,     5,     0,     0,     6,     0,     7,     8,     9,
-      10,    11,    12,    13,    14,    15,     0,     0,     0,     0,
-       0,     0,     0,     0,    16,    17,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,    18,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,    19,    20,     0,     0,
-       0,     0,    21,    22,     0,    23,     0,     0,    24,    25,
-     111,     3,     4,     5,     0,     0,     6,     0,     7,     8,
-       9,    10,    11,    12,    13,    14,    15,     0,     0,     0,
-       5,     0,     0,     0,     0,    16,    17,     9,     0,    46,
-      12,    13,    14,    15,     0,     0,     0,    18,     0,     0,
-       0,     0,    16,    17,     0,     0,     0,    19,    20,     0,
-       0,     0,     0,    21,    22,     0,    23,     0,     0,    62,
-      25,    64,    65,    66,    19,    20,     0,     0,     0,     0,
-      21,    22,     0,    23,    61,    62,    63,    64,    65,    66,
-      67,    68,     0,     0,     0,     0,     0,     0,    74,    75,
-      76,    77,    78,     0,     0,    69,     0,    79,    70,    71,
-      72,    73,     0,    80,    74,    75,    76,    77,    78,     0,
-       0,     0,     0,    79,     0,     0,     0,     0,     0,    80,
-     158,    61,    62,    63,    64,    65,    66,    67,    68,     0,
+      45,    45,   107,    48,    49,    50,    51,    52,    64,    39,
+      46,    47,    96,    36,    97,    81,    82,    38,    42,    41,
+      99,    54,    43,    55,   103,   101,   105,   102,   104,   122,
+      78,   155,    53,   150,     0,     0,   106,     0,     0,   110,
+     112,   113,   114,   115,   116,   117,   118,   119,   120,   111,
+     121,     0,   123,   124,   125,   126,   127,   128,   129,   130,
+     131,   132,   133,     0,   135,   153,    98,     0,   136,   137,
+     138,   139,   140,   141,   142,   143,   144,   145,    45,   147,
+     148,     0,     0,    57,     0,    59,   149,     0,   146,   152,
+      57,     2,    59,    57,     3,    59,     4,     0,     0,     5,
+       0,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+       0,     0,    72,    73,    74,    75,    76,     0,    15,    16,
+     162,    77,     0,     0,    74,    75,    76,    79,    77,     0,
+      17,    77,     0,     0,    79,     0,     0,    79,     0,   159,
+      18,    19,     0,   160,     0,     0,    20,    21,   164,    22,
+       0,     0,    23,    24,     3,     0,     4,     0,     0,     5,
+       0,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+       0,     0,     0,     0,     0,     0,     0,     0,    15,    16,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,    56,    69,     0,     0,    70,    71,    72,    73,     0,
-       0,    74,    75,    76,    77,    78,     0,     0,     0,     0,
-      79,     0,     0,    57,     0,     0,    80,    61,    62,    63,
-      64,    65,    66,    67,    68,     0,    82,    83,    84,    85,
-      86,    87,    88,    89,    90,    91,    92,    93,    69,    94,
-      95,    70,    71,    72,    73,     0,     0,    74,    75,    76,
-      77,    78,     0,     0,     0,     0,    79,   110,     0,   156,
-       0,     0,    80,    61,    62,    63,    64,    65,    66,    67,
-      68,     0,    82,    83,    84,    85,    86,    87,    88,    89,
-      90,    91,    92,    93,    69,    94,    95,    70,    71,    72,
-      73,     0,     0,    74,    75,    76,    77,    78,     0,     0,
-       0,     0,    79,   153,     0,     0,     0,     0,    80,    61,
-      62,    63,    64,    65,    66,    67,    68,     0,     0,     0,
+      17,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+      18,    19,     0,     0,     0,     0,    20,    21,     0,    22,
+       0,     0,    23,    24,   109,     3,     0,     4,     0,     0,
+       5,     0,     6,     7,     8,     9,    10,    11,    12,    13,
+      14,     0,     0,     0,     0,     0,     0,     0,     0,    15,
+      16,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,    17,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,    18,    19,     0,     0,     0,     0,    20,    21,     0,
+      22,     0,     0,    95,    24,     3,     0,     4,     0,     0,
+       5,     0,     6,     7,     8,     9,    10,    11,    12,    13,
+      14,     0,     3,     0,     4,     0,     0,     0,     0,    15,
+      16,     8,     0,    44,    11,    12,    13,    14,     0,     0,
+       0,    17,     0,     0,     0,     0,    15,    16,     0,     0,
+       0,    18,    19,     0,     0,     0,     0,    20,    21,     0,
+      22,     0,     0,     0,    24,     0,     0,     0,    18,    19,
+       0,     0,     0,     0,    20,    21,     0,    22,    56,    57,
+      58,    59,    60,    61,    62,    63,     0,    81,    82,    83,
+      84,    85,    86,    87,    88,    89,    90,    91,    92,    65,
+      93,    94,    66,    67,    68,    69,    70,    71,    72,    73,
+      74,    75,    76,     0,     0,     0,     0,    77,     0,     0,
+     154,     0,     0,    79,   156,    56,    57,    58,    59,    60,
+      61,    62,    63,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    64,    65,     0,     0,    66,
+      67,    68,    69,    70,    71,    72,    73,    74,    75,    76,
+       0,     0,     0,     0,    77,     0,     0,    78,     0,     0,
+      79,    56,    57,    58,    59,    60,    61,    62,    63,     0,
+      81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
+      91,    92,    65,    93,    94,    66,    67,    68,    69,    70,
+      71,    72,    73,    74,    75,    76,     0,     0,     0,     0,
+      77,   108,     0,     0,     0,     0,    79,    56,    57,    58,
+      59,    60,    61,    62,    63,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,    65,     0,
+       0,    66,    67,    68,    69,    70,    71,    72,    73,    74,
+      75,    76,     0,     0,     0,     0,    77,   151,     0,     0,
+       0,     0,    79,    56,    57,    58,    59,    60,    61,    62,
+      63,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,    65,     0,     0,    66,    67,    68,
+      69,    70,    71,    72,    73,    74,    75,    76,     0,     0,
+       0,     0,    77,   157,     0,     0,     0,     0,    79,    56,
+      57,    58,    59,    60,    61,    62,    63,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-      69,     0,     0,    70,    71,    72,    73,     0,     0,    74,
-      75,    76,    77,    78,     0,     0,     0,     0,    79,   154,
-       0,     0,     0,     0,    80,    61,    62,    63,    64,    65,
-      66,    67,    68,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,    69,     0,     0,    70,
-      71,    72,    73,     0,     0,    74,    75,    76,    77,    78,
-       0,     0,     0,     0,    79,   164,     0,     0,     0,     0,
-      80,    61,    62,    63,    64,    65,    66,    67,    68,     0,
+      65,     0,     0,    66,    67,    68,    69,    70,    71,    72,
+      73,    74,    75,    76,     0,     0,     0,     0,    77,   161,
+       0,     0,     0,     0,    79,    56,    57,    58,    59,    60,
+      61,    62,    63,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,    65,     0,     0,    66,
+      67,    68,    69,    70,    71,    72,    73,    74,    75,    76,
+       0,     0,     0,     0,    77,   165,     0,     0,     0,     0,
+      79,    56,    57,    58,    59,    60,    61,    62,    63,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    69,     0,     0,    70,    71,    72,    73,     0,
-       0,    74,    75,    76,    77,    78,     0,     0,     0,     0,
-      79,   168,     0,     0,     0,     0,    80,    61,    62,    63,
-      64,    65,    66,    67,    68,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,    69,     0,
-       0,    70,    71,    72,    73,     0,     0,    74,    75,    76,
-      77,    78,     0,     0,     0,     0,    79,     0,     0,     0,
-       0,     0,    80,    61,    62,    63,    64,    65,    66,    67,
-      68,     0,     0,    61,    62,    63,    64,    65,    66,     0,
-       0,     0,     0,     0,     0,     0,     0,    70,    71,    72,
-      73,     0,     0,    74,    75,    76,    77,    78,    71,    72,
-      73,     0,    79,    74,    75,    76,    77,    78,    80,     0,
-       0,     0,    79,     0,     0,     0,     0,     0,    80,    61,
-      62,    63,    64,    65,    66,     0,     0,     0,     0,     0,
-      62,     0,    64,     0,    62,     0,    64,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,    74,
-      75,    76,    77,    78,     0,     0,     0,     0,    79,    74,
-      75,    76,    77,    78,    80,    76,    77,    78,    79,     0,
-       0,     0,    79,     0,    80,     0,     0,     0,    80,   -40,
-     -40,   -40,   -40,   -40,   -40,   -40,   -40,   -40,   -40,   -40,
-     -40,   -40,     0,   -40,   -41,   -41,   -41,   -41,   -41,   -41,
-     -41,   -41,   -41,   -41,   -41,   -41,   -41,     0,   -41,     0,
-       0,   -40,   -40,   -40,     0,     0,     0,   -40,     0,     0,
-       0,     0,     0,     0,     0,     0,   -41,   -41,   -41,     0,
-       0,     0,   -41
+       0,     0,    65,     0,     0,    66,    67,    68,    69,    70,
+      71,    72,    73,    74,    75,    76,     0,     0,     0,     0,
+      77,     0,     0,     0,     0,     0,    79,    56,    57,    58,
+      59,    60,    61,    62,    63,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,    66,    67,    68,    69,    70,    71,    72,    73,    74,
+      75,    76,     0,     0,     0,     0,    77,     0,     0,     0,
+       0,     0,    79,    56,    57,    58,    59,    60,    61,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,    56,    57,    58,    59,    60,    61,     0,    67,    68,
+      69,    70,    71,    72,    73,    74,    75,    76,     0,     0,
+       0,    57,    77,    59,    60,    61,     0,     0,    79,    70,
+      71,    72,    73,    74,    75,    76,     0,     0,     0,     0,
+      77,     0,     0,     0,     0,     0,    79,     0,    70,    71,
+      72,    73,    74,    75,    76,     0,     0,     0,     0,    77,
+       0,     0,     0,     0,     0,    79,   -39,   -39,   -39,   -39,
+     -39,   -39,   -39,   -39,   -39,   -39,   -39,   -39,   -39,     0,
+     -39,   -40,   -40,   -40,   -40,   -40,   -40,   -40,   -40,   -40,
+     -40,   -40,   -40,   -40,     0,   -40,     0,     0,   -39,   -39,
+     -39,     0,     0,     0,   -39,     0,     0,     0,     0,     0,
+       0,     0,     0,   -40,   -40,   -40,     0,     0,     0,   -40
   };
 
   const short int
   parser::yycheck_[] =
   {
-      16,    17,    39,    19,    20,    21,    22,    23,    30,    40,
-      14,    16,    17,     9,    14,    97,    27,    28,    58,   101,
-     103,   104,    44,    14,    61,    41,    42,    43,    59,    58,
-      58,    14,    40,    60,    40,    61,    61,    40,    43,    41,
-      58,    14,    59,    59,    60,    61,    62,    63,    64,    65,
-      66,    67,    68,    69,    59,    71,    72,    73,    74,    75,
-      76,    77,    78,    79,    80,    61,    63,    62,    84,    85,
-      86,    87,    88,    89,    90,    91,    92,    93,    94,    95,
-     162,    20,    25,    22,    -1,   107,   102,     0,    -1,    94,
-       3,     4,     5,    -1,    -1,     8,    -1,    10,    11,    12,
-      13,    14,    15,    16,    17,    18,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    27,    28,    -1,    -1,    -1,    58,
-      -1,    -1,    -1,    -1,    -1,    64,    39,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    49,    50,   160,   155,
-     156,    -1,    55,    56,    -1,    58,    -1,   163,    61,    62,
-       3,     4,     5,    -1,    -1,     8,    -1,    10,    11,    12,
-      13,    14,    15,    16,    17,    18,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    27,    28,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    39,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    49,    50,    -1,    -1,
-      -1,    -1,    55,    56,    -1,    58,    -1,    -1,    61,    62,
-      63,     3,     4,     5,    -1,    -1,     8,    -1,    10,    11,
-      12,    13,    14,    15,    16,    17,    18,    -1,    -1,    -1,
-       5,    -1,    -1,    -1,    -1,    27,    28,    12,    -1,    14,
-      15,    16,    17,    18,    -1,    -1,    -1,    39,    -1,    -1,
-      -1,    -1,    27,    28,    -1,    -1,    -1,    49,    50,    -1,
-      -1,    -1,    -1,    55,    56,    -1,    58,    -1,    -1,    20,
-      62,    22,    23,    24,    49,    50,    -1,    -1,    -1,    -1,
-      55,    56,    -1,    58,    19,    20,    21,    22,    23,    24,
-      25,    26,    -1,    -1,    -1,    -1,    -1,    -1,    49,    50,
-      51,    52,    53,    -1,    -1,    40,    -1,    58,    43,    44,
-      45,    46,    -1,    64,    49,    50,    51,    52,    53,    -1,
-      -1,    -1,    -1,    58,    -1,    -1,    -1,    -1,    -1,    64,
-      65,    19,    20,    21,    22,    23,    24,    25,    26,    -1,
+      15,    16,    42,    18,    19,    20,    21,    22,    39,    58,
+      15,    16,    32,    14,     9,    27,    28,    14,    14,    58,
+      61,    40,    60,    40,    39,    41,    41,    40,    58,    14,
+      61,    59,    24,   102,    -1,    -1,    41,    -1,    -1,    54,
+      55,    56,    57,    58,    59,    60,    61,    62,    63,    54,
+      65,    -1,    67,    68,    69,    70,    71,    72,    73,    74,
+      75,    76,    77,    -1,    79,   105,    61,    -1,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+     100,    -1,    -1,    20,    -1,    22,   101,    -1,    93,   104,
+      20,     0,    22,    20,     3,    22,     5,    -1,    -1,     8,
+      -1,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      -1,    -1,    49,    50,    51,    52,    53,    -1,    27,    28,
+     160,    58,    -1,    -1,    51,    52,    53,    64,    58,    -1,
+      39,    58,    -1,    -1,    64,    -1,    -1,    64,    -1,   154,
+      49,    50,    -1,   158,    -1,    -1,    55,    56,   163,    58,
+      -1,    -1,    61,    62,     3,    -1,     5,    -1,    -1,     8,
+      -1,    10,    11,    12,    13,    14,    15,    16,    17,    18,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    27,    28,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    39,    40,    -1,    -1,    43,    44,    45,    46,    -1,
-      -1,    49,    50,    51,    52,    53,    -1,    -1,    -1,    -1,
-      58,    -1,    -1,    61,    -1,    -1,    64,    19,    20,    21,
-      22,    23,    24,    25,    26,    -1,    27,    28,    29,    30,
-      31,    32,    33,    34,    35,    36,    37,    38,    40,    40,
-      41,    43,    44,    45,    46,    -1,    -1,    49,    50,    51,
-      52,    53,    -1,    -1,    -1,    -1,    58,    59,    -1,    60,
+      39,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      49,    50,    -1,    -1,    -1,    -1,    55,    56,    -1,    58,
+      -1,    -1,    61,    62,    63,     3,    -1,     5,    -1,    -1,
+       8,    -1,    10,    11,    12,    13,    14,    15,    16,    17,
+      18,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    27,
+      28,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    39,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    49,    50,    -1,    -1,    -1,    -1,    55,    56,    -1,
+      58,    -1,    -1,    61,    62,     3,    -1,     5,    -1,    -1,
+       8,    -1,    10,    11,    12,    13,    14,    15,    16,    17,
+      18,    -1,     3,    -1,     5,    -1,    -1,    -1,    -1,    27,
+      28,    12,    -1,    14,    15,    16,    17,    18,    -1,    -1,
+      -1,    39,    -1,    -1,    -1,    -1,    27,    28,    -1,    -1,
+      -1,    49,    50,    -1,    -1,    -1,    -1,    55,    56,    -1,
+      58,    -1,    -1,    -1,    62,    -1,    -1,    -1,    49,    50,
+      -1,    -1,    -1,    -1,    55,    56,    -1,    58,    19,    20,
+      21,    22,    23,    24,    25,    26,    -1,    27,    28,    29,
+      30,    31,    32,    33,    34,    35,    36,    37,    38,    40,
+      40,    41,    43,    44,    45,    46,    47,    48,    49,    50,
+      51,    52,    53,    -1,    -1,    -1,    -1,    58,    -1,    -1,
+      60,    -1,    -1,    64,    65,    19,    20,    21,    22,    23,
+      24,    25,    26,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    39,    40,    -1,    -1,    43,
+      44,    45,    46,    47,    48,    49,    50,    51,    52,    53,
+      -1,    -1,    -1,    -1,    58,    -1,    -1,    61,    -1,    -1,
+      64,    19,    20,    21,    22,    23,    24,    25,    26,    -1,
+      27,    28,    29,    30,    31,    32,    33,    34,    35,    36,
+      37,    38,    40,    40,    41,    43,    44,    45,    46,    47,
+      48,    49,    50,    51,    52,    53,    -1,    -1,    -1,    -1,
+      58,    59,    -1,    -1,    -1,    -1,    64,    19,    20,    21,
+      22,    23,    24,    25,    26,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    40,    -1,
+      -1,    43,    44,    45,    46,    47,    48,    49,    50,    51,
+      52,    53,    -1,    -1,    -1,    -1,    58,    59,    -1,    -1,
       -1,    -1,    64,    19,    20,    21,    22,    23,    24,    25,
-      26,    -1,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    40,    40,    41,    43,    44,    45,
-      46,    -1,    -1,    49,    50,    51,    52,    53,    -1,    -1,
+      26,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    40,    -1,    -1,    43,    44,    45,
+      46,    47,    48,    49,    50,    51,    52,    53,    -1,    -1,
       -1,    -1,    58,    59,    -1,    -1,    -1,    -1,    64,    19,
       20,    21,    22,    23,    24,    25,    26,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      40,    -1,    -1,    43,    44,    45,    46,    -1,    -1,    49,
+      40,    -1,    -1,    43,    44,    45,    46,    47,    48,    49,
       50,    51,    52,    53,    -1,    -1,    -1,    -1,    58,    59,
       -1,    -1,    -1,    -1,    64,    19,    20,    21,    22,    23,
       24,    25,    26,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    40,    -1,    -1,    43,
-      44,    45,    46,    -1,    -1,    49,    50,    51,    52,    53,
+      44,    45,    46,    47,    48,    49,    50,    51,    52,    53,
       -1,    -1,    -1,    -1,    58,    59,    -1,    -1,    -1,    -1,
       64,    19,    20,    21,    22,    23,    24,    25,    26,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    40,    -1,    -1,    43,    44,    45,    46,    -1,
-      -1,    49,    50,    51,    52,    53,    -1,    -1,    -1,    -1,
-      58,    59,    -1,    -1,    -1,    -1,    64,    19,    20,    21,
+      -1,    -1,    40,    -1,    -1,    43,    44,    45,    46,    47,
+      48,    49,    50,    51,    52,    53,    -1,    -1,    -1,    -1,
+      58,    -1,    -1,    -1,    -1,    -1,    64,    19,    20,    21,
       22,    23,    24,    25,    26,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    40,    -1,
-      -1,    43,    44,    45,    46,    -1,    -1,    49,    50,    51,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    43,    44,    45,    46,    47,    48,    49,    50,    51,
       52,    53,    -1,    -1,    -1,    -1,    58,    -1,    -1,    -1,
-      -1,    -1,    64,    19,    20,    21,    22,    23,    24,    25,
-      26,    -1,    -1,    19,    20,    21,    22,    23,    24,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    43,    44,    45,
-      46,    -1,    -1,    49,    50,    51,    52,    53,    44,    45,
-      46,    -1,    58,    49,    50,    51,    52,    53,    64,    -1,
-      -1,    -1,    58,    -1,    -1,    -1,    -1,    -1,    64,    19,
-      20,    21,    22,    23,    24,    -1,    -1,    -1,    -1,    -1,
-      20,    -1,    22,    -1,    20,    -1,    22,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    49,
-      50,    51,    52,    53,    -1,    -1,    -1,    -1,    58,    49,
-      50,    51,    52,    53,    64,    51,    52,    53,    58,    -1,
-      -1,    -1,    58,    -1,    64,    -1,    -1,    -1,    64,    27,
-      28,    29,    30,    31,    32,    33,    34,    35,    36,    37,
-      38,    39,    -1,    41,    27,    28,    29,    30,    31,    32,
-      33,    34,    35,    36,    37,    38,    39,    -1,    41,    -1,
-      -1,    59,    60,    61,    -1,    -1,    -1,    65,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    59,    60,    61,    -1,
-      -1,    -1,    65
+      -1,    -1,    64,    19,    20,    21,    22,    23,    24,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    19,    20,    21,    22,    23,    24,    -1,    44,    45,
+      46,    47,    48,    49,    50,    51,    52,    53,    -1,    -1,
+      -1,    20,    58,    22,    23,    24,    -1,    -1,    64,    47,
+      48,    49,    50,    51,    52,    53,    -1,    -1,    -1,    -1,
+      58,    -1,    -1,    -1,    -1,    -1,    64,    -1,    47,    48,
+      49,    50,    51,    52,    53,    -1,    -1,    -1,    -1,    58,
+      -1,    -1,    -1,    -1,    -1,    64,    27,    28,    29,    30,
+      31,    32,    33,    34,    35,    36,    37,    38,    39,    -1,
+      41,    27,    28,    29,    30,    31,    32,    33,    34,    35,
+      36,    37,    38,    39,    -1,    41,    -1,    -1,    59,    60,
+      61,    -1,    -1,    -1,    65,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    59,    60,    61,    -1,    -1,    -1,    65
   };
 
   const unsigned char
   parser::yystos_[] =
   {
-       0,    67,     0,     3,     4,     5,     8,    10,    11,    12,
-      13,    14,    15,    16,    17,    18,    27,    28,    39,    49,
-      50,    55,    56,    58,    61,    62,    68,    70,    72,    73,
-      74,    75,    76,    78,    79,    81,    82,    14,    71,    14,
-      14,    58,    58,    58,    14,    60,    14,    74,    75,    75,
-      74,    74,    74,    74,    74,    67,    39,    61,    69,    40,
-      40,    19,    20,    21,    22,    23,    24,    25,    26,    40,
-      43,    44,    45,    46,    49,    50,    51,    52,    53,    58,
-      64,    69,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    40,    41,    61,    80,     9,    61,
-      61,    83,    41,    40,    58,    74,    74,    74,    75,    69,
-      59,    63,    74,    75,    74,    74,    74,    74,    74,    74,
-      74,    74,    74,    74,    14,    74,    74,    74,    74,    74,
+       0,    67,     0,     3,     5,     8,    10,    11,    12,    13,
+      14,    15,    16,    17,    18,    27,    28,    39,    49,    50,
+      55,    56,    58,    61,    62,    68,    70,    72,    73,    74,
+      75,    76,    78,    82,    83,    84,    14,    71,    14,    58,
+      79,    58,    14,    60,    14,    74,    75,    75,    74,    74,
+      74,    74,    74,    67,    40,    40,    19,    20,    21,    22,
+      23,    24,    25,    26,    39,    40,    43,    44,    45,    46,
+      47,    48,    49,    50,    51,    52,    53,    58,    61,    64,
+      69,    27,    28,    29,    30,    31,    32,    33,    34,    35,
+      36,    37,    38,    40,    41,    61,    68,     9,    61,    61,
+      85,    41,    40,    74,    58,    74,    75,    69,    59,    63,
+      74,    75,    74,    74,    74,    74,    74,    74,    74,    74,
+      74,    74,    14,    74,    74,    74,    74,    74,    74,    74,
       74,    74,    74,    74,    77,    74,    74,    74,    74,    74,
-      74,    74,    74,    74,    74,    74,    75,    74,    68,    68,
-      74,    71,    71,    59,    59,    69,    60,    59,    65,    59,
-      74,    74,    62,    69,    59,    68,    74,    63,    59
+      74,    74,    74,    74,    74,    74,    75,    74,    68,    74,
+      71,    59,    74,    69,    60,    59,    65,    59,    80,    74,
+      74,    59,    69,    81,    74,    59
   };
 
   const unsigned char
   parser::yyr1_[] =
   {
        0,    66,    67,    67,    67,    68,    68,    68,    68,    68,
-      68,    69,    69,    70,    70,    70,    71,    71,    71,    72,
-      72,    73,    73,    73,    74,    74,    75,    75,    75,    75,
+      68,    69,    69,    70,    71,    71,    71,    72,    72,    73,
+      73,    73,    74,    74,    75,    75,    75,    75,    75,    75,
       75,    75,    75,    75,    75,    75,    75,    75,    75,    75,
-      75,    75,    75,    76,    76,    76,    76,    76,    76,    76,
+      75,    75,    76,    76,    76,    76,    76,    76,    76,    76,
       76,    76,    76,    76,    76,    76,    76,    76,    76,    76,
       76,    76,    76,    76,    76,    76,    76,    76,    76,    76,
-      76,    76,    76,    76,    77,    77,    78,    78,    78,    78,
-      78,    80,    79,    79,    81,    81,    82,    83,    82
+      76,    76,    76,    76,    76,    77,    77,    78,    79,    78,
+      80,    81,    78,    78,    78,    82,    82,    83,    83,    84,
+      85,    84
   };
 
   const unsigned char
   parser::yyr2_[] =
   {
-       0,     2,     0,     2,     2,     3,     1,     2,     2,     1,
-       3,     1,     1,     2,     2,     8,     1,     3,     3,     3,
-       3,     3,     3,     3,     1,     1,     1,     3,     4,     3,
+       0,     2,     0,     2,     2,     3,     1,     1,     2,     1,
+       3,     1,     1,     2,     1,     3,     3,     3,     3,     3,
+       3,     3,     1,     1,     1,     2,     3,     4,     3,     3,
+       3,     3,     3,     3,     3,     3,     3,     3,     3,     2,
+       2,     1,     1,     1,     1,     1,     1,     2,     4,     3,
        3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       2,     2,     1,     1,     1,     1,     1,     1,     2,     4,
-       3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     3,     3,     3,     3,     3,     2,     2,     2,     2,
-       3,     2,     2,     1,     0,     1,     4,     4,     8,     6,
-       2,     0,     3,     2,     2,     2,     1,     0,     3
+       3,     3,     3,     3,     3,     3,     3,     2,     2,     2,
+       2,     3,     2,     2,     1,     0,     1,     4,     0,     5,
+       0,     0,    10,     6,     2,     2,     2,     2,     2,     1,
+       0,     3
   };
 
 
@@ -1955,9 +2055,9 @@ namespace yy {
   "'.'", "'&'", "'|'", "'^'", "'>'", "'<'", "'-'", "'+'", "'*'", "'/'",
   "'%'", "UMINUS", "'!'", "'~'", "PROMOTION", "'('", "')'", "':'", "'\\n'",
   "'{'", "'}'", "'['", "']'", "$accept", "start", "code", "ends",
-  "statement", "define", "tuple_lval", "tuple_exp", "expression", "lvalue",
-  "rvalue", "arguments", "branch_head", "branch_body", "$@1",
-  "branch_else", "conditional", "$@2", YY_NULLPTR
+  "goto_label", "define", "tuple_lval", "tuple_exp", "expression",
+  "lvalue", "rvalue", "arguments", "branch_head", "$@1", "$@2", "$@3",
+  "branch_body", "branch_else", "conditional", "$@4", YY_NULLPTR
   };
 
 
@@ -1965,14 +2065,15 @@ namespace yy {
   parser::yyrline_[] =
   {
        0,    70,    70,    70,    70,    72,    77,    82,    87,    92,
-      93,    96,    96,    98,    99,   104,   109,   114,   121,   124,
-     125,   130,   131,   132,   136,   136,   138,   145,   150,   154,
-     160,   165,   170,   175,   180,   185,   190,   195,   200,   205,
-     210,   215,   220,   228,   233,   240,   247,   254,   261,   265,
-     271,   287,   303,   319,   335,   351,   367,   383,   399,   415,
-     431,   448,   465,   481,   497,   513,   529,   542,   555,   568,
-     581,   582,   587,   592,   600,   601,   606,   607,   608,   609,
-     610,   613,   613,   622,   624,   624,   626,   627,   627
+      93,    96,    96,    98,   112,   117,   124,   127,   128,   133,
+     134,   135,   139,   139,   141,   148,   151,   156,   160,   166,
+     171,   176,   181,   186,   191,   196,   201,   206,   211,   216,
+     221,   226,   234,   239,   246,   253,   260,   267,   271,   277,
+     293,   309,   325,   341,   357,   373,   389,   405,   421,   437,
+     453,   469,   486,   503,   519,   535,   551,   567,   580,   593,
+     606,   619,   620,   625,   630,   638,   639,   644,   652,   652,
+     659,   661,   659,   668,   673,   676,   690,   692,   692,   694,
+     695,   695
   };
 
   // Print the state stack on the debug stream.
@@ -2057,8 +2158,8 @@ namespace yy {
 
 
 } // yy
-#line 2061 "zScript.tab.cpp" // lalr1.cc:1167
-#line 640 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
+#line 2162 "zScript.tab.cpp" // lalr1.cc:1167
+#line 708 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
 
 
 void yy::parser::error(const location_type& loc, const std::string& msg)

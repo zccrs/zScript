@@ -31,6 +31,7 @@ ignore [ \t]
 "if"            { return TOKEN_PREFIX::IF;}
 "else"          { return TOKEN_PREFIX::ELSE;}
 "while"         { return TOKEN_PREFIX::WHILE;}
+"for"           { return TOKEN_PREFIX::FOR;}
 "undefined"     { return TOKEN_PREFIX::UNDEFINED;}
 "goto"          { return TOKEN_PREFIX::GOTO;}
 "=="            { return TOKEN_PREFIX::EQ;}

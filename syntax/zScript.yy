@@ -14,7 +14,7 @@ enum ValueType {
 };
 
 /// if current code block belong be which is true else is false.
-bool isWhileCodeBlock = false;
+int forCycieBeginCodeIndex = 0;
 
 Z_USE_NAMESPACE
 
@@ -79,7 +79,7 @@ code:       GOTO IDENTIFIER ends {
                         && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
                     ZCodeParse::currentCodeParse->appendCode(ZCode::PopAll);
             }
-            | statement ends {
+            | goto_label {
                 if(ZCodeParse::currentCodeParse->getCodeList().count() > 1
                         && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
                     ZCodeParse::currentCodeParse->appendCode(ZCode::PopAll);
@@ -95,16 +95,19 @@ code:       GOTO IDENTIFIER ends {
 
 ends:       ';'|'\n'
 
-statement:  VAR define
-            | IDENTIFIER ':' {
+goto_label: IDENTIFIER ':' {
                 *ZCodeParse::currentCodeParse->getGotoLabel(*$1) = ZCodeParse::currentCodeParse->getCodeList().count();
 
                 delete $1;
             }
-            | FUNCTION IDENTIFIER '(' define ')' '{' code '}' {
-                /// TODO
-            }
-            ;
+
+//statement:  VAR define {
+
+//            }
+//            | FUNCTION IDENTIFIER '(' define ')' '{' code '}' {
+//                /// TODO
+//            }
+//            ;
 
 define:     IDENTIFIER {
                 ZCodeParse::currentCodeParse->addIdentifier(*$1);
@@ -141,6 +144,9 @@ lvalue:     IDENTIFIER {
                 ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::currentCodeParse->getIdentifierAddress(*$1));
 
                 delete $1;
+            }
+            | VAR define {
+                $$ = ValueType::Variant;
             }
             | lvalue '=' expression {
                 $$ = ValueType::Variant;
@@ -396,6 +402,38 @@ rvalue:     UNDEFINED {
                         ZCodeParse::currentCodeParse->appendCode(ZCode::Mod);
                     }
             }
+            | expression '>' expression {
+                    if($1 == ValueType::Constant && $3 == ValueType::Constant) {
+                        $$ = $1;
+
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+
+                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value > *last_code->value);
+
+                        delete pre_code;
+                    } else {
+                        $$ = ValueType::Variant;
+
+                        ZCodeParse::currentCodeParse->appendCode(ZCode::Greater);
+                    }
+            }
+            | expression '<' expression {
+                    if($1 == ValueType::Constant && $3 == ValueType::Constant) {
+                        $$ = $1;
+
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+
+                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value < *last_code->value);
+
+                        delete pre_code;
+                    } else {
+                        $$ = ValueType::Variant;
+
+                        ZCodeParse::currentCodeParse->appendCode(ZCode::Less);
+                    }
+            }
             | expression EQ expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
@@ -603,21 +641,51 @@ arguments:  {$$ = 0;}
             }
             ;
 
-branch_head:IF '(' expression ')' {$$ = Q_NULLPTR;}
-            | WHILE '(' expression ')' {$$ = Q_NULLPTR;}
-            | FOR '(' expression ends expression ends expression ')' {$$ = Q_NULLPTR;}
-            | FOR '(' lvalue ':' expression ')' {$$ = Q_NULLPTR;}
+branch_head:IF '(' expression ')' {
+                $$ = Q_NULLPTR;
+
+                ZCodeParse::currentCodeParse->beginCodeBlock(ZCodeParse::CodeBlock::If);
+                ZCodeParse::currentCodeParse->appendCode(ZCode::If, ZCodeParse::currentCodeParse->createConstant("", ZVariant::Undefined));
+
+                $$ = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
+            }
+            | WHILE {
+                ZCodeParse::currentCodeParse->beginCodeBlock(ZCodeParse::CodeBlock::While);
+            } '(' expression ')' {
+                ZCodeParse::currentCodeParse->appendCode(ZCode::If, ZCodeParse::currentCodeParse->createConstant("", ZVariant::Undefined));
+
+                $$ = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
+            }
+            | FOR '(' expression ends {
+                ZCodeParse::currentCodeParse->beginCodeBlock(ZCodeParse::CodeBlock::While);
+            } expression ends {
+                ZCodeParse::currentCodeParse->appendCode(ZCode::If, ZCodeParse::currentCodeParse->createConstant("", ZVariant::Undefined));
+
+                forCycieBeginCodeIndex = ZCodeParse::currentCodeParse->getCodeList().count() - 1;
+            } expression ')' {
+                $$ = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().value(forCycieBeginCodeIndex))->value;
+            }
+            | FOR '(' lvalue ':' expression ')' {
+                $$ = Q_NULLPTR;
+
+                ZCodeParse::currentCodeParse->beginCodeBlock(ZCodeParse::CodeBlock::While);
+            }
             | branch_head '\n'
             ;
 
-branch_body :branch_head  {
-                ZCodeParse::currentCodeParse->appendCode(ZCode::If, ZCodeParse::currentCodeParse->createConstant("", ZVariant::Undefined));
-                $1 = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
-            } code {
+branch_body :branch_head code {
+                if(ZCodeParse::currentCodeParse->getCodeBlock()->type == ZCodeParse::CodeBlock::While) {
+                    int index = ZCodeParse::currentCodeParse->getCodeBlock()->beginCodeIndex;
+
+                    ZCodeParse::currentCodeParse->appendCode(ZCode::Goto, ZCodeParse::currentCodeParse->createConstant(QByteArray::number(index), ZVariant::Int));
+                }
+
                 int index = ZCodeParse::currentCodeParse->getCodeList().count();
 
                 *$1 = ZCodeParse::createConstant(QByteArray::number(index), ZVariant::Int);
                 $$ = $1;
+
+                ZCodeParse::currentCodeParse->endCodeBlock();
             }
             | branch_body '\n'
             ;

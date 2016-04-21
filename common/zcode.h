@@ -3,7 +3,7 @@
 
 #include "zvariant.h"
 
-#include <QSet>
+#include <QDebug>
 
 class yyFlexLexer;
 
@@ -103,6 +103,8 @@ public:
             If
         };
 
+        int beginCodeIndex;
+
         quint8 type = Normal;
         CodeBlock *parent = Q_NULLPTR;
         QHash<QByteArray, ZSharedVariantPointer> identifiers;
@@ -157,16 +159,25 @@ public:
 
     inline void addIdentifier(const QByteArray &name)
     {
+        if(currentCodeBlock->identifiers.contains(name)) {
+            zWarning << "Symbol has been defined:" << name;
+
+            return;
+        }
+
         ZSharedVariantPointer val = currentCodeBlock->undefinedIdentifier.take(name);
 
         if(!val) {
-            val = new ZSharedVariant(constUndefined);
+            val = new ZSharedVariant();
         }
 
         currentCodeBlock->identifiers[name] = val;
     }
 
-    void beginCodeBlock();
+    inline CodeBlock *getCodeBlock() const
+    { return currentCodeBlock;}
+
+    void beginCodeBlock(CodeBlock::Type type = CodeBlock::Normal);
     void endCodeBlock();
 
     static ZCodeParse *currentCodeParse;
