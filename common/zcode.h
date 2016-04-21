@@ -122,10 +122,10 @@ public:
 
     ZSharedVariantPointer getIdentifierAddress(const QByteArray &name);
 
-    static ZSharedVariant *getConstantAddress(const QByteArray &value, ZVariant::Type type);
+    static ZSharedVariant *createConstant(const QByteArray &value, ZVariant::Type type);
 
-    static inline ZSharedVariant *getConstantAddressByValue(const ZVariant &value)
-    { return getConstantAddress(value.toString().toLatin1(), value.type());}
+    static inline ZSharedVariant *createConstantByValue(const ZVariant &value)
+    { return createConstant(value.toString().toLatin1(), value.type());}
 
     inline void appendCode(const ZCode::Action &action)
     { codeList << createCode(action, ZSharedVariantPointer());}
@@ -186,11 +186,11 @@ private:
     QMap<QByteArray, ZSharedVariant*> gotoLabelMap;
 
     static QHash<const QByteArray, ZSharedVariant*> globalIdentifierHash;
-    static QMap<QByteArray, ZSharedVariant*> stringConstantMap;
-    static QMap<QByteArray, ZSharedVariant*> numberConstantMap;
-    static ZSharedVariant constTrue;
-    static ZSharedVariant constFalse;
-    static ZSharedVariant constUndefined;
+    static QMap<QByteArray, ZVariant*> stringConstantMap;
+    static QMap<QByteArray, ZVariant*> numberConstantMap;
+    static ZVariant constTrue;
+    static ZVariant constFalse;
+    static ZVariant constUndefined;
 };
 
 Z_END_NAMESPACE

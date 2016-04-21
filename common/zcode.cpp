@@ -404,11 +404,11 @@ int ZCode::exec(const QList<ZCode *> &codeList)
 ZCodeParse *ZCodeParse::currentCodeParse = Q_NULLPTR;
 bool ZCodeParse::yywrap = true;
 QHash<const QByteArray, ZSharedVariant*> ZCodeParse::globalIdentifierHash;
-QMap<QByteArray, ZSharedVariant*> ZCodeParse::stringConstantMap;
-QMap<QByteArray, ZSharedVariant*> ZCodeParse::numberConstantMap;
-ZSharedVariant ZCodeParse::constTrue(true);
-ZSharedVariant ZCodeParse::constFalse(false);
-ZSharedVariant ZCodeParse::constUndefined(ZVariant::Undefined);
+QMap<QByteArray, ZVariant*> ZCodeParse::stringConstantMap;
+QMap<QByteArray, ZVariant*> ZCodeParse::numberConstantMap;
+ZVariant ZCodeParse::constTrue(true);
+ZVariant ZCodeParse::constFalse(false);
+ZVariant ZCodeParse::constUndefined;
 
 ZCodeParse::ZCodeParse()
 {
@@ -509,46 +509,46 @@ ZSharedVariantPointer ZCodeParse::getIdentifierAddress(const QByteArray &name)
     return val;
 }
 
-ZSharedVariant *ZCodeParse::getConstantAddress(const QByteArray &value, ZVariant::Type type)
+ZSharedVariant *ZCodeParse::createConstant(const QByteArray &value, ZVariant::Type type)
 {
     switch(type) {
     case ZVariant::Int: {
-        ZSharedVariant *val = numberConstantMap.value(value);
+        ZVariant *val = numberConstantMap.value(value);
 
         if(!val) {
-            val = new ZSharedVariant(value.toInt());
+            val = new ZVariant(value.toInt());
             numberConstantMap[value] = val;
         }
 
-        return val;
+        return new ZSharedVariant(*val);
     }
     case ZVariant::Double: {
-        ZSharedVariant *val = numberConstantMap.value(value);
+        ZVariant *val = numberConstantMap.value(value);
 
         if(!val) {
-            val = new ZSharedVariant(value.toDouble());
+            val = new ZVariant(value.toDouble());
             numberConstantMap[value] = val;
         }
 
-        return val;
+        return new ZSharedVariant(*val);
     }
     case ZVariant::String: {
-        ZSharedVariant *val = stringConstantMap.value(value);
+        ZVariant *val = stringConstantMap.value(value);
 
         if(!val) {
-            val = new ZSharedVariant(QString(value));
+            val = new ZVariant(QString(value));
             stringConstantMap[value] = val;
         }
 
-        return val;
+        return new ZSharedVariant(*val);
     }
     case ZVariant::Bool:
         if(value == "true")
-            return &constTrue;
+            return new ZSharedVariant(constTrue);
         else
-            return &constFalse;
+            return new ZSharedVariant(constFalse);
     default:
-        return &constUndefined;
+        return new ZSharedVariant(constUndefined);
     }
 }
 
