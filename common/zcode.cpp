@@ -12,7 +12,7 @@
 
 Z_BEGIN_NAMESPACE
 
-QStack<ZSharedVariant*> ZCode::virtualStack;
+QStack<ZVariant*> ZCode::virtualStack;
 
 QString ZCode::actionName(quint8 action)
 {
@@ -76,7 +76,7 @@ QString ZCode::actionName(quint8 action)
 
 int ZCode::exec(const QList<ZCode *> &codeList)
 {
-    QList<ZSharedVariant> temporaryList;
+    QList<ZVariant> temporaryList;
 
     temporaryList.reserve(10);
 
@@ -87,14 +87,14 @@ int ZCode::exec(const QList<ZCode *> &codeList)
 
         switch(code->action) {
         case LeftAssign: {
-            ZSharedVariant &right_val = *virtualStack.pop();
+            ZVariant *right_val = virtualStack.pop();
 
             *virtualStack.top() = right_val;
             break;
         }
         case RightAssign: {
-            ZSharedVariant &left_val = *virtualStack.pop();
-            ZSharedVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.pop();
+            ZVariant *right_val = virtualStack.pop();
 
             left_val = right_val;
             virtualStack.push(&left_val);
@@ -125,15 +125,15 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             virtualStack.push(&temporaryList.last());
             break;
         case And:
-            temporaryList << ZVariant(*virtualStack.pop() & *virtualStack.pop());
+            temporaryList << *virtualStack.pop() & *virtualStack.pop();
             virtualStack.push(&temporaryList.last());
             break;
         case Or:
-            temporaryList << ZVariant(*virtualStack.pop() | *virtualStack.pop());
+            temporaryList << *virtualStack.pop() | *virtualStack.pop();
             virtualStack.push(&temporaryList.last());
             break;
         case Xor:
-            temporaryList << ZVariant(*virtualStack.pop() ^ *virtualStack.pop());
+            temporaryList << *virtualStack.pop() ^ *virtualStack.pop();
             virtualStack.push(&temporaryList.last());
             break;
         case Contrary:
@@ -145,63 +145,63 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             virtualStack.push(&temporaryList.last());
             break;
         case Not:
-            temporaryList << ZSharedVariant(! *virtualStack.pop());
+            temporaryList << ! *virtualStack.pop();
             virtualStack.push(&temporaryList.last());
             break;
         case AddAssign: {
-            ZSharedVariant &right_val = *virtualStack.pop();
+            ZVariant &right_val = *virtualStack.pop();
 
             *virtualStack.top() += right_val;
             break;
         }
         case SubAssign: {
-            ZSharedVariant &right_val = *virtualStack.pop();
+            ZVariant &right_val = *virtualStack.pop();
 
             *virtualStack.top() -= right_val;
             break;
         }
         case MulAssign: {
-            ZSharedVariant &right_val = *virtualStack.pop();
+            ZVariant &right_val = *virtualStack.pop();
 
             *virtualStack.top() *= right_val;
             break;
         }
         case DivAssign: {
-            ZSharedVariant &right_val = *virtualStack.pop();
+            ZVariant &right_val = *virtualStack.pop();
 
             *virtualStack.top() /= right_val;
             break;
         }
         case AndAssign: {         // "&=";
-            ZSharedVariant &right_val = *virtualStack.pop();
+            ZVariant &right_val = *virtualStack.pop();
 
             *virtualStack.top() &= right_val;
             break;
         }
         case OrAssign: {          // "|=";
-            ZSharedVariant &right_val = *virtualStack.pop();
+            ZVariant &right_val = *virtualStack.pop();
 
             *virtualStack.top() |= right_val;
             break;
         }
         case XorAssign: {         // "^=";
-            ZSharedVariant &right_val = *virtualStack.pop();
+            ZVariant &right_val = *virtualStack.pop();
 
             *virtualStack.top() ^= right_val;
             break;
         }
         case ModAssign: {         // "%=";
-            ZSharedVariant &right_val = *virtualStack.pop();
+            ZVariant &right_val = *virtualStack.pop();
 
             *virtualStack.top() %= right_val;
             break;
         }
         case Less:
-            temporaryList << ZSharedVariant(*virtualStack.pop() < *virtualStack.pop());
+            temporaryList << (*virtualStack.pop() < *virtualStack.pop());
             virtualStack.push(&temporaryList.last());
             break;
         case Greater:
-            temporaryList << ZSharedVariant(*virtualStack.pop() > *virtualStack.pop());
+            temporaryList << (*virtualStack.pop() > *virtualStack.pop());
             virtualStack.push(&temporaryList.last());
             break;
         case New:
@@ -214,89 +214,89 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             /// TODO
             break;
         case EQ:
-            temporaryList << ZSharedVariant(*virtualStack.pop() == *virtualStack.pop());
+            temporaryList << (*virtualStack.pop() == *virtualStack.pop());
             virtualStack.push(&temporaryList.last());
             break;
         case STEQ: {
-            const ZSharedVariant &v1 = *virtualStack.pop();
-            const ZSharedVariant &v2 = *virtualStack.pop();
+            const ZVariant &v1 = *virtualStack.pop();
+            const ZVariant &v2 = *virtualStack.pop();
 
-            temporaryList << ZSharedVariant(v1.type() == v2.type() && v1 == v2);
+            temporaryList << (v1.type() == v2.type() && v1 == v2);
 
             virtualStack.push(&temporaryList.last());
             break;
         }
         case NEQ:
-            temporaryList << ZSharedVariant(*virtualStack.pop() != *virtualStack.pop());
+            temporaryList << (*virtualStack.pop() != *virtualStack.pop());
             virtualStack.push(&temporaryList.last());
             break;
         case STNEQ: {
-            const ZSharedVariant &v1 = *virtualStack.pop();
-            const ZSharedVariant &v2 = *virtualStack.pop();
+            const ZVariant &v1 = *virtualStack.pop();
+            const ZVariant &v2 = *virtualStack.pop();
 
-            temporaryList << ZSharedVariant(v1.type() != v2.type() || v1 != v2);
+            temporaryList << (v1.type() != v2.type() || v1 != v2);
             virtualStack.push(&temporaryList.last());
             break;
         }
         case LE:
-            temporaryList << ZSharedVariant(*virtualStack.pop() <= *virtualStack.pop());
+            temporaryList << (*virtualStack.pop() <= *virtualStack.pop());
             virtualStack.push(&temporaryList.last());
             break;
         case GE:
-            temporaryList << ZSharedVariant(*virtualStack.pop() >= *virtualStack.pop());
+            temporaryList << (*virtualStack.pop() >= *virtualStack.pop());
             virtualStack.push(&temporaryList.last());
             break;
         case LAnd:
-            temporaryList << ZSharedVariant(*virtualStack.pop() && *virtualStack.pop());
+            temporaryList << (*virtualStack.pop() && *virtualStack.pop());
             virtualStack.push(&temporaryList.last());
             break;
         case LOr:
-            temporaryList << ZSharedVariant(*virtualStack.pop() || *virtualStack.pop());
+            temporaryList << (*virtualStack.pop() || *virtualStack.pop());
             virtualStack.push(&temporaryList.last());
             break;
         case LAndAssign: {        // "&&=";
-            ZSharedVariant &right_val = *virtualStack.pop();
-            ZSharedVariant &left_val = *virtualStack.top();
+            ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.top();
 
             left_val = left_val && right_val;
             break;
         }
         case LOrAssign: {         // "||=";
-            ZSharedVariant &right_val = *virtualStack.pop();
-            ZSharedVariant &left_val = *virtualStack.top();
+            ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.top();
 
             left_val = left_val || right_val;
             break;
         }
         case PrefixAddSelf: {     // "++(prefix)";
-            ZSharedVariant &left_val = *virtualStack.top();
+            ZVariant &left_val = *virtualStack.top();
 
             left_val = 1 + left_val;
             break;
         }
         case PostfixAddSelf: {   // "++(postfix)";
-            ZSharedVariant &left_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.pop();
             temporaryList << left_val;
             virtualStack.push(&temporaryList.last());
             left_val = 1 + left_val;
             break;
         }
         case PrefixSubSelf: {     // "--(prefix)";
-            ZSharedVariant &left_val = *virtualStack.top();
+            ZVariant &left_val = *virtualStack.top();
 
             left_val = -1 + left_val;
             break;
         }
         case PostfixSubSelf: {   // "--(postfix)";
-            ZSharedVariant &left_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.pop();
             temporaryList << left_val;
             virtualStack.push(&temporaryList.last());
             left_val = -1 + left_val;
             break;
         }
         case Get: {
-            ZSharedVariant &right_val = *virtualStack.pop();
-            ZSharedVariant &left_val = *virtualStack.pop();
+            ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.pop();
             ZObject *obj = left_val.toObject();
 
             temporaryList << obj->property(right_val.toString().toLatin1().constData());
@@ -319,7 +319,7 @@ int ZCode::exec(const QList<ZCode *> &codeList)
                 group.insert(0, virtualStack.pop());
             }
 
-            temporaryList << ZSharedVariant(group);
+            temporaryList << std::move(group);
 
             virtualStack.push(&temporaryList.last());
             break;
@@ -352,7 +352,7 @@ int ZCode::exec(const QList<ZCode *> &codeList)
                     group << &temporaryList.last();
                 }
 
-                temporaryList << ZSharedVariant(group);
+                temporaryList << group;
 
                 virtualStack.push(&temporaryList.last());
             }
@@ -362,7 +362,7 @@ int ZCode::exec(const QList<ZCode *> &codeList)
         }
         case Push: {
             ValueCode *valueCode = static_cast<ValueCode*>(code);
-            virtualStack.push(valueCode->value->data());
+            virtualStack.push(valueCode->value.data());
             break;
         }
         case Pop: {
@@ -375,12 +375,12 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             break;
         }
         case Goto: {
-            i = static_cast<ValueCode*>(code)->value->data()->toInt() - 1;
+            i = static_cast<ValueCode*>(code)->value->toInt() - 1;
             break;
         }
         case If: {
             if(!virtualStack.pop()->toBool())
-                i = static_cast<ValueCode*>(code)->value->data()->toInt() - 1;
+                i = static_cast<ValueCode*>(code)->value->toInt() - 1;
 
             break;
         }
@@ -490,9 +490,9 @@ int ZCodeParse::eval(const QByteArray &code, bool *ok)
     return -1;
 }
 
-ZSharedVariantPointer *ZCodeParse::getIdentifierAddress(const QByteArray &name)
+ZSharedVariantPointer ZCodeParse::getIdentifierAddress(const QByteArray &name)
 {
-    ZSharedVariantPointer *val = currentCodeBlock->identifiers.value(name);
+    ZSharedVariantPointer val = currentCodeBlock->identifiers.value(name);
 
     if(val)
         return val;
@@ -502,7 +502,7 @@ ZSharedVariantPointer *ZCodeParse::getIdentifierAddress(const QByteArray &name)
     if(val)
         return val;
 
-    val = new ZSharedVariantPointer(&constUndefined);
+    val = new ZSharedVariant(constUndefined);
 
     currentCodeBlock->undefinedIdentifier[name] = val;
 
@@ -552,7 +552,7 @@ ZSharedVariant *ZCodeParse::getConstantAddress(const QByteArray &value, ZVariant
     }
 }
 
-ZCode *ZCodeParse::createCode(const ZCode::Action &action, ZSharedVariantPointer *val)
+ZCode *ZCodeParse::createCode(const ZCode::Action &action, const ZSharedVariantPointer &val)
 {
     if(val) {
         ValueCode *code = new ValueCode;
@@ -583,27 +583,26 @@ void ZCodeParse::beginCodeBlock()
 
 void ZCodeParse::endCodeBlock()
 {
-    for(ZSharedVariantPointer *val_pointer : currentCodeBlock->undefinedIdentifier) {
+    for(ZSharedVariantPointer &val_pointer : currentCodeBlock->undefinedIdentifier) {
         const QByteArray &name = currentCodeBlock->undefinedIdentifier.key(val_pointer);
         CodeBlock *block = currentCodeBlock->parent;
-        ZSharedVariantPointer *val;
 
         while(block) {
-            val = block->identifiers.value(name);
+            ZSharedVariantPointer val = block->identifiers.value(name);
 
             if(val) {
-                *val_pointer = val->data();
+                val_pointer->depthCopyAssign(*val.constData());
                 break;
             }
 
             block = block->parent;
         }
 
-        if(!val) {
+        if(!block) {
             ZSharedVariant *val = globalIdentifierHash.value(name);
 
             if(val) {
-                *val_pointer = val;
+                val_pointer->depthCopyAssign(*val);
             } else {
                 zError << "undefined reference:" << name;
             }

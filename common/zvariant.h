@@ -57,6 +57,19 @@ public:
     ZObject *toObject() const;
     QVariant toQVariant() const;
 
+    inline void depthCopyAssign(const ZVariant &other)
+    {
+        data->variant = other.data->variant;
+        data->type = other.data->type;
+    }
+
+    inline void depthCopyAssign(ZVariant &&other)
+    {
+        qSwap(data->variant, other.data->variant);
+
+        data->type = other.data->type;
+    }
+
     inline ZVariant& operator=(const ZVariant &other)
     {
         if(type() == Tuple) {
@@ -101,6 +114,8 @@ public:
 
         return *this;
     }
+    inline ZVariant& operator=(const ZVariant *other)
+    { depthCopyAssign(*other); return *this;}
     inline bool operator==(const ZVariant &v) const
     { return data->variant == v.data->variant; }
     inline bool operator!=(const ZVariant &v) const
@@ -156,6 +171,8 @@ private:
     };
 
     QSharedDataPointer<VariantData> data;
+
+    friend class ZCode;
 };
 
 QT_BEGIN_NAMESPACE

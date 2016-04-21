@@ -964,7 +964,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() + *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value + *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -985,7 +985,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() - *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value - *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1006,7 +1006,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() * *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value * *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1027,7 +1027,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() / *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value / *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1048,7 +1048,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() & *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value & *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1069,7 +1069,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() | *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value | *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1090,7 +1090,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() ^ *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value ^ *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1111,7 +1111,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() % *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value % *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1132,7 +1132,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() == *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value == *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1153,7 +1153,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() != *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value != *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1174,8 +1174,8 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(pre_code->value->data()->type() == last_code->value->data()->type()
-                                                                     && *pre_code->value->data() == *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(pre_code->value->type() == last_code->value->type()
+                                                                     && *pre_code->value == *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1196,8 +1196,8 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(pre_code->value->data()->type() == last_code->value->data()->type()
-                                                                     && *pre_code->value->data() != *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(pre_code->value->type() == last_code->value->type()
+                                                                     && *pre_code->value != *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1218,7 +1218,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() <= *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value <= *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1239,7 +1239,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() >= *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value >= *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1260,7 +1260,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() && *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value && *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1281,7 +1281,7 @@ namespace yy {
                         ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value->data() || *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(*pre_code->value || *last_code->value);
 
                         delete pre_code;
                     } else {
@@ -1301,7 +1301,7 @@ namespace yy {
 
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(~ *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(~ *last_code->value);
                     } else {
                         (yylhs.value.valueType) = ValueType::Variant;
 
@@ -1319,7 +1319,7 @@ namespace yy {
 
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(! *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(! *last_code->value);
                     } else {
                         (yylhs.value.valueType) = ValueType::Variant;
 
@@ -1337,7 +1337,7 @@ namespace yy {
 
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(- *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(- *last_code->value);
                     } else {
                         (yylhs.value.valueType) = ValueType::Variant;
 
@@ -1355,7 +1355,7 @@ namespace yy {
 
                         ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::getConstantAddressByValue(+ *last_code->value->data());
+                        *last_code->value = ZCodeParse::getConstantAddressByValue(+ *last_code->value);
                     } else {
                         (yylhs.value.valueType) = ValueType::Variant;
 
@@ -1444,7 +1444,7 @@ namespace yy {
 #line 613 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeParse::currentCodeParse->appendCode(ZCode::If, ZCodeParse::currentCodeParse->getConstantAddress("", ZVariant::Undefined));
-                (yystack_[0].value.value) = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
+                (yystack_[0].value.value) = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
             }
 #line 1450 "zScript.tab.cpp" // lalr1.cc:859
     break;
@@ -1470,7 +1470,7 @@ namespace yy {
 
                 *(yystack_[0].value.value) = ZCodeParse::getConstantAddress(QByteArray::number(index), ZVariant::Int);
 
-                (yystack_[0].value.value) = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
+                (yystack_[0].value.value) = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
             }
 #line 1476 "zScript.tab.cpp" // lalr1.cc:859
     break;

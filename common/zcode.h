@@ -13,7 +13,7 @@ class parser;
 
 typedef yyFlexLexer YYFlexLexer;
 typedef yy::parser  YYParser;
-typedef QSharedDataPointer<ZSharedVariant> ZSharedVariantPointer;
+typedef QExplicitlySharedDataPointer<ZSharedVariant> ZSharedVariantPointer;
 
 Z_BEGIN_NAMESPACE
 
@@ -81,12 +81,12 @@ struct ZCode
 
     quint8 action = Unknow;
 
-    static QStack<ZSharedVariant*> virtualStack;
+    static QStack<ZVariant*> virtualStack;
 };
 
 struct ValueCode : public ZCode
 {
-    ZSharedVariantPointer *value = Q_NULLPTR;
+    ZSharedVariantPointer value;
 };
 
 class ZCodeParse
@@ -105,8 +105,8 @@ public:
 
         quint8 type = Normal;
         CodeBlock *parent = Q_NULLPTR;
-        QHash<QByteArray, ZSharedVariantPointer*> identifiers;
-        QMap<QByteArray, ZSharedVariantPointer*> undefinedIdentifier;
+        QHash<QByteArray, ZSharedVariantPointer> identifiers;
+        QMap<QByteArray, ZSharedVariantPointer> undefinedIdentifier;
     };
 
     inline static void registerIdentifier(const QByteArray &name, ZSharedVariant *variant)
@@ -120,7 +120,7 @@ public:
     inline int exec()
     { return ZCode::exec(codeList);}
 
-    ZSharedVariantPointer *getIdentifierAddress(const QByteArray &name);
+    ZSharedVariantPointer getIdentifierAddress(const QByteArray &name);
 
     static ZSharedVariant *getConstantAddress(const QByteArray &value, ZVariant::Type type);
 
@@ -128,12 +128,12 @@ public:
     { return getConstantAddress(value.toString().toLatin1(), value.type());}
 
     inline void appendCode(const ZCode::Action &action)
-    { codeList << createCode(action, Q_NULLPTR);}
+    { codeList << createCode(action, ZSharedVariantPointer());}
 
     inline void appendCode(const ZCode::Action &action, ZSharedVariant *val)
-    { codeList << createCode(action, new ZSharedVariantPointer(val));}
+    { codeList << createCode(action, ZSharedVariantPointer(val));}
 
-    inline void appendCode(const ZCode::Action &action, ZSharedVariantPointer *val)
+    inline void appendCode(const ZCode::Action &action, const ZSharedVariantPointer &val)
     { codeList << createCode(action, val);}
 
     inline ZSharedVariant *getGotoLabel(const QByteArray &name)
@@ -157,10 +157,10 @@ public:
 
     inline void addIdentifier(const QByteArray &name)
     {
-        ZSharedVariantPointer *val = currentCodeBlock->undefinedIdentifier.take(name);
+        ZSharedVariantPointer val = currentCodeBlock->undefinedIdentifier.take(name);
 
         if(!val) {
-            val = new ZSharedVariantPointer(&constUndefined);
+            val = new ZSharedVariant(constUndefined);
         }
 
         currentCodeBlock->identifiers[name] = val;
@@ -173,7 +173,7 @@ public:
     static bool yywrap;
 
 private:
-    ZCode *createCode(const ZCode::Action &action, ZSharedVariantPointer *val = Q_NULLPTR);
+    ZCode *createCode(const ZCode::Action &action, const ZSharedVariantPointer &val);
 
     YYFlexLexer *m_yyFlexLexer = Q_NULLPTR;
     YYParser *m_yyParser = Q_NULLPTR;
