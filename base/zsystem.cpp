@@ -12,7 +12,11 @@ void ZSystem::eval(QList<ZVariant> &retVals, const QList<ZVariant> &args)
     if(args.isEmpty())
         return;
 
-    ZCodeParse parse;
+    ZCodeExecuter *executer = ZCodeExecuter::beginCodeExecuter();
 
-    retVals << parse.eval(args.first().toString().toLocal8Bit());
+    retVals << executer->eval(args.first().toString().toLocal8Bit());
+
+    executer->endCodeExecuter();
+
+    delete executer;
 }

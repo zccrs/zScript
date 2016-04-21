@@ -89,11 +89,10 @@ struct ValueCode : public ZCode
     ZSharedVariantPointer value;
 };
 
-class ZCodeParse
+class ZCodeExecuter
 {
 public:
-    ZCodeParse();
-    ~ZCodeParse();
+    ~ZCodeExecuter();
 
     struct CodeBlock{
         enum Type {
@@ -143,7 +142,7 @@ public:
         ZSharedVariant *val = gotoLabelMap.value(name);
 
         if(!val) {
-            val = new ZSharedVariant(constUndefined);
+            val = new ZSharedVariant();
 
             gotoLabelMap[name] = val;
         }
@@ -154,10 +153,18 @@ public:
     inline QList<ZCode*> &getCodeList()
     { return codeList;}
 
-    inline YYFlexLexer *yyFlexLexer() const
-    { return m_yyFlexLexer;}
-
     inline void addIdentifier(const QByteArray &name)
+    {
+        ZSharedVariantPointer val = currentCodeBlock->undefinedIdentifier.take(name);
+
+        if(!val) {
+            val = new ZSharedVariant();
+        }
+
+        addIdentifier(name, val);
+    }
+
+    inline void addIdentifier(const QByteArray &name, const ZSharedVariantPointer &val)
     {
         if(currentCodeBlock->identifiers.contains(name)) {
             zWarning << "Symbol has been defined:" << name;
@@ -165,14 +172,10 @@ public:
             return;
         }
 
-        ZSharedVariantPointer val = currentCodeBlock->undefinedIdentifier.take(name);
-
-        if(!val) {
-            val = new ZSharedVariant();
-        }
-
         currentCodeBlock->identifiers[name] = val;
     }
+
+    static ZSharedVariantPointer createFunction(const ZCodeExecuter *executer);
 
     inline CodeBlock *getCodeBlock() const
     { return currentCodeBlock;}
@@ -180,16 +183,20 @@ public:
     void beginCodeBlock(CodeBlock::Type type = CodeBlock::Normal);
     void endCodeBlock();
 
-    static ZCodeParse *currentCodeParse;
+    static ZCodeExecuter *beginCodeExecuter();
+    static ZCodeExecuter *endCodeExecuter();
+
+    static ZCodeExecuter *currentCodeExecuter;
+    static YYFlexLexer *yyFlexLexer;
     static bool yywrap;
 
 private:
+    ZCodeExecuter();
+
     ZCode *createCode(const ZCode::Action &action, const ZSharedVariantPointer &val);
 
-    YYFlexLexer *m_yyFlexLexer = Q_NULLPTR;
-    YYParser *m_yyParser = Q_NULLPTR;
 
-    ZCodeParse *parent = Q_NULLPTR;
+    ZCodeExecuter *parent = Q_NULLPTR;
 
     QList<ZCode*> codeList;
     CodeBlock *currentCodeBlock = Q_NULLPTR;

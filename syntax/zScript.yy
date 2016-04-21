@@ -70,24 +70,24 @@ Z_USE_NAMESPACE
 start:      | start code | start '\n'
 
 code:       GOTO IDENTIFIER ends {
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Goto, ZCodeParse::currentCodeParse->getGotoLabel(*$2));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->getGotoLabel(*$2));
 
                 delete $2;
             }
             | conditional {
-                if(ZCodeParse::currentCodeParse->getCodeList().count() > 1
-                        && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
-                    ZCodeParse::currentCodeParse->appendCode(ZCode::PopAll);
+                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
+                        && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
             }
             | goto_label {
-                if(ZCodeParse::currentCodeParse->getCodeList().count() > 1
-                        && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
-                    ZCodeParse::currentCodeParse->appendCode(ZCode::PopAll);
+                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
+                        && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
             }
             | expression ends {
-                if(ZCodeParse::currentCodeParse->getCodeList().count() > 1
-                        && ZCodeParse::currentCodeParse->getCodeList().last()->action != ZCode::PopAll)
-                    ZCodeParse::currentCodeParse->appendCode(ZCode::PopAll);
+                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
+                        && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
             }
             | ';'
             | '{' start '}'
@@ -96,7 +96,7 @@ code:       GOTO IDENTIFIER ends {
 ends:       ';'|'\n'
 
 goto_label: IDENTIFIER ':' {
-                *ZCodeParse::currentCodeParse->getGotoLabel(*$1) = ZCodeParse::currentCodeParse->getCodeList().count();
+                *ZCodeExecuter::currentCodeExecuter->getGotoLabel(*$1) = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 
                 delete $1;
             }
@@ -109,15 +109,27 @@ goto_label: IDENTIFIER ':' {
 //            }
 //            ;
 
+function:   FUNCTION '(' {
+                ZCodeExecuter::beginCodeExecuter()->beginCodeBlock();
+            } parameter ')' '{' start '}' %prec PROMOTION {
+                ZCodeExecuter::currentCodeExecuter->endCodeBlock();
+                ZCodeExecuter *executer = ZCodeExecuter::endCodeExecuter();
+
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createFunction(executer));
+            }
+            ;
+
+parameter:  |define
+
 define:     IDENTIFIER {
-                ZCodeParse::currentCodeParse->addIdentifier(*$1);
+                ZCodeExecuter::currentCodeExecuter->addIdentifier(*$1);
 
                 delete $1;
             }
             | IDENTIFIER '=' expression {
-                ZCodeParse::currentCodeParse->addIdentifier(*$1);
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::currentCodeParse->getIdentifierAddress(*$1));
-                ZCodeParse::currentCodeParse->appendCode(ZCode::RightAssign);
+                ZCodeExecuter::currentCodeExecuter->addIdentifier(*$1);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifierAddress(*$1));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::RightAssign);
 
                 delete $1;
             }
@@ -138,20 +150,20 @@ tuple_exp:  expression ',' expression {$$ = 2;}
 
 expression: lvalue | rvalue %prec PROMOTION;
 
-lvalue:     IDENTIFIER {
+lvalue:     VAR define {
+                $$ = ValueType::Variant;
+            }
+            | IDENTIFIER {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::currentCodeParse->getIdentifierAddress(*$1));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifierAddress(*$1));
 
                 delete $1;
-            }
-            | VAR define {
-                $$ = ValueType::Variant;
             }
             | lvalue '=' expression {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::LeftAssign);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LeftAssign);
             }
             | expression '[' expression ']' {
                 $$ = ValueType::Variant;
@@ -160,107 +172,107 @@ lvalue:     IDENTIFIER {
             | expression '.' IDENTIFIER {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::createConstant(*$3, ZVariant::String));
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Get);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(*$3, ZVariant::String));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Get);
             }
             | lvalue ADDASSIGN expression {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::AddAssign);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::AddAssign);
             }
             | lvalue SUBASSIGN expression {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::SubAssign);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::SubAssign);
             }
             | lvalue MULASSIGN expression {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::MulAssign);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::MulAssign);
             }
             | lvalue DIVASSIGN expression {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::DivAssign);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::DivAssign);
             }
             | lvalue ANDASSIGN expression {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::AndAssign);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::AndAssign);
             }
             | lvalue ORASSIGN expression {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::OrAssign);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::OrAssign);
             }
             | lvalue XORASSIGN expression {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::XorAssign);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::XorAssign);
             }
             | lvalue MODASSIGN expression {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::ModAssign);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::ModAssign);
             }
             | lvalue LORASSIGN expression {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::LOrAssign);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LOrAssign);
             }
             | lvalue LANDASSIGN expression {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::LAndAssign);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LAndAssign);
             }
             | ADDSELF lvalue {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::PrefixAddSelf);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PrefixAddSelf);
             }
             | SUBSELF lvalue {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::PrefixSubSelf);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PrefixSubSelf);
             }
             | tuple_lval {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::createConstant(QByteArray::number($1), ZVariant::Int));
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Join);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($1), ZVariant::Int));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
             }
             ;
 
 rvalue:     UNDEFINED {
                 $$ = ValueType::Constant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::createConstant(QByteArray(), ZVariant::Null));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray(), ZVariant::Null));
             }
             | INT {
                 $$ = ValueType::Constant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::createConstant(*$1, ZVariant::Int));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(*$1, ZVariant::Int));
 
                 delete $1;
             }
             | STRING {
                 $$ = ValueType::Constant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::createConstant(*$1, ZVariant::String));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(*$1, ZVariant::String));
 
                 delete $1;
             }
             | DOUBLE {
                 $$ = ValueType::Constant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::createConstant(*$1, ZVariant::Double));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(*$1, ZVariant::Double));
 
                 delete $1;
             }
             | BOOL {
                 $$ = ValueType::Constant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::createConstant(*$1, ZVariant::Bool));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(*$1, ZVariant::Bool));
 
                 delete $1;
             }
@@ -271,367 +283,370 @@ rvalue:     UNDEFINED {
             | expression '(' arguments ')' {
                     $$ = ValueType::Variant;
 
-                    ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::createConstant(QByteArray::number($3), ZVariant::Int));
-                    ZCodeParse::currentCodeParse->appendCode(ZCode::Call);
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($3), ZVariant::Int));
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Call);
             }
             | expression '+' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value + *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value + *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::Add);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Add);
                     }
             }
             | expression '-' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value - *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value - *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::Sub);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Sub);
                     }
             }
             | expression '*' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value * *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value * *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::Mul);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Mul);
                     }
             }
             | expression '/' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value / *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value / *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::Div);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Div);
                     }
             }
             | expression '&' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value & *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value & *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::And);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::And);
                     }
             }
             | expression '|' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value | *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value | *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::Or);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Or);
                     }
             }
             | expression '^' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value ^ *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value ^ *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::Xor);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Xor);
                     }
             }
             | expression '%' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value % *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value % *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::Mod);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Mod);
                     }
             }
             | expression '>' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value > *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value > *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::Greater);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Greater);
                     }
             }
             | expression '<' expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value < *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value < *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::Less);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Less);
                     }
             }
             | expression EQ expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value == *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value == *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::EQ);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::EQ);
                     }
             }
             | expression NEQ expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value != *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value != *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::NEQ);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::NEQ);
                     }
             }
             | expression STEQ expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(pre_code->value->type() == last_code->value->type()
+                        *last_code->value = ZCodeExecuter::createConstantByValue(pre_code->value->type() == last_code->value->type()
                                                                      && *pre_code->value == *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::STEQ);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::STEQ);
                     }
             }
             | expression STNEQ expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(pre_code->value->type() == last_code->value->type()
+                        *last_code->value = ZCodeExecuter::createConstantByValue(pre_code->value->type() == last_code->value->type()
                                                                      && *pre_code->value != *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::STNEQ);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::STNEQ);
                     }
             }
             | expression LE expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value <= *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value <= *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::LE);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LE);
                     }
             }
             | expression GE expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value >= *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value >= *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::GE);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::GE);
                     }
             }
             | expression LAND expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value && *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value && *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::LAnd);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LAnd);
                     }
             }
             | expression LOR expression {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(*pre_code->value || *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value || *last_code->value);
 
                         delete pre_code;
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::LOr);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LOr);
                     }
             }
             | '~' expression {
                     if($2 == ValueType::Constant) {
                         $$ = $2;
 
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(~ *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(~ *last_code->value);
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::Contrary);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Contrary);
                     }
                 }
             | '!' expression {
                     if($2 == ValueType::Constant) {
                         $$ = $2;
 
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(! *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(! *last_code->value);
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::Not);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Not);
                     }
                 }
             | '-' expression %prec UMINUS {
                     if($2 == ValueType::Constant) {
                         $$ = $2;
 
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(- *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(- *last_code->value);
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::Minus);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Minus);
                     }
                 }
             | '+' expression %prec UMINUS {
                     if($2 == ValueType::Constant) {
                         $$ = $2;
 
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last());
+                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
 
-                        *last_code->value = ZCodeParse::createConstantByValue(+ *last_code->value);
+                        *last_code->value = ZCodeExecuter::createConstantByValue(+ *last_code->value);
                     } else {
                         $$ = ValueType::Variant;
 
-                        ZCodeParse::currentCodeParse->appendCode(ZCode::Abs);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Abs);
                     }
                 }
             | '(' expression ')' { $$ = $2;}
             | lvalue ADDSELF {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::PostfixAddSelf);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PostfixAddSelf);
             }
             | lvalue SUBSELF {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::PostfixSubSelf);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PostfixSubSelf);
             }
             | tuple_exp {
                 $$ = ValueType::Variant;
 
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Push, ZCodeParse::createConstant(QByteArray::number($1), ZVariant::Int));
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Join);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($1), ZVariant::Int));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
+            }
+            | function {
+                $$ = ValueType::Variant;
             }
             ;
 
@@ -644,48 +659,48 @@ arguments:  {$$ = 0;}
 branch_head:IF '(' expression ')' {
                 $$ = Q_NULLPTR;
 
-                ZCodeParse::currentCodeParse->beginCodeBlock(ZCodeParse::CodeBlock::If);
-                ZCodeParse::currentCodeParse->appendCode(ZCode::If, ZCodeParse::currentCodeParse->createConstant("", ZVariant::Undefined));
+                ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::If);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
-                $$ = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
+                $$ = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last())->value;
             }
             | WHILE {
-                ZCodeParse::currentCodeParse->beginCodeBlock(ZCodeParse::CodeBlock::While);
+                ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::While);
             } '(' expression ')' {
-                ZCodeParse::currentCodeParse->appendCode(ZCode::If, ZCodeParse::currentCodeParse->createConstant("", ZVariant::Undefined));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
-                $$ = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
+                $$ = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last())->value;
             }
             | FOR '(' expression ends {
-                ZCodeParse::currentCodeParse->beginCodeBlock(ZCodeParse::CodeBlock::While);
+                ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::While);
             } expression ends {
-                ZCodeParse::currentCodeParse->appendCode(ZCode::If, ZCodeParse::currentCodeParse->createConstant("", ZVariant::Undefined));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
-                forCycieBeginCodeIndex = ZCodeParse::currentCodeParse->getCodeList().count() - 1;
+                forCycieBeginCodeIndex = ZCodeExecuter::currentCodeExecuter->getCodeList().count() - 1;
             } expression ')' {
-                $$ = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().value(forCycieBeginCodeIndex))->value;
+                $$ = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().value(forCycieBeginCodeIndex))->value;
             }
             | FOR '(' lvalue ':' expression ')' {
                 $$ = Q_NULLPTR;
 
-                ZCodeParse::currentCodeParse->beginCodeBlock(ZCodeParse::CodeBlock::While);
+                ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::While);
             }
             | branch_head '\n'
             ;
 
 branch_body :branch_head code {
-                if(ZCodeParse::currentCodeParse->getCodeBlock()->type == ZCodeParse::CodeBlock::While) {
-                    int index = ZCodeParse::currentCodeParse->getCodeBlock()->beginCodeIndex;
+                if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->type == ZCodeExecuter::CodeBlock::While) {
+                    int index = ZCodeExecuter::currentCodeExecuter->getCodeBlock()->beginCodeIndex;
 
-                    ZCodeParse::currentCodeParse->appendCode(ZCode::Goto, ZCodeParse::currentCodeParse->createConstant(QByteArray::number(index), ZVariant::Int));
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstant(QByteArray::number(index), ZVariant::Int));
                 }
 
-                int index = ZCodeParse::currentCodeParse->getCodeList().count();
+                int index = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 
-                *$1 = ZCodeParse::createConstant(QByteArray::number(index), ZVariant::Int);
+                *$1 = ZCodeExecuter::createConstant(QByteArray::number(index), ZVariant::Int);
                 $$ = $1;
 
-                ZCodeParse::currentCodeParse->endCodeBlock();
+                ZCodeExecuter::currentCodeExecuter->endCodeBlock();
             }
             | branch_body '\n'
             ;
@@ -693,17 +708,17 @@ branch_else : branch_body ELSE | branch_else '\n'
 
 conditional:branch_body
             | branch_else {
-                ZCodeParse::currentCodeParse->appendCode(ZCode::Action::Goto,
-                                             ZCodeParse::createConstant("", ZVariant::Undefined));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Action::Goto,
+                                             ZCodeExecuter::createConstant("", ZVariant::Undefined));
 
-                int index = ZCodeParse::currentCodeParse->getCodeList().count();
+                int index = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 
-                *$1 = ZCodeParse::createConstant(QByteArray::number(index), ZVariant::Int);
+                *$1 = ZCodeExecuter::createConstant(QByteArray::number(index), ZVariant::Int);
 
-                $1 = &static_cast<ValueCode*>(ZCodeParse::currentCodeParse->getCodeList().last())->value;
+                $1 = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last())->value;
             } code {
-                 int index = ZCodeParse::currentCodeParse->getCodeList().count();
-                *$1 = ZCodeParse::createConstant(QByteArray::number(index), ZVariant::Int);
+                 int index = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
+                *$1 = ZCodeExecuter::createConstant(QByteArray::number(index), ZVariant::Int);
             }
 %%
 
@@ -717,8 +732,8 @@ void yy::parser::error(const location_type& loc, const std::string& msg)
 
 int yyFlexLexer::yywrap()
 {
-    if(!ZCodeParse::yywrap) {
-        ZCodeParse::yywrap = true;
+    if(!ZCodeExecuter::yywrap) {
+        ZCodeExecuter::yywrap = true;
 
         return 0;
     }
@@ -733,5 +748,5 @@ int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)
     yylval = lval;
     yyloc = location;
 
-    return ZCodeParse::currentCodeParse->yyFlexLexer()->yylex();
+    return ZCodeExecuter::yyFlexLexer->yylex();
 }

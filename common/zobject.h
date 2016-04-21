@@ -17,10 +17,12 @@ class ZObject : public QObject
 public:
     explicit ZObject(ZObject *parent = 0);
 
-    ZVariant property(const char *name) const;
+    inline ZVariant property(const char *name) const
+    { return ZVariant(QObject::property(name));}
 
 public slots:
-    void setProperty(const char *name, const ZVariant &value);
+    void setProperty(const char *name, const ZVariant &value)
+    { QObject::setProperty(name, value.toQVariant());}
 };
 
 class ZFunction : public ZObject
@@ -28,15 +30,17 @@ class ZFunction : public ZObject
     Q_OBJECT
 
 public:
+    inline explicit ZFunction(ZObject *parent = 0)
+        : ZObject(parent){}
+
     template<typename T, typename Fun>
-    explicit ZFunction(T target, Fun method, ZObject *parent)
+    inline explicit ZFunction(T target, Fun method, ZObject *parent)
         : ZObject(parent)
     {
         connect(this, &ZFunction::callFun, target, method, Qt::DirectConnection);
     }
 
-public slots:
-    QList<ZVariant> call(const QList<ZVariant> &args) const;
+    virtual QList<ZVariant> call(const QList<ZVariant> &args) const;
 
 signals:
     void callFun(QList<ZVariant> &retVals, const QList<ZVariant> &args) const;

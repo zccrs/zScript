@@ -400,53 +400,64 @@ int ZCode::exec(const QList<ZCode *> &codeList)
     return 0;
 }
 
-
-ZCodeParse *ZCodeParse::currentCodeParse = Q_NULLPTR;
-bool ZCodeParse::yywrap = true;
-QHash<const QByteArray, ZSharedVariant*> ZCodeParse::globalIdentifierHash;
-QMap<QByteArray, ZVariant*> ZCodeParse::stringConstantMap;
-QMap<QByteArray, ZVariant*> ZCodeParse::numberConstantMap;
-ZVariant ZCodeParse::constTrue(true);
-ZVariant ZCodeParse::constFalse(false);
-ZVariant ZCodeParse::constUndefined;
-
-ZCodeParse::ZCodeParse()
+class ZUserFunction : public ZFunction
 {
-    parent = currentCodeParse;
+public:
+    explicit ZUserFunction(const QList<ZCode*> &codes, ZObject *parent = 0)
+        : ZFunction(parent), codeList(codes){}
 
-    currentCodeParse = this;
+    QList<ZVariant> call(const QList<ZVariant> &args) const Q_DECL_OVERRIDE
+    {
+        Q_UNUSED(args);
+
+        ZCode::exec(codeList);
+
+        return QList<ZVariant>();
+    }
+
+private:
+    QList<ZCode*> codeList;
+};
+
+ZCodeExecuter *ZCodeExecuter::currentCodeExecuter = Q_NULLPTR;
+YYFlexLexer *ZCodeExecuter::yyFlexLexer = Q_NULLPTR;
+bool ZCodeExecuter::yywrap = true;
+QHash<const QByteArray, ZSharedVariant*> ZCodeExecuter::globalIdentifierHash;
+QMap<QByteArray, ZVariant*> ZCodeExecuter::stringConstantMap;
+QMap<QByteArray, ZVariant*> ZCodeExecuter::numberConstantMap;
+ZVariant ZCodeExecuter::constTrue(true);
+ZVariant ZCodeExecuter::constFalse(false);
+ZVariant ZCodeExecuter::constUndefined;
+
+ZCodeExecuter::ZCodeExecuter()
+{
+
 }
 
-ZCodeParse::~ZCodeParse()
+ZCodeExecuter::~ZCodeExecuter()
 {
-    currentCodeParse = Q_NULLPTR;
-
     qDeleteAll(codeBlockList);
     qDeleteAll(codeList);
     qDeleteAll(gotoLabelMap);
-
-    currentCodeParse = parent;
 }
 
-int ZCodeParse::eval()
+int ZCodeExecuter::eval()
 {
-    m_yyFlexLexer = new YYFlexLexer();
-
-    if(parent) {
-        m_yyFlexLexer = parent->m_yyFlexLexer;
-        m_yyParser = parent->m_yyParser;
-
-        yywrap = false;
-    } else {
-        m_yyFlexLexer = new YYFlexLexer;
-        m_yyParser = new YYParser;
-
-        m_yyParser->set_debug_level(QByteArray(getenv("DEBUG_PARSE_LEVEL")).toInt());
-    }
-
     beginCodeBlock();
 
-    m_yyParser->parse();
+    YYFlexLexer *yyFlexLexer = new YYFlexLexer;
+    YYParser *yyParser = new YYParser;
+
+    yyParser->set_debug_level(QByteArray(getenv("DEBUG_PARSE_LEVEL")).toInt());
+
+    this->yyFlexLexer = yyFlexLexer;
+
+    yyParser->parse();
+
+    this->yyFlexLexer = Q_NULLPTR;
+
+    delete yyFlexLexer;
+    delete yyParser;
 
     endCodeBlock();
 
@@ -456,15 +467,10 @@ int ZCodeParse::eval()
 
     int result = exec();
 
-    if(!parent) {
-        delete m_yyFlexLexer;
-        delete m_yyParser;
-    }
-
     return result;
 }
 
-int ZCodeParse::eval(const char *fileName, bool *ok)
+int ZCodeExecuter::eval(const char *fileName, bool *ok)
 {
     FILE *fd = freopen(fileName, "r", stdin);
 
@@ -474,7 +480,7 @@ int ZCodeParse::eval(const char *fileName, bool *ok)
     return eval();
 }
 
-int ZCodeParse::eval(const QByteArray &code, bool *ok)
+int ZCodeExecuter::eval(const QByteArray &code, bool *ok)
 {
     QTemporaryFile file;
 
@@ -490,7 +496,7 @@ int ZCodeParse::eval(const QByteArray &code, bool *ok)
     return -1;
 }
 
-ZSharedVariantPointer ZCodeParse::getIdentifierAddress(const QByteArray &name)
+ZSharedVariantPointer ZCodeExecuter::getIdentifierAddress(const QByteArray &name)
 {
     ZSharedVariantPointer val = currentCodeBlock->identifiers.value(name);
 
@@ -509,7 +515,7 @@ ZSharedVariantPointer ZCodeParse::getIdentifierAddress(const QByteArray &name)
     return val;
 }
 
-ZSharedVariant *ZCodeParse::createConstant(const QByteArray &value, ZVariant::Type type)
+ZSharedVariant *ZCodeExecuter::createConstant(const QByteArray &value, ZVariant::Type type)
 {
     switch(type) {
     case ZVariant::Int: {
@@ -552,7 +558,12 @@ ZSharedVariant *ZCodeParse::createConstant(const QByteArray &value, ZVariant::Ty
     }
 }
 
-ZCode *ZCodeParse::createCode(const ZCode::Action &action, const ZSharedVariantPointer &val)
+ZSharedVariantPointer ZCodeExecuter::createFunction(const ZCodeExecuter *executer)
+{
+    return ZSharedVariantPointer(new ZSharedVariant(ZVariant(new ZUserFunction(executer->codeList, 0))));
+}
+
+ZCode *ZCodeExecuter::createCode(const ZCode::Action &action, const ZSharedVariantPointer &val)
 {
     if(val) {
         ValueCode *code = new ValueCode;
@@ -570,7 +581,7 @@ ZCode *ZCodeParse::createCode(const ZCode::Action &action, const ZSharedVariantP
     return code;
 }
 
-void ZCodeParse::beginCodeBlock(CodeBlock::Type type)
+void ZCodeExecuter::beginCodeBlock(CodeBlock::Type type)
 {
     CodeBlock *block = new CodeBlock;
 
@@ -583,7 +594,7 @@ void ZCodeParse::beginCodeBlock(CodeBlock::Type type)
     currentCodeBlock = block;
 }
 
-void ZCodeParse::endCodeBlock()
+void ZCodeExecuter::endCodeBlock()
 {
     for(ZSharedVariantPointer &val_pointer : currentCodeBlock->undefinedIdentifier) {
         const QByteArray &name = currentCodeBlock->undefinedIdentifier.key(val_pointer);
@@ -615,6 +626,39 @@ void ZCodeParse::endCodeBlock()
     currentCodeBlock = currentCodeBlock->parent;
 }
 
+ZCodeExecuter *ZCodeExecuter::beginCodeExecuter()
+{
+    ZCodeExecuter *executer = new ZCodeExecuter();
+
+    executer->parent = currentCodeExecuter;
+
+    if(currentCodeExecuter) {
+        executer->currentCodeBlock = currentCodeExecuter->currentCodeBlock;
+
+        yywrap = false;
+    }
+
+    currentCodeExecuter = executer;
+
+    return executer;
+}
+
+ZCodeExecuter *ZCodeExecuter::endCodeExecuter()
+{
+    ZCodeExecuter *executer = currentCodeExecuter;
+
+    if(!executer)
+        return executer;
+
+    qDeleteAll(executer->codeBlockList);
+    executer->codeBlockList.clear();
+    executer->gotoLabelMap.clear();
+
+    currentCodeExecuter = executer->parent;
+
+    return executer;
+}
+
 Z_END_NAMESPACE
 
 QT_BEGIN_NAMESPACE
@@ -631,3 +675,5 @@ QDebug operator<<(QDebug deg, const ZCode &var)
     return deg;
 }
 QT_END_NAMESPACE
+
+//#include "zcode.moc"

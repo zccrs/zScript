@@ -12,9 +12,15 @@ void begin(const char *fileName)
 
     ZBase::initGlobalIdentifier();
 
-    ZCodeParse codeParse;
+    ZCodeExecuter *executer = ZCodeExecuter::beginCodeExecuter();
 
-    qApp->exit(codeParse.eval(fileName));
+    int quitCode = executer->eval(fileName);
+
+    ZCodeExecuter::endCodeExecuter();
+
+    delete executer;
+
+    qApp->exit(quitCode);
 }
 
 int main(int argc, char *argv[])
