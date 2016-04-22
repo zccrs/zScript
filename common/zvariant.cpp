@@ -248,7 +248,7 @@ QString ZVariant::toString() const
     case Undefined:
         return QString(typeName());
     case Tuple: {
-        QString str = "(";
+        QString str = "<";
         const ZTuple &tuple = toTuple();
 
         for(int i = 0; i < tuple.count() - 1; ++i) {
@@ -256,9 +256,9 @@ QString ZVariant::toString() const
         }
 
         if(tuple.isEmpty())
-            return str.append(")");
+            return str.append(">");
 
-        return str.append(tuple.last()->toString()).append(")");
+        return str.append(tuple.last()->toString()).append(">");
     }
     case List: {
         QString str = "[";

@@ -33,7 +33,7 @@ Z_USE_NAMESPACE
 };
 
 /// keyword
-%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR UNDEFINED GOTO
+%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR UNDEFINED GOTO RETURN
 
 /// identifier
 %token <identifier> IDENTIFIER INT STRING BOOL DOUBLE
@@ -53,7 +53,7 @@ Z_USE_NAMESPACE
 %left LAND LOR
 %left '&' '|' '^'
 %left EQ NEQ
-%left '>' '<' GE LE
+%left '>' '<' GE LE LTGT
 %left '-' '+'
 %left '*' '/' '%'
 %left UMINUS ADDSELF SUBSELF '!' '~'
@@ -89,6 +89,9 @@ code:       GOTO IDENTIFIER ends {
                         && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
             }
+            | return ends {
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstantByValue(ZVariant(INT32_MAX)));
+            }
             | ';'
             | '{' start '}'
             ;
@@ -109,9 +112,9 @@ goto_label: IDENTIFIER ':' {
 //            }
 //            ;
 
-function:   FUNCTION '(' {
+function:   '@' '(' {
                 ZCodeExecuter::beginCodeExecuter()->beginCodeBlock();
-            } parameter ')' '{' start '}' %prec PROMOTION {
+            } parameter ')' '{' start '}' {
                 ZCodeExecuter::currentCodeExecuter->endCodeBlock();
                 ZCodeExecuter *executer = ZCodeExecuter::endCodeExecuter();
 
@@ -119,7 +122,26 @@ function:   FUNCTION '(' {
             }
             ;
 
-parameter:  |define
+return:     RETURN {
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant("", ZVariant::Undefined));
+            }
+            | RETURN expression
+            | RETURN tuple_exp {
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($2), ZVariant::Int));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
+            }
+            ;
+
+parameter:
+            | IDENTIFIER {
+                ZCodeExecuter::currentCodeExecuter->getParameterList() << ZCodeExecuter::currentCodeExecuter->addIdentifier(*$1);
+                delete $1;
+            }
+            | parameter ',' IDENTIFIER {
+                ZCodeExecuter::currentCodeExecuter->getParameterList() << ZCodeExecuter::currentCodeExecuter->addIdentifier(*$3);
+                delete $3;
+            }
+            ;
 
 define:     IDENTIFIER {
                 ZCodeExecuter::currentCodeExecuter->addIdentifier(*$1);
@@ -128,7 +150,7 @@ define:     IDENTIFIER {
             }
             | IDENTIFIER '=' expression {
                 ZCodeExecuter::currentCodeExecuter->addIdentifier(*$1);
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifierAddress(*$1));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifier(*$1));
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::RightAssign);
 
                 delete $1;
@@ -136,19 +158,15 @@ define:     IDENTIFIER {
             | define ',' define
             ;
 
-tuple_lval: lvalue ',' lvalue %prec COMMA {$$ = 2;}
-            | tuple_lval ',' lvalue %prec COMMA {
-                $$ = $1 + 1;
-            }
+tuple_lval: lvalue ',' lvalue %prec LTGT {$$ = 2;}
+            | tuple_lval ',' lvalue {$$ = $1 + 1;}
             ;
 
-tuple_exp:  expression ',' expression {$$ = 2;}
-            | tuple_lval ',' expression {$$ = $1 + 1;}
-            | tuple_exp ',' expression {
-                $$ = $1 + 1;
-            }
+tuple_exp:  expression ',' expression %prec LTGT {$$ = 2;}
+            | tuple_exp ',' expression {$$ = $1 + 1;}
+            ;
 
-expression: lvalue | rvalue %prec PROMOTION;
+expression: lvalue | rvalue;
 
 lvalue:     VAR define {
                 $$ = ValueType::Variant;
@@ -156,7 +174,7 @@ lvalue:     VAR define {
             | IDENTIFIER {
                 $$ = ValueType::Variant;
 
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifierAddress(*$1));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifier(*$1));
 
                 delete $1;
             }
@@ -235,10 +253,10 @@ lvalue:     VAR define {
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PrefixSubSelf);
             }
-            | tuple_lval {
+            | '<' tuple_lval '>' {
                 $$ = ValueType::Variant;
 
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($1), ZVariant::Int));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($2), ZVariant::Int));
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
             }
             ;
@@ -639,21 +657,20 @@ rvalue:     UNDEFINED {
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PostfixSubSelf);
             }
-            | tuple_exp {
-                $$ = ValueType::Variant;
+//            | '<' tuple_exp '>' {
+//                $$ = ValueType::Variant;
 
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($1), ZVariant::Int));
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
-            }
+//                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($2), ZVariant::Int));
+//                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
+//            }
             | function {
                 $$ = ValueType::Variant;
             }
             ;
 
 arguments:  {$$ = 0;}
-            | expression {
-                $$ = 1;
-            }
+            | expression {$$ = 1;}
+            | tuple_exp
             ;
 
 branch_head:IF '(' expression ')' {

@@ -74,7 +74,7 @@ QString ZCode::actionName(quint8 action)
     return "";
 }
 
-int ZCode::exec(const QList<ZCode *> &codeList)
+ZVariant ZCode::exec(const QList<ZCode *> &codeList)
 {
     QList<ZVariant> temporaryList;
 
@@ -332,28 +332,13 @@ int ZCode::exec(const QList<ZCode *> &codeList)
             args.reserve(argsCount);
 
             for(int i = 0; i < argsCount; ++i) {
-                const ZVariant *val = virtualStack.pop();
-
-                if(val->type() == ZVariant::Tuple) {
-                    args = val->toList() + args;
-                } else {
-                    args.insert(0, *val);
-                }
+                args.insert(0, *virtualStack.pop());
             }
 
             ZFunction *fun = qobject_cast<ZFunction*>(virtualStack.pop()->toObject());
 
             if(fun) {
-                const QList<ZVariant> &list = fun->call(args);
-                ZVariant::ZTuple group;
-
-                for(const ZVariant &val : list) {
-                    temporaryList << val;
-                    group << &temporaryList.last();
-                }
-
-                temporaryList << group;
-
+                temporaryList << fun->call(args);
                 virtualStack.push(&temporaryList.last());
             }
 
@@ -397,26 +382,43 @@ int ZCode::exec(const QList<ZCode *> &codeList)
         }
     }
 
-    return 0;
+    if(!virtualStack.isEmpty())
+        return *virtualStack.pop();
+
+    return ZCodeExecuter::constUndefined;
 }
 
 class ZUserFunction : public ZFunction
 {
 public:
-    explicit ZUserFunction(const QList<ZCode*> &codes, ZObject *parent = 0)
-        : ZFunction(parent), codeList(codes){}
+    explicit ZUserFunction(ZCodeExecuter *e, ZObject *parent = 0)
+        : ZFunction(parent), executer(e){}
 
-    QList<ZVariant> call(const QList<ZVariant> &args) const Q_DECL_OVERRIDE
+    ZVariant call(const QList<ZVariant> &args) const Q_DECL_OVERRIDE
     {
-        Q_UNUSED(args);
+        int min_count = qMin(args.count(), executer->parameterList.count());
+        int i = 0;
 
-        ZCode::exec(codeList);
+        for(; i < min_count; ++i) {
+            *executer->parameterList.at(i) = args.at(i);
+        }
 
-        return QList<ZVariant>();
+        for(; i < executer->parameterList.count(); ++i) {
+            *executer->parameterList.at(i) = ZCodeExecuter::constUndefined;
+        }
+
+        /// sava current runtime stack
+        QStack<ZVariant*> stack = ZCode::virtualStack;
+
+        ZVariant retVal = ZCode::exec(executer->codeList);
+
+        ZCode::virtualStack = stack;
+
+        return retVal;
     }
 
 private:
-    QList<ZCode*> codeList;
+    ZCodeExecuter *executer;
 };
 
 ZCodeExecuter *ZCodeExecuter::currentCodeExecuter = Q_NULLPTR;
@@ -465,7 +467,11 @@ int ZCodeExecuter::eval()
     codeBlockList.clear();
     gotoLabelMap.clear();
 
-    int result = exec();
+    bool ok;
+    int result = exec().toInt(&ok);
+
+    if(!ok)
+        return 0;
 
     return result;
 }
@@ -496,7 +502,7 @@ int ZCodeExecuter::eval(const QByteArray &code, bool *ok)
     return -1;
 }
 
-ZSharedVariantPointer ZCodeExecuter::getIdentifierAddress(const QByteArray &name)
+ZSharedVariantPointer ZCodeExecuter::getIdentifier(const QByteArray &name)
 {
     ZSharedVariantPointer val = currentCodeBlock->identifiers.value(name);
 
@@ -558,9 +564,9 @@ ZSharedVariant *ZCodeExecuter::createConstant(const QByteArray &value, ZVariant:
     }
 }
 
-ZSharedVariantPointer ZCodeExecuter::createFunction(const ZCodeExecuter *executer)
+ZSharedVariantPointer ZCodeExecuter::createFunction(ZCodeExecuter *executer)
 {
-    return ZSharedVariantPointer(new ZSharedVariant(ZVariant(new ZUserFunction(executer->codeList, 0))));
+    return ZSharedVariantPointer(new ZSharedVariant(ZVariant(new ZUserFunction(executer))));
 }
 
 ZCode *ZCodeExecuter::createCode(const ZCode::Action &action, const ZSharedVariantPointer &val)

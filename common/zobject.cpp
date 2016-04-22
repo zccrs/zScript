@@ -11,9 +11,9 @@ ZObject::ZObject(ZObject *parent)
 
 Z_END_NAMESPACE
 
-QList<ZVariant> ZFunction::call(const QList<ZVariant> &args) const
+ZVariant ZFunction::call(const QList<ZVariant> &args) const
 {
-    QList<ZVariant> retVal;
+    ZVariant retVal;
 
     emit callFun(retVal, args);
 

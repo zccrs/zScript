@@ -10,7 +10,7 @@ ZConsole::ZConsole(ZObject *parent)
     Z_REGIST_SLOT(&ZConsole::log);
 }
 
-void ZConsole::log(QList<ZVariant> &retVals, const QList<ZVariant> &args) const
+void ZConsole::log(ZVariant &retVals, const QList<ZVariant> &args) const
 {
     Q_UNUSED(retVals)
 

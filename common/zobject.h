@@ -40,10 +40,10 @@ public:
         connect(this, &ZFunction::callFun, target, method, Qt::DirectConnection);
     }
 
-    virtual QList<ZVariant> call(const QList<ZVariant> &args) const;
+    virtual ZVariant call(const QList<ZVariant> &args) const;
 
 signals:
-    void callFun(QList<ZVariant> &retVals, const QList<ZVariant> &args) const;
+    void callFun(ZVariant &retVals, const QList<ZVariant> &args) const;
 };
 
 Z_END_NAMESPACE

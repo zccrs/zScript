@@ -77,7 +77,7 @@ struct ZCode
 
     static QString actionName(quint8 action);
 
-    static int exec(const QList<ZCode*> &codeList);
+    static ZVariant exec(const QList<ZCode*> &codeList);
 
     quint8 action = Unknow;
 
@@ -106,7 +106,8 @@ public:
 
         quint8 type = Normal;
         CodeBlock *parent = Q_NULLPTR;
-        QHash<QByteArray, ZSharedVariantPointer> identifiers;
+
+        QMap<QByteArray, ZSharedVariantPointer> identifiers;
         QMap<QByteArray, ZSharedVariantPointer> undefinedIdentifier;
     };
 
@@ -118,17 +119,17 @@ public:
     int eval(const char *fileName, bool *ok = 0);
     int eval(const QByteArray &code, bool *ok = 0);
 
-    inline int exec()
+    inline ZVariant exec()
     { return ZCode::exec(codeList);}
 
-    ZSharedVariantPointer getIdentifierAddress(const QByteArray &name);
+    ZSharedVariantPointer getIdentifier(const QByteArray &name);
 
     static ZSharedVariant *createConstant(const QByteArray &value, ZVariant::Type type);
 
     static inline ZSharedVariant *createConstantByValue(const ZVariant &value)
     { return createConstant(value.toString().toLatin1(), value.type());}
 
-    inline void appendCode(const ZCode::Action &action)
+    inline void     appendCode(const ZCode::Action &action)
     { codeList << createCode(action, ZSharedVariantPointer());}
 
     inline void appendCode(const ZCode::Action &action, ZSharedVariant *val)
@@ -153,7 +154,7 @@ public:
     inline QList<ZCode*> &getCodeList()
     { return codeList;}
 
-    inline void addIdentifier(const QByteArray &name)
+    inline ZSharedVariant *addIdentifier(const QByteArray &name)
     {
         ZSharedVariantPointer val = currentCodeBlock->undefinedIdentifier.take(name);
 
@@ -162,6 +163,8 @@ public:
         }
 
         addIdentifier(name, val);
+
+        return val.data();
     }
 
     inline void addIdentifier(const QByteArray &name, const ZSharedVariantPointer &val)
@@ -175,10 +178,13 @@ public:
         currentCodeBlock->identifiers[name] = val;
     }
 
-    static ZSharedVariantPointer createFunction(const ZCodeExecuter *executer);
+    static ZSharedVariantPointer createFunction(ZCodeExecuter *executer);
 
     inline CodeBlock *getCodeBlock() const
     { return currentCodeBlock;}
+
+    inline QVector<ZSharedVariant*> &getParameterList()
+    { return parameterList;}
 
     void beginCodeBlock(CodeBlock::Type type = CodeBlock::Normal);
     void endCodeBlock();
@@ -202,6 +208,8 @@ private:
     CodeBlock *currentCodeBlock = Q_NULLPTR;
     QList<CodeBlock*> codeBlockList;
     QMap<QByteArray, ZSharedVariant*> gotoLabelMap;
+    /// function object parameter tmp list
+    QVector<ZSharedVariant*> parameterList;
 
     static QHash<const QByteArray, ZSharedVariant*> globalIdentifierHash;
     static QMap<QByteArray, ZVariant*> stringConstantMap;
@@ -209,6 +217,9 @@ private:
     static ZVariant constTrue;
     static ZVariant constFalse;
     static ZVariant constUndefined;
+
+    friend class ZUserFunction;
+    friend class ZCode;
 };
 
 Z_END_NAMESPACE

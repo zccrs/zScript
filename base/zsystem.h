@@ -8,7 +8,7 @@ class ZSystem : public ZObject
 public:
     explicit ZSystem(ZObject *parent = 0);
 
-    void eval(QList<ZVariant> &retVals, const QList<ZVariant> &args);
+    void eval(ZVariant &retVals, const QList<ZVariant> &args);
 };
 
 #endif // ZSYSTEM_H

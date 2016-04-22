@@ -162,34 +162,36 @@ namespace yy {
         FOR = 266,
         UNDEFINED = 267,
         GOTO = 268,
-        IDENTIFIER = 269,
-        INT = 270,
-        STRING = 271,
-        BOOL = 272,
-        DOUBLE = 273,
-        EQ = 274,
-        STEQ = 275,
-        NEQ = 276,
-        STNEQ = 277,
-        LE = 278,
-        GE = 279,
-        LAND = 280,
-        LOR = 281,
-        ADDSELF = 282,
-        SUBSELF = 283,
-        DIVASSIGN = 284,
-        MULASSIGN = 285,
-        ADDASSIGN = 286,
-        SUBASSIGN = 287,
-        MODASSIGN = 288,
-        ANDASSIGN = 289,
-        ORASSIGN = 290,
-        XORASSIGN = 291,
-        LANDASSIGN = 292,
-        LORASSIGN = 293,
-        COMMA = 294,
-        UMINUS = 295,
-        PROMOTION = 296
+        RETURN = 269,
+        IDENTIFIER = 270,
+        INT = 271,
+        STRING = 272,
+        BOOL = 273,
+        DOUBLE = 274,
+        EQ = 275,
+        STEQ = 276,
+        NEQ = 277,
+        STNEQ = 278,
+        LE = 279,
+        GE = 280,
+        LAND = 281,
+        LOR = 282,
+        ADDSELF = 283,
+        SUBSELF = 284,
+        DIVASSIGN = 285,
+        MULASSIGN = 286,
+        ADDASSIGN = 287,
+        SUBASSIGN = 288,
+        MODASSIGN = 289,
+        ANDASSIGN = 290,
+        ORASSIGN = 291,
+        XORASSIGN = 292,
+        LANDASSIGN = 293,
+        LORASSIGN = 294,
+        COMMA = 295,
+        LTGT = 296,
+        UMINUS = 297,
+        PROMOTION = 298
       };
     };
 
@@ -494,12 +496,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 966,     ///< Last index in yytable_.
-      yynnts_ = 23,  ///< Number of nonterminal symbols.
+      yylast_ = 1005,     ///< Last index in yytable_.
+      yynnts_ = 24,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 66  ///< Number of tokens.
+      yyntokens_ = 69  ///< Number of tokens.
     };
 
 
@@ -508,7 +510,7 @@ namespace yy {
 
 
 } // yy
-#line 512 "zScript.tab.hpp" // lalr1.cc:377
+#line 514 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

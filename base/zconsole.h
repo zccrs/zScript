@@ -13,7 +13,7 @@ public:
     explicit ZConsole(ZObject *parent = 0);
 
 public slots:
-    void log(QList<ZVariant> &retVals, const QList<ZVariant> &args) const;
+    void log(ZVariant &retVals, const QList<ZVariant> &args) const;
 };
 
 Z_END_NAMESPACE

@@ -59,6 +59,19 @@ public:
 
     inline void depthCopyAssign(const ZVariant &other) const
     {
+        if(type() == Tuple) {
+            const ZTuple &tuple = toTuple();
+            const ZTuple &other_tuple = other.toTuple();
+
+            int min = qMin(tuple.count(), other_tuple.count());
+
+            for(int i = 0; i < min; ++i) {
+                tuple.at(i)->depthCopyAssign(*other_tuple.at(i));
+            }
+
+            return;
+        }
+
         VariantData *data = const_cast<VariantData*>(this->data.constData());
 
         data->variant = other.data->variant;
@@ -76,11 +89,6 @@ public:
             for(int i = 0; i < min; ++i) {
                 this_group[i]->data = other_group[i]->data;
             }
-        } else if(other.type() == Tuple) {
-            const ZTuple &other_group = other.toTuple();
-
-            if(!other_group.isEmpty())
-                data = other_group.first()->data;
         } else {
             data = other.data;
         }
@@ -98,11 +106,6 @@ public:
             for(int i = 0; i < min; ++i) {
                 qSwap(this_group[i]->data, other_group[i]->data);
             }
-        } else if(other.type() == Tuple) {
-            const ZTuple &other_group = other.toTuple();
-
-            if(!other_group.isEmpty())
-                qSwap(data, other_group.first()->data);
         } else {
             qSwap(data, other.data);
         }
