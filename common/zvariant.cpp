@@ -98,7 +98,14 @@ ZVariant::ZVariant(ZObject * const object)
     : data(new VariantData)
 {
     data->variant = QVariant::fromValue(object);
-    data->type = object ? Object : Null;
+    data->type = Object;
+}
+
+ZVariant::ZVariant(ZFunction * const function)
+    : data(new VariantData)
+{
+    data->variant = QVariant::fromValue(function);
+    data->type = Function;
 }
 
 ZVariant::ZVariant(const QVariant &val)
@@ -131,7 +138,9 @@ ZVariant::ZVariant(const QVariant &val)
         break;
     case QVariant::UserType:{
         if(QString(val.typeName()) == "ZObject*") {
-            data->type = toObject() ? Object : Null;
+            data->type = Object;
+        } else if(QString(val.typeName()) == "ZFunction*") {
+            data->type = Function;
         } else if(QString(val.typeName()) == "ZVariant") {
             data = qvariant_cast<ZVariant>(val).data;
         } else {
@@ -140,7 +149,7 @@ ZVariant::ZVariant(const QVariant &val)
         break;
     }
     default:
-        data->type = NaN;
+        data->type = Undefined;
         break;
     }
 }
@@ -148,11 +157,6 @@ ZVariant::ZVariant(const QVariant &val)
 ZVariant::~ZVariant()
 {
 
-}
-
-ZVariant::Type ZVariant::type() const
-{
-    return data->type;
 }
 
 const char *ZVariant::typeName() const
@@ -170,12 +174,10 @@ const char *ZVariant::typeName() const
         return "list";
     case Object:
         return "object";
+    case Function:
+        return "function";
     case Undefined:
         return "undefined";
-    case NaN:
-        return "number";
-    case Null:
-        return "object";
     case Tuple:
         return "tuple";
     default:
@@ -197,9 +199,8 @@ int ZVariant::toInt(bool *ok) const
         return data->variant.toBool();
     case String:
     case Object:
-    case Null:
+    case Function:
     case Undefined:
-    case NaN:
         if(ok)
             *ok = false;
         return 0;
@@ -211,6 +212,23 @@ int ZVariant::toInt(bool *ok) const
 
 double ZVariant::toDouble(bool *ok) const
 {
+    switch(data->type) {
+    case Int:
+        return data->variant.toInt();
+    case Double:
+        return data->variant.toDouble();
+    case Bool:
+        return data->variant.toBool();
+    case String:
+    case Object:
+    case Function:
+    case Undefined:
+        if(ok)
+            *ok = false;
+        return 0;
+    default:break;
+    }
+
     return data->variant.toDouble(ok);
 }
 
@@ -226,58 +244,14 @@ bool ZVariant::toBool() const
     case String:
         return !data->variant.toString().isEmpty();
     case Object:
-        return true;
-    case Null:
+    case Function:
+        return (bool)toObject();
     case Undefined:
-    case NaN:
         return false;
     default: break;
     }
 
     return data->variant.toBool();
-}
-
-QString ZVariant::toString() const
-{
-    switch (data->type) {
-    case Object:
-        return QString::number((qlonglong)toObject(), 16);
-    case Null:
-        return "0x0";
-    case NaN:
-    case Undefined:
-        return QString(typeName());
-    case Tuple: {
-        QString str = "<";
-        const ZTuple &tuple = toTuple();
-
-        for(int i = 0; i < tuple.count() - 1; ++i) {
-            str.append(tuple.value(i)->toString()).append(", ");
-        }
-
-        if(tuple.isEmpty())
-            return str.append(">");
-
-        return str.append(tuple.last()->toString()).append(">");
-    }
-    case List: {
-        QString str = "[";
-        const QList<ZVariant> &list = toList();
-
-        for(int i = 0; i < list.count() - 1; ++i) {
-            str.append(list.value(i).toString()).append(", ");
-        }
-
-        if(list.isEmpty())
-            return str.append("]");
-
-        return str.append(list.last().toString()).append("]");
-    }
-    default:
-        break;
-    }
-
-    return data->variant.toString();
 }
 
 QList<ZVariant> ZVariant::toList() const
@@ -295,22 +269,14 @@ QList<ZVariant> ZVariant::toList() const
     return qvariant_cast<QList<ZVariant>>(data->variant);
 }
 
-ZVariant::ZTuple ZVariant::toTuple() const
-{
-    if(type() == Tuple)
-        return qvariant_cast<ZTuple>(data->variant);
-
-    return ZTuple() << const_cast<ZVariant*>(this);
-}
-
 ZObject *ZVariant::toObject() const
 {
     return qvariant_cast<ZObject*>(data->variant);
 }
 
-QVariant ZVariant::toQVariant() const
+ZFunction *ZVariant::toFunction() const
 {
-    return data->variant;
+    return qobject_cast<ZFunction*>(toObject());
 }
 
 QDebug operator<<(QDebug deg, const ZVariant &var)
@@ -321,7 +287,8 @@ QDebug operator<<(QDebug deg, const ZVariant &var)
     case ZVariant::Object:
         deg.nospace() << var.toObject();
         break;
-    case ZVariant::NaN:
+    case ZVariant::Function:
+        deg.nospace() << var.toFunction();
     case ZVariant::Undefined:
         deg.nospace() << var.typeName();
         break;
@@ -350,7 +317,7 @@ ZVariant operator +(const int var1, const ZVariant &var2)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator -(const int var1, const ZVariant &var2)
@@ -365,7 +332,7 @@ ZVariant operator -(const int var1, const ZVariant &var2)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator *(const int var1, const ZVariant &var2)
@@ -382,7 +349,7 @@ ZVariant operator *(const int var1, const ZVariant &var2)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator /(const int var1, const ZVariant &var2)
@@ -397,7 +364,7 @@ ZVariant operator /(const int var1, const ZVariant &var2)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator &(const int var1, const ZVariant &var2)
@@ -412,7 +379,7 @@ ZVariant operator &(const int var1, const ZVariant &var2)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator |(const int var1, const ZVariant &var2)
@@ -427,7 +394,7 @@ ZVariant operator |(const int var1, const ZVariant &var2)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator ^(const int var1, const ZVariant &var2)
@@ -442,7 +409,7 @@ ZVariant operator ^(const int var1, const ZVariant &var2)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator %(const int var1, const ZVariant &var2)
@@ -457,7 +424,7 @@ ZVariant operator %(const int var1, const ZVariant &var2)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator +(const double &var1, const ZVariant &var2)
@@ -474,7 +441,7 @@ ZVariant operator +(const double &var1, const ZVariant &var2)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator -(const double &var1, const ZVariant &var2)
@@ -489,7 +456,7 @@ ZVariant operator -(const double &var1, const ZVariant &var2)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator *(const double &var1, const ZVariant &var2)
@@ -504,7 +471,7 @@ ZVariant operator *(const double &var1, const ZVariant &var2)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator /(const double &var1, const ZVariant &var2)
@@ -519,7 +486,7 @@ ZVariant operator /(const double &var1, const ZVariant &var2)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator +(const QString &var1, const ZVariant &var2)
@@ -536,7 +503,7 @@ ZVariant operator +(const QString &var1, const ZVariant &var2)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator -(const QString &var1, const ZVariant &var2)
@@ -563,7 +530,7 @@ ZVariant operator *(const QString &var1, const ZVariant &var2)
         return array;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 ZVariant operator /(const QString &var1, const ZVariant &var2)
@@ -680,7 +647,7 @@ ZVariant operator ~(const ZVariant &var)
     default: break;
     }
 
-    return ZVariant::NaN;
+    return ZVariant::Undefined;
 }
 
 Z_END_NAMESPACE

@@ -123,12 +123,14 @@ goto_label: IDENTIFIER ':' {
 function:   '(' parameter ')' {
                 ZCodeExecuter::beginCodeExecuter()->beginCodeBlock();
 
-                for(QByteArray *id : *$2) {
-                    ZCodeExecuter::currentCodeExecuter->getParameterList() << ZCodeExecuter::currentCodeExecuter->addIdentifier(*id);
-                    delete id;
-                }
+                if($2) {
+                    for(QByteArray *id : *$2) {
+                        ZCodeExecuter::currentCodeExecuter->getParameterList() << ZCodeExecuter::currentCodeExecuter->addIdentifier(*id);
+                        delete id;
+                    }
 
-                delete $2;
+                    delete $2;
+                }
             } '{' start '}'  {
                 ZCodeExecuter::currentCodeExecuter->endCodeBlock();
                 ZCodeExecuter *executer = ZCodeExecuter::endCodeExecuter();
@@ -277,7 +279,7 @@ lvalue:     VAR define {
 rvalue:     UNDEFINED {
                 $$ = ValueType::Constant;
 
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray(), ZVariant::Null));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray(), ZVariant::Undefined));
             }
             | INT {
                 $$ = ValueType::Constant;

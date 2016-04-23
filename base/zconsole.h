@@ -14,6 +14,9 @@ public:
 
 public slots:
     void log(ZVariant &retVals, const QList<ZVariant> &args) const;
+
+private:
+    QString variantToString(const ZVariant &val) const;
 };
 
 Z_END_NAMESPACE

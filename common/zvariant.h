@@ -9,6 +9,7 @@
 Z_BEGIN_NAMESPACE
 
 class ZObject;
+class ZFunction;
 
 class ZVariant
 {
@@ -21,9 +22,8 @@ public:
         List = QMetaType::QVariantList,
         Object = QMetaType::PointerToQObject,
         Undefined = QMetaType::UnknownType,
-        NaN = QMetaType::User + 1,
-        Null = QMetaType::User + 2,
-        Tuple = QMetaType::User + 3
+        Tuple = QMetaType::User + 1,
+        Function = QMetaType::User + 2
     };
 
     typedef QList<ZVariant*> ZTuple;
@@ -42,20 +42,31 @@ public:
     ZVariant(const QList<ZVariant> &val);
     ZVariant(const ZTuple &group);
     ZVariant(ZObject * const object);
+    ZVariant(ZFunction * const function);
     ZVariant(const QVariant &val);
     ~ZVariant();
 
-    Type type() const;
     const char *typeName() const;
+
+    inline Type type() const
+    { return data->type;}
 
     int toInt(bool *ok = 0) const;
     double toDouble(bool *ok = 0) const;
     bool toBool() const;
-    QString toString() const;
+    inline QString toString() const
+    { return data->variant.toString();}
     QList<ZVariant> toList() const;
-    ZTuple toTuple() const;
+    inline ZTuple toTuple() const
+    { if(type() == Tuple)
+            return qvariant_cast<ZTuple>(data->variant);
+
+        return ZTuple() << const_cast<ZVariant*>(this);
+    }
     ZObject *toObject() const;
-    QVariant toQVariant() const;
+    ZFunction *toFunction() const;
+    inline QVariant toQVariant() const
+    { return data->variant;}
 
     inline void depthCopyAssign(const ZVariant &other) const
     {
@@ -141,7 +152,7 @@ public:
             return -toInt();
         case String:
             return toString().toLower();
-        default: return NaN;
+        default: return Undefined;
         }
     }
     inline ZVariant operator+() const
@@ -154,7 +165,7 @@ public:
             return qAbs(toInt());
         case String:
             return toString().toUpper();
-        default: return NaN;
+        default: return Undefined;
         }
     }
 
@@ -228,7 +239,7 @@ ZVariant operator %(const QString &var1, const ZVariant &var2);
             return (int)var1.toBool() OP var2;\
         default: break;\
         }\
-        return ZVariant::NaN;\
+        return ZVariant::Undefined;\
     }
 
 #define OPERATOR_ASS(OP) \

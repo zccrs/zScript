@@ -335,7 +335,7 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
                 args.insert(0, *virtualStack.pop());
             }
 
-            ZFunction *fun = qobject_cast<ZFunction*>(virtualStack.pop()->toObject());
+            ZFunction *fun = virtualStack.pop()->toFunction();
 
             if(fun) {
                 temporaryList << fun->call(args);
