@@ -130,8 +130,9 @@ namespace yy {
     int count;
     QByteArray *identifier;
     ZSharedVariantPointer *value;
+    QVarLengthArray<QByteArray*, 10> *parameterList;
 
-#line 135 "zScript.tab.hpp" // lalr1.cc:377
+#line 136 "zScript.tab.hpp" // lalr1.cc:377
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -497,11 +498,11 @@ namespace yy {
     {
       yyeof_ = 0,
       yylast_ = 1005,     ///< Last index in yytable_.
-      yynnts_ = 24,  ///< Number of nonterminal symbols.
+      yynnts_ = 25,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 69  ///< Number of tokens.
+      yyntokens_ = 70  ///< Number of tokens.
     };
 
 
@@ -510,7 +511,7 @@ namespace yy {
 
 
 } // yy
-#line 514 "zScript.tab.hpp" // lalr1.cc:377
+#line 515 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

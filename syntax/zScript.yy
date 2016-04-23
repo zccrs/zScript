@@ -30,6 +30,7 @@ Z_USE_NAMESPACE
     int count;
     QByteArray *identifier;
     ZSharedVariantPointer *value;
+    QVarLengthArray<QByteArray*, 10> *parameterList;
 };
 
 /// keyword
@@ -49,7 +50,7 @@ Z_USE_NAMESPACE
 %right '=' DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
 %left COMMA
 %left '.'
-//%right '?' ':'
+%right '?' ':'
 %left LAND LOR
 %left '&' '|' '^'
 %left EQ NEQ
@@ -59,11 +60,11 @@ Z_USE_NAMESPACE
 %left UMINUS ADDSELF SUBSELF '!' '~'
 %left PROMOTION
 %left '(' ')'
-%left ':'
 
 %type <valueType> expression lvalue rvalue
 %type <count> arguments tuple_exp tuple_lval
 %type <value> branch_head branch_body branch_else
+%type <parameterList> parameter
 
 %%
 
@@ -92,6 +93,13 @@ code:       GOTO IDENTIFIER ends {
             | return ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstantByValue(ZVariant(INT32_MAX)));
             }
+            | tuple_lval {
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($1), ZVariant::Int));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
+            }
+            '=' expression {
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LeftAssign);
+            }
             | ';'
             | '{' start '}'
             ;
@@ -112,9 +120,16 @@ goto_label: IDENTIFIER ':' {
 //            }
 //            ;
 
-function:   '@' '(' {
+function:   '(' parameter ')' {
                 ZCodeExecuter::beginCodeExecuter()->beginCodeBlock();
-            } parameter ')' '{' start '}' {
+
+                for(QByteArray *id : *$2) {
+                    ZCodeExecuter::currentCodeExecuter->getParameterList() << ZCodeExecuter::currentCodeExecuter->addIdentifier(*id);
+                    delete id;
+                }
+
+                delete $2;
+            } '{' start '}'  {
                 ZCodeExecuter::currentCodeExecuter->endCodeBlock();
                 ZCodeExecuter *executer = ZCodeExecuter::endCodeExecuter();
 
@@ -132,20 +147,19 @@ return:     RETURN {
             }
             ;
 
-parameter:
+parameter:  {$$ = Q_NULLPTR;}
             | IDENTIFIER {
-                ZCodeExecuter::currentCodeExecuter->getParameterList() << ZCodeExecuter::currentCodeExecuter->addIdentifier(*$1);
-                delete $1;
+                $$ = new QVarLengthArray<QByteArray*, 10>();
+                $$->append($1);
             }
             | parameter ',' IDENTIFIER {
-                ZCodeExecuter::currentCodeExecuter->getParameterList() << ZCodeExecuter::currentCodeExecuter->addIdentifier(*$3);
-                delete $3;
+                $$ = $1;
+                $$->append($3);
             }
             ;
 
 define:     IDENTIFIER {
                 ZCodeExecuter::currentCodeExecuter->addIdentifier(*$1);
-
                 delete $1;
             }
             | IDENTIFIER '=' expression {
@@ -158,11 +172,11 @@ define:     IDENTIFIER {
             | define ',' define
             ;
 
-tuple_lval: lvalue ',' lvalue %prec LTGT {$$ = 2;}
+tuple_lval: lvalue ',' lvalue %prec COMMA {$$ = 2;}
             | tuple_lval ',' lvalue {$$ = $1 + 1;}
             ;
 
-tuple_exp:  expression ',' expression %prec LTGT {$$ = 2;}
+tuple_exp:  expression ',' expression %prec COMMA {$$ = 2;}
             | tuple_exp ',' expression {$$ = $1 + 1;}
             ;
 
@@ -177,6 +191,11 @@ lvalue:     VAR define {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifier(*$1));
 
                 delete $1;
+            }
+            | '_' {
+                $$ = ValueType::Constant;
+
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZSharedVariantPointer(new ZSharedVariant()));
             }
             | lvalue '=' expression {
                 $$ = ValueType::Variant;
@@ -252,12 +271,6 @@ lvalue:     VAR define {
                 $$ = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PrefixSubSelf);
-            }
-            | '<' tuple_lval '>' {
-                $$ = ValueType::Variant;
-
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($2), ZVariant::Int));
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
             }
             ;
 
@@ -646,7 +659,6 @@ rvalue:     UNDEFINED {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Abs);
                     }
                 }
-            | '(' expression ')' { $$ = $2;}
             | lvalue ADDSELF {
                 $$ = ValueType::Variant;
 
@@ -657,15 +669,10 @@ rvalue:     UNDEFINED {
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PostfixSubSelf);
             }
-//            | '<' tuple_exp '>' {
-//                $$ = ValueType::Variant;
-
-//                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($2), ZVariant::Int));
-//                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
-//            }
             | function {
                 $$ = ValueType::Variant;
             }
+            | '(' expression ')' { $$ = $2;}
             ;
 
 arguments:  {$$ = 0;}
