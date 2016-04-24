@@ -144,7 +144,9 @@ ZVariant::ZVariant(const QVariant &val)
         } else if(QString(val.typeName()) == "ZVariant") {
             data = qvariant_cast<ZVariant>(val).data;
         } else {
-            zError << "Unknow Type:" << val.typeName();
+//            zWarning << "Unknow Type:" << val.typeName();
+            data->type = Unknow;
+            data->variant = val;
         }
         break;
     }
@@ -325,34 +327,6 @@ ZVariant ZVariant::operator[](const ZVariant &value) const
     default:
         return Undefined;
     }
-}
-
-QDebug operator<<(QDebug deg, const ZVariant &var)
-{
-    deg.nospace() << "Variant(" << var.typeName() << ", ";
-
-    switch(var.type()) {
-    case ZVariant::Object:
-        deg.nospace() << var.toObject();
-        break;
-    case ZVariant::Function:
-        deg.nospace() << var.toFunction();
-        break;
-    case ZVariant::Undefined:
-        deg.nospace() << var.typeName();
-        break;
-    case ZVariant::List:
-    case ZVariant::Tuple:
-        deg.noquote() << var.toList();
-        break;
-    default:
-        deg.nospace() << var.toString();
-        break;
-    }
-
-    deg.nospace() << ")";
-
-    return deg;
 }
 
 /// global
@@ -704,3 +678,63 @@ ZVariant operator ~(const ZVariant &var)
 }
 
 Z_END_NAMESPACE
+
+QDebug operator<<(QDebug deg, const ZVariant &var)
+{
+    deg.nospace() << "Variant(" << var.typeName() << ", ";
+
+    switch(var.type()) {
+    case ZVariant::Object:
+        deg.nospace() << var.toObject();
+        break;
+    case ZVariant::Function:
+        deg.nospace() << var.toFunction();
+        break;
+    case ZVariant::Undefined:
+        deg.nospace() << var.typeName();
+        break;
+    case ZVariant::List:
+    case ZVariant::Tuple:
+        deg.noquote() << var.toList();
+        break;
+    default:
+        deg.nospace() << var.toString();
+        break;
+    }
+
+    deg.nospace() << ")";
+
+    return deg;
+}
+
+QT_BEGIN_NAMESPACE
+uint qHash(const ZVariant &val, uint seed)
+{
+    switch (val.type()) {
+    case ZVariant::Int:
+        return qHash(val.toInt(), seed);
+    case ZVariant::Double:
+        return qHash(val.toDouble(), seed);
+    case ZVariant::String:
+        return qHash(val.toString(), seed);
+    case ZVariant::Bool:
+        return qHash(val.toBool(), seed);
+    case ZVariant::List:
+        return qHash(val.toList(), seed);
+    case ZVariant::Object:
+    case ZVariant::Function:
+        return qHash(val.toObject(), seed);
+    case ZVariant::Tuple: {
+        uint hash;
+
+        for(const ZVariant *val : val->toTuple()) {
+            hash ^= qHash(*val, seed);
+        }
+
+        return hash;
+    }
+    default:
+        return -1;
+    }
+}
+QT_END_NAMESPACE

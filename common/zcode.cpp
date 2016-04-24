@@ -71,6 +71,7 @@ QString ZCode::actionName(quint8 action)
         case If:                return "if";
         case Children:          return "[](get children)";
         case Append:            return "<<(append)";
+        case Switch:            return "switch";
         case Unknow:            return "unknow";
     }
 
@@ -404,12 +405,29 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             virtualStack.push(&temporaryList.last());
             break;
         }
-        case Append:{
+        case Append: {
             const ZVariant &value = *virtualStack.pop();
             ZVariant &target = *virtualStack.top();
 
             target << value;
             break;
+        }
+        case Switch: {
+            const QHash<ZVariant, int> &val = qvariant_cast<QHash<ZVariant, int>>(code->toValueCode()->value->toQVariant());
+
+            int tmp = i;
+
+            i = val.value(*virtualStack.pop(), -1) - 1;
+
+            if(i < 0) {
+                i = val.value(ZVariant(), -1);
+
+                if(i < 0) {
+                    zWarning << "switch code block undefined default code";
+
+                    i = tmp;
+                }
+            }
         }
         default: break;
         }
@@ -633,7 +651,9 @@ void ZCodeExecuter::beginCodeBlock(CodeBlock::Type type)
     CodeBlock *block;
 
     if(type == CodeBlock::NormalFor || type == CodeBlock::While) {
-        block = new LoopStruceureCodeBlock;
+        block = new LoopStructureCodeBlock;
+    } else if(type == CodeBlock::Switch) {
+        block = new SwitchCodeBlock;
     } else {
         block = new CodeBlock;
     }
@@ -727,6 +747,8 @@ QDebug operator<<(QDebug deg, const ZCode &var)
         deg << var.toValueCode()->value->toInt();
     } else if(var.action == ZCode::If) {
         deg << "if false goto:" << var.toValueCode()->value->toInt();
+    } else if(var.action == ZCode::Switch) {
+        deg << "switch value:" << *var.toValueCode()->value;
     }
 
     return deg;

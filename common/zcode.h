@@ -75,7 +75,8 @@ struct ZCode
         If,                 // if                           50
         Children,           // get children(X[])            51
         Append,             // << add children to last      52
-        Unknow              //                              53
+        Switch,             // switch                       53
+        Unknow              //                              54
     };
 
     static QString actionName(quint8 action);
@@ -108,7 +109,8 @@ class ZCodeExecuter
 public:
     ~ZCodeExecuter();
 
-    struct LoopStruceureCodeBlock;
+    struct LoopStructureCodeBlock;
+    struct SwitchCodeBlock;
     struct CodeBlock{
         enum Type {
             Normal = 0x01,
@@ -116,7 +118,8 @@ public:
             While = 0x04,
             NormalFor = 0x08,
             LoopStructure = While | NormalFor,
-            If = 0x10
+            If = 0x10,
+            Switch = 0x20
         };
 
         /// 代码块第一条指令的index
@@ -134,15 +137,20 @@ public:
         inline bool isLoopStructure() const
         { return (type | LoopStructure) == LoopStructure;}
 
-        inline const LoopStruceureCodeBlock *toForCodeBlock() const
-        { return static_cast<const LoopStruceureCodeBlock*>(this);}
-        inline LoopStruceureCodeBlock *toForCodeBlock()
-        { return static_cast<LoopStruceureCodeBlock*>(this);}
+        inline const LoopStructureCodeBlock *toLoopStructureCodeBlock() const
+        { return static_cast<const LoopStructureCodeBlock*>(this);}
+        inline LoopStructureCodeBlock *toLoopStructureCodeBlock()
+        { return static_cast<LoopStructureCodeBlock*>(this);}
+
+        inline const SwitchCodeBlock *toSwitchCodeBlock() const
+        { return static_cast<const SwitchCodeBlock*>(this);}
+        inline SwitchCodeBlock *toSwitchCodeBlock()
+        { return static_cast<SwitchCodeBlock*>(this);}
     };
 
     /// 循环结构的代码块
-    struct LoopStruceureCodeBlock : public CodeBlock{
-        LoopStruceureCodeBlock() {
+    struct LoopStructureCodeBlock : public CodeBlock {
+        LoopStructureCodeBlock() {
             breakIndex = new ZSharedVariant();
             containueIndex = new ZSharedVariant();
         }
@@ -153,6 +161,16 @@ public:
         ZSharedVariantPointer breakIndex;
         /// 执行containue语句时要goto到的指令的位置
         ZSharedVariantPointer containueIndex;
+    };
+
+    /// switch结构的代码块
+    struct SwitchCodeBlock : public CodeBlock {
+        SwitchCodeBlock() {
+            breakIndex = new ZSharedVariant();
+        }
+
+        /// 执行break语句时要goto到的指令的位置
+        ZSharedVariantPointer breakIndex;
     };
 
     inline static void registerIdentifier(const QByteArray &name, ZSharedVariant *variant)
@@ -279,7 +297,9 @@ private:
             CodeBlock *block = codeBlockList.at(i);
 
             if(block->isLoopStructure()) {
-                delete block->toForCodeBlock();
+                delete block->toLoopStructureCodeBlock();
+            } else if(block->type == CodeBlock::Switch) {
+                delete block->toSwitchCodeBlock();
             } else {
                 delete block;
             }

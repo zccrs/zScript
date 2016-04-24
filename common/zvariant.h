@@ -7,6 +7,14 @@
 #include <QVariant>
 
 Z_BEGIN_NAMESPACE
+class ZVariant;
+Z_END_NAMESPACE
+
+QT_BEGIN_NAMESPACE
+uint qHash(const ZVariant &val, uint seed = 0);
+QT_END_NAMESPACE
+
+Z_BEGIN_NAMESPACE
 
 class ZObject;
 class ZFunction;
@@ -23,7 +31,8 @@ public:
         Object = QMetaType::PointerToQObject,
         Undefined = QMetaType::UnknownType,
         Tuple = QMetaType::User + 1,
-        Function = QMetaType::User + 2
+        Function = QMetaType::User + 2,
+        Unknow = QMetaType::User + 3
     };
 
     typedef QList<ZVariant*> ZTuple;
@@ -194,6 +203,8 @@ public:
         return val;
     }
 
+    friend uint qHash(const ZVariant &val, uint seed);
+
 private:
     class VariantData : public QSharedData
     {
@@ -207,10 +218,6 @@ private:
 
     friend class ZCode;
 };
-
-QT_BEGIN_NAMESPACE
-Q_CORE_EXPORT QDebug operator<<(QDebug deg, const ZVariant &var);
-QT_END_NAMESPACE
 
 /// int
 ZVariant operator +(const int var1, const ZVariant &var2);
@@ -328,6 +335,10 @@ public:
 };
 
 Z_END_NAMESPACE
+
+QT_BEGIN_NAMESPACE
+Q_CORE_EXPORT QDebug operator<<(QDebug deg, const ZVariant &var);
+QT_END_NAMESPACE
 
 Q_DECLARE_METATYPE(ZVariant)
 Q_DECLARE_METATYPE(ZVariant::ZTuple)

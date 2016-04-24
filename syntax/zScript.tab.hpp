@@ -131,8 +131,10 @@ namespace yy {
     QByteArray *identifier;
     ZSharedVariantPointer *value;
     QVarLengthArray<QByteArray*, 10> *parameterList;
+    QPair<ZSharedVariantPointer*, quint16> *caseKey;
+    QVector<QPair<ZSharedVariantPointer*, quint16>> *cases;
 
-#line 136 "zScript.tab.hpp" // lalr1.cc:377
+#line 138 "zScript.tab.hpp" // lalr1.cc:377
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -168,36 +170,37 @@ namespace yy {
         CONTAINUE = 271,
         SWITCH = 272,
         CASE = 273,
-        IDENTIFIER = 274,
-        INT = 275,
-        STRING = 276,
-        BOOL = 277,
-        DOUBLE = 278,
-        EQ = 279,
-        STEQ = 280,
-        NEQ = 281,
-        STNEQ = 282,
-        LE = 283,
-        GE = 284,
-        LAND = 285,
-        LOR = 286,
-        ADDSELF = 287,
-        SUBSELF = 288,
-        LL = 289,
-        GG = 290,
-        DIVASSIGN = 291,
-        MULASSIGN = 292,
-        ADDASSIGN = 293,
-        SUBASSIGN = 294,
-        MODASSIGN = 295,
-        ANDASSIGN = 296,
-        ORASSIGN = 297,
-        XORASSIGN = 298,
-        LANDASSIGN = 299,
-        LORASSIGN = 300,
-        COMMA = 301,
-        LTGT = 302,
-        UMINUS = 303
+        DEFAULT = 274,
+        IDENTIFIER = 275,
+        INT = 276,
+        STRING = 277,
+        BOOL = 278,
+        DOUBLE = 279,
+        EQ = 280,
+        STEQ = 281,
+        NEQ = 282,
+        STNEQ = 283,
+        LE = 284,
+        GE = 285,
+        LAND = 286,
+        LOR = 287,
+        ADDSELF = 288,
+        SUBSELF = 289,
+        LL = 290,
+        GG = 291,
+        DIVASSIGN = 292,
+        MULASSIGN = 293,
+        ADDASSIGN = 294,
+        SUBASSIGN = 295,
+        MODASSIGN = 296,
+        ANDASSIGN = 297,
+        ORASSIGN = 298,
+        XORASSIGN = 299,
+        LANDASSIGN = 300,
+        LORASSIGN = 301,
+        COMMA = 302,
+        LTGT = 303,
+        UMINUS = 304
       };
     };
 
@@ -358,7 +361,7 @@ namespace yy {
     /// \param yyvalue   the value to check
     static bool yy_table_value_is_error_ (int yyvalue);
 
-    static const short int yypact_ninf_;
+    static const signed char yypact_ninf_;
     static const signed char yytable_ninf_;
 
     /// Convert a scanner token number \a t to a symbol number.
@@ -375,7 +378,7 @@ namespace yy {
   static const unsigned char yydefact_[];
 
   // YYPGOTO[NTERM-NUM].
-  static const short int yypgoto_[];
+  static const signed char yypgoto_[];
 
   // YYDEFGOTO[NTERM-NUM].
   static const short int yydefgoto_[];
@@ -502,12 +505,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1006,     ///< Last index in yytable_.
-      yynnts_ = 30,  ///< Number of nonterminal symbols.
+      yylast_ = 1085,     ///< Last index in yytable_.
+      yynnts_ = 34,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 75  ///< Number of tokens.
+      yyntokens_ = 76  ///< Number of tokens.
     };
 
 
@@ -516,7 +519,7 @@ namespace yy {
 
 
 } // yy
-#line 520 "zScript.tab.hpp" // lalr1.cc:377
+#line 523 "zScript.tab.hpp" // lalr1.cc:377
 
 
 
