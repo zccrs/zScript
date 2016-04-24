@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QStack>
 #include <QTemporaryFile>
+#include <QCoreApplication>
 
 #include <unistd.h>
 
@@ -38,7 +39,6 @@ QString ZCode::actionName(quint8 action)
         case AndAssign:         return "&=";
         case OrAssign:          return "|=";
         case XorAssign:         return "^=";
-        case ContraryAssign:    return "~=";
         case ModAssign:         return "%=";
         case NotAssign:         return "!=";
         case Less:              return "<";
@@ -61,13 +61,16 @@ QString ZCode::actionName(quint8 action)
         case PrefixSubSelf:     return "--(prefix)";
         case PostfixSubSelf:    return "--(postfix)";
         case Get:               return ".";
-        case Join:              return ",";
+        case JoinToTuple:       return "join to tuple";
+        case JoinToList:        return "join to list";
         case Call:              return "call";
         case Push:              return "push";
         case Pop:               return "pop";
         case PopAll:            return "pop all";
         case Goto:              return "goto";
         case If:                return "if";
+        case Children:          return "[](get children)";
+        case Append:            return "<<(append)";
         case Unknow:            return "unknow";
     }
 
@@ -316,18 +319,34 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             virtualStack.push(&temporaryList.last());
             break;
         }
-        case Join: {     /// join to ZGroup
-            ZVariant::ZTuple group;
+        case JoinToTuple: {     /// join to ZTuple
+            ZVariant::ZTuple tuple;
 
             int argsCount = virtualStack.pop()->toInt();
 
-            group.reserve(argsCount);
+            tuple.reserve(argsCount);
 
             for(int i = 0; i< argsCount; ++i) {
-                group.insert(0, virtualStack.pop());
+                tuple.insert(0, virtualStack.pop());
             }
 
-            temporaryList << std::move(group);
+            temporaryList << std::move(tuple);
+
+            virtualStack.push(&temporaryList.last());
+            break;
+        }
+        case JoinToList: {     /// join to Variant List
+            QList<ZVariant> list;
+
+            int argsCount = virtualStack.pop()->toInt();
+
+            list.reserve(argsCount);
+
+            for(int i = 0; i< argsCount; ++i) {
+                list.insert(0, ZVariant::copy(*virtualStack.pop()));
+            }
+
+            temporaryList << ZVariant(list);
 
             virtualStack.push(&temporaryList.last());
             break;
@@ -375,6 +394,21 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             if(!virtualStack.pop()->toBool())
                 i = code->toValueCode()->value->toInt() - 1;
 
+            break;
+        }
+        case Children: {
+            const ZVariant &value = *virtualStack.pop();
+            const ZVariant &target = *virtualStack.pop();
+
+            temporaryList << target[value];
+            virtualStack.push(&temporaryList.last());
+            break;
+        }
+        case Append:{
+            const ZVariant &value = *virtualStack.pop();
+            ZVariant &target = *virtualStack.top();
+
+            target << value;
             break;
         }
         default: break;
@@ -446,8 +480,8 @@ ZCodeExecuter::ZCodeExecuter()
 
 ZCodeExecuter::~ZCodeExecuter()
 {
-    qDeleteAll(codeBlockList);
-    qDeleteAll(codeList);
+    deleteAllCodeBlock();
+    deleteAllCode();
     qDeleteAll(gotoLabelMap);
 }
 
@@ -471,8 +505,7 @@ int ZCodeExecuter::eval()
 
     endCodeBlock();
 
-    qDeleteAll(codeBlockList);
-    codeBlockList.clear();
+    deleteAllCodeBlock();
     gotoLabelMap.clear();
 
     bool ok;
@@ -638,6 +671,7 @@ void ZCodeExecuter::endCodeBlock()
                 *val_pointer.data() = *val;
             } else {
                 zError << "undefined reference:" << name;
+                zErrorQuit;
             }
         }
     }
@@ -670,8 +704,7 @@ ZCodeExecuter *ZCodeExecuter::endCodeExecuter()
     if(!executer)
         return executer;
 
-    qDeleteAll(executer->codeBlockList);
-    executer->codeBlockList.clear();
+    executer->deleteAllCodeBlock();
     executer->gotoLabelMap.clear();
 
     currentCodeExecuter = executer->parent;

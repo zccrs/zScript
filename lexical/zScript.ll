@@ -15,7 +15,7 @@ yy::parser::location_type *yyloc = Q_NULLPTR;
 %}
 
 identifier [a-zA-Z_][a-zA-Z0-9_]*
-number [1-9][0-9]*
+number [0-9]+
 real ({number}|0)\.[0-9]+
 operator [-+*/=!<>,;{}\(\)\[\]&\|\^%~.?:@_]
 ignore [ \t]
@@ -57,6 +57,8 @@ ignore [ \t]
 "||"            { return TOKEN_PREFIX::LOR;}
 "&&="           { return TOKEN_PREFIX::LANDASSIGN;}
 "||="           { return TOKEN_PREFIX::LORASSIGN;}
+"<<"            { return TOKEN_PREFIX::LL;}
+">>"            { return TOKEN_PREFIX::GG;}
 
 "true" {
     yylval->identifier = new QByteArray("true");

@@ -23,27 +23,26 @@ struct ZCode
     enum Action
     {
         LeftAssign,         // =                            0
-        RightAssign,        // =
-        Add,                // +                            1
-        Sub,                // -                            2
-        Mul,                // *                            3
-        Div,                // /                            4
-        Abs,                // +                            5
-        Minus,              // -                            6
-        And,                // &                            7
-        Or,                 // |                            8
-        Xor,                // ^                            9
+        RightAssign,        // =                            1
+        Add,                // +                            2
+        Sub,                // -                            3
+        Mul,                // *                            4
+        Div,                // /                            5
+        Abs,                // +                            6
+        Minus,              // -                            7
+        And,                // &                            8
+        Or,                 // |                            9
+        Xor,                // ^                            10
         Contrary,           // ~                            10
-        Mod,                // %                            11
-        Not,                // !                            12
-        AddAssign,          // +=                           13
-        SubAssign,          // -=                           14
-        MulAssign,          // *=                           15
-        DivAssign,          // /=                           16
-        AndAssign,          // &=                           17
-        OrAssign,           // |=                           18
-        XorAssign,          // ^=                           19
-        ContraryAssign,     // ~=                           20        remove
+        Mod,                // %                            12
+        Not,                // !                            13
+        AddAssign,          // +=                           14
+        SubAssign,          // -=                           15
+        MulAssign,          // *=                           16
+        DivAssign,          // /=                           17
+        AndAssign,          // &=                           18
+        OrAssign,           // |=                           19
+        XorAssign,          // ^=                           20
         ModAssign,          // %=                           21
         NotAssign,          // !=                           22        remove
         Less,               // <                            23
@@ -66,14 +65,17 @@ struct ZCode
         PrefixSubSelf,      // --                           40
         PostfixSubSelf,     // --                           41
         Get,                // .                            42
-        Join,               // ,                            43     join variant
-        Call,               // ()                           44
-        Push,               // push target value to stack   45
-        Pop,                // pop stack                    46
-        PopAll,             // clear stack                  47
-        Goto,               // goto code index              48
-        If,                 // if                           49
-        Unknow              //                              50
+        JoinToTuple,        // join                         43      join to tuple
+        JoinToList,         // join                         44      join to list
+        Call,               // ()                           45
+        Push,               // push target value to stack   46
+        Pop,                // pop stack                    47
+        PopAll,             // clear stack                  48
+        Goto,               // goto code index              49
+        If,                 // if                           50
+        Children,           // get children(X[])            51
+        Append,             // << add children to last      52
+        Unknow              //                              53
     };
 
     static QString actionName(quint8 action);
@@ -83,6 +85,9 @@ struct ZCode
     quint8 action = Unknow;
 
     static QStack<ZVariant*> virtualStack;
+
+    inline bool isValueCode() const
+    {return action == Push || action == Goto || action == If;}
 
     inline const ValueCode *toValueCode() const;
     inline ValueCode *toValueCode();
@@ -267,6 +272,36 @@ private:
     ZCodeExecuter();
 
     ZCode *createCode(const ZCode::Action &action, const ZSharedVariantPointer &val);
+
+    inline void deleteAllCodeBlock()
+    {
+        for(int i = 0; i < codeBlockList.count(); ++i) {
+            CodeBlock *block = codeBlockList.at(i);
+
+            if(block->type == CodeBlock::NormalFor) {
+                delete block->toForCodeBlock();
+            } else {
+                delete block;
+            }
+        }
+
+        codeBlockList.clear();
+    }
+
+    inline void deleteAllCode()
+    {
+        for(int i = 0; i < codeList.count(); ++i) {
+            ZCode *code = codeList.at(i);
+
+            if(code->isValueCode()) {
+                delete code->toValueCode();
+            } else {
+                delete code;
+            }
+        }
+
+        codeList.clear();
+    }
 
     ZCodeExecuter *parent = Q_NULLPTR;
 

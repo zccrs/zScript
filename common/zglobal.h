@@ -11,7 +11,7 @@
 #define zWarning qWarning().noquote() << "[Warning]:"
 #define zPrint qDebug().noquote()
 #define zStandardPrint std::cout
-#define zExit(code) exit(code)
+#define zExit(code) quick_exit(code)
 #define zErrorQuit zExit(-1)
 #define zQuit zExit(0)
 

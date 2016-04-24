@@ -36,8 +36,8 @@ Z_USE_NAMESPACE
 /// identifier
 %token <identifier> IDENTIFIER INT STRING BOOL DOUBLE
 
-///     ==  ===    !=  !==  <= >=  &&   ||   ++      --
-%token  EQ  STEQ  NEQ STNEQ LE GE LAND LOR ADDSELF SUBSELF
+///     ==  ===    !=  !==  <= >=  &&   ||   ++      --    << >>
+%token  EQ  STEQ  NEQ STNEQ LE GE LAND LOR ADDSELF SUBSELF LL GG
 ///         /=        *=        +=       -=         %=        &=       |=       ^=        ||=        &&=
 %token  DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
 
@@ -55,7 +55,8 @@ Z_USE_NAMESPACE
 %left '-' '+'
 %left '*' '/' '%'
 %left UMINUS ADDSELF SUBSELF '!' '~'
-%left PROMOTION
+//%left PROMOTION
+%left '[' ']'
 %left '(' ')'
 
 %type <valueType> expression lvalue rvalue
@@ -84,7 +85,7 @@ code:       GOTO IDENTIFIER ends {
             }
             | tuple_lval {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($1), ZVariant::Int));
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::JoinToTuple);
             }
             '=' expression ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LeftAssign);
@@ -176,7 +177,7 @@ return:     RETURN {
             | RETURN expression
             | RETURN tuple_exp {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($2), ZVariant::Int));
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::JoinToTuple);
             }
             ;
 
@@ -237,7 +238,8 @@ lvalue:     VAR define {
             }
             | expression '[' expression ']' {
                 $$ = ValueType::Variant;
-                /// TODO
+
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Children);
             }
             | expression '.' IDENTIFIER {
                 $$ = ValueType::Variant;
@@ -339,6 +341,18 @@ rvalue:     UNDEFINED {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(*$1, ZVariant::Bool));
 
                 delete $1;
+            }
+            | '[' tuple_exp ']' {
+                $$ = ValueType::Variant;
+
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($2), ZVariant::Int));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::JoinToList);
+            }
+            | '[' expression ']' {
+                $$ = ValueType::Variant;
+
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant("1", ZVariant::Int));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::JoinToList);
             }
             | NEW IDENTIFIER {
                 /// TODO
@@ -701,6 +715,11 @@ rvalue:     UNDEFINED {
                 $$ = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PostfixSubSelf);
+            }
+            | lvalue LL expression {
+                $$ = ValueType::Variant;
+
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Append);
             }
             | function {
                 $$ = ValueType::Variant;

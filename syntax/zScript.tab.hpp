@@ -181,20 +181,21 @@ namespace yy {
         LOR = 284,
         ADDSELF = 285,
         SUBSELF = 286,
-        DIVASSIGN = 287,
-        MULASSIGN = 288,
-        ADDASSIGN = 289,
-        SUBASSIGN = 290,
-        MODASSIGN = 291,
-        ANDASSIGN = 292,
-        ORASSIGN = 293,
-        XORASSIGN = 294,
-        LANDASSIGN = 295,
-        LORASSIGN = 296,
-        COMMA = 297,
-        LTGT = 298,
-        UMINUS = 299,
-        PROMOTION = 300
+        LL = 287,
+        GG = 288,
+        DIVASSIGN = 289,
+        MULASSIGN = 290,
+        ADDASSIGN = 291,
+        SUBASSIGN = 292,
+        MODASSIGN = 293,
+        ANDASSIGN = 294,
+        ORASSIGN = 295,
+        XORASSIGN = 296,
+        LANDASSIGN = 297,
+        LORASSIGN = 298,
+        COMMA = 299,
+        LTGT = 300,
+        UMINUS = 301
       };
     };
 
@@ -355,7 +356,7 @@ namespace yy {
     /// \param yyvalue   the value to check
     static bool yy_table_value_is_error_ (int yyvalue);
 
-    static const short int yypact_ninf_;
+    static const signed char yypact_ninf_;
     static const signed char yytable_ninf_;
 
     /// Convert a scanner token number \a t to a symbol number.
@@ -372,7 +373,7 @@ namespace yy {
   static const unsigned char yydefact_[];
 
   // YYPGOTO[NTERM-NUM].
-  static const short int yypgoto_[];
+  static const signed char yypgoto_[];
 
   // YYDEFGOTO[NTERM-NUM].
   static const short int yydefgoto_[];
@@ -499,12 +500,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 974,     ///< Last index in yytable_.
+      yylast_ = 940,     ///< Last index in yytable_.
       yynnts_ = 28,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 72  ///< Number of tokens.
+      yyntokens_ = 73  ///< Number of tokens.
     };
 
 
@@ -513,7 +514,7 @@ namespace yy {
 
 
 } // yy
-#line 517 "zScript.tab.hpp" // lalr1.cc:377
+#line 518 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

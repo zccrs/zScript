@@ -190,6 +190,9 @@ const char *ZVariant::typeName() const
 
 int ZVariant::toInt(bool *ok) const
 {
+    if(ok)
+        *ok = true;
+
     switch(data->type) {
     case Int:
         return data->variant.toInt();
@@ -212,6 +215,9 @@ int ZVariant::toInt(bool *ok) const
 
 double ZVariant::toDouble(bool *ok) const
 {
+    if(ok)
+        *ok = true;
+
     switch(data->type) {
     case Int:
         return data->variant.toInt();
@@ -279,6 +285,48 @@ ZFunction *ZVariant::toFunction() const
     return qobject_cast<ZFunction*>(toObject());
 }
 
+ZVariant ZVariant::operator[](const ZVariant &value) const
+{
+    switch (data->type) {
+    case List: {
+        bool ok = false;
+
+        const ZVariant &val = toList().value(value.toInt(&ok));
+
+        if(!ok)
+            return ZVariant();
+        else
+            return val;
+    }
+    case Tuple: {
+        bool ok;
+
+        const ZVariant &val = *toTuple().value(value.toInt(&ok));
+
+        if(!ok)
+            return ZVariant();
+        else
+            return val;
+    }
+    case String: {
+        bool ok;
+
+        int index = value.toInt(&ok);
+        const QString &str = toString();
+
+        if(!ok || index >= str.size())
+            return QString();
+        else
+            return QString(str.at(index));
+    }
+    case Function:
+    case Object:
+        return toObject()->property(value.toString().toLatin1().constData());
+    default:
+        return Undefined;
+    }
+}
+
 QDebug operator<<(QDebug deg, const ZVariant &var)
 {
     deg.nospace() << "Variant(" << var.typeName() << ", ";
@@ -289,8 +337,13 @@ QDebug operator<<(QDebug deg, const ZVariant &var)
         break;
     case ZVariant::Function:
         deg.nospace() << var.toFunction();
+        break;
     case ZVariant::Undefined:
         deg.nospace() << var.typeName();
+        break;
+    case ZVariant::List:
+    case ZVariant::Tuple:
+        deg.noquote() << var.toList();
         break;
     default:
         deg.nospace() << var.toString();

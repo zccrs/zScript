@@ -168,6 +168,31 @@ public:
         default: return Undefined;
         }
     }
+    inline ZVariant operator<<(const ZVariant &value)
+    {
+        switch (data->type) {
+        case List:
+            data->variant = QVariant::fromValue(toList() += value);
+            break;
+        case String:
+            data->variant = toString().append(value.toString());
+            break;
+        default:
+            break;
+        }
+
+        return *this;
+    }
+    ZVariant operator[](const ZVariant &value) const;
+
+    inline static ZVariant copy(const ZVariant &value)
+    {
+        ZVariant val(value.data->type);
+
+        val.data->variant = value.data->variant;
+
+        return val;
+    }
 
 private:
     class VariantData : public QSharedData
