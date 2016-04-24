@@ -17,6 +17,7 @@ typedef QExplicitlySharedDataPointer<ZSharedVariant> ZSharedVariantPointer;
 
 Z_BEGIN_NAMESPACE
 
+struct ValueCode;
 struct ZCode
 {
     enum Action
@@ -82,6 +83,9 @@ struct ZCode
     quint8 action = Unknow;
 
     static QStack<ZVariant*> virtualStack;
+
+    inline const ValueCode *toValueCode() const;
+    inline ValueCode *toValueCode();
 };
 
 struct ValueCode : public ZCode
@@ -89,26 +93,47 @@ struct ValueCode : public ZCode
     ZSharedVariantPointer value;
 };
 
+const ValueCode *ZCode::toValueCode() const
+{ return static_cast<const ValueCode*>(this);}
+ValueCode *ZCode::toValueCode()
+{ return static_cast<ValueCode*>(this);}
+
 class ZCodeExecuter
 {
 public:
     ~ZCodeExecuter();
 
+    struct NormalForCodeBlock;
     struct CodeBlock{
         enum Type {
-            Normal,
-            Function,
-            While,
-            If
+            Normal = 0x01,
+            Function = 0x02,
+            While = 0x04,
+            NormalFor = 0x08,
+            LoopStructure = While | NormalFor,
+            If = 0x10
         };
 
         int beginCodeIndex;
 
-        quint8 type = Normal;
+        Type type = Normal;
         CodeBlock *parent = Q_NULLPTR;
 
         QMap<QByteArray, ZSharedVariantPointer> identifiers;
         QMap<QByteArray, ZSharedVariantPointer> undefinedIdentifier;
+
+        inline bool isLoopStructure() const
+        { return (type | LoopStructure) == LoopStructure;}
+
+        inline const NormalForCodeBlock *toNormalFor() const
+        { return static_cast<const NormalForCodeBlock*>(this);}
+        inline NormalForCodeBlock *toNormalFor()
+        { return static_cast<NormalForCodeBlock*>(this);}
+    };
+
+    struct NormalForCodeBlock : public CodeBlock{
+        /// 普通for循环中第三个表达式开始的指令在codeList中的index
+        int lastExpressionActionIndex;
     };
 
     inline static void registerIdentifier(const QByteArray &name, ZSharedVariant *variant)
@@ -183,6 +208,21 @@ public:
     inline CodeBlock *getCodeBlock() const
     { return currentCodeBlock;}
 
+    inline CodeBlock *getCodeBlockByType(CodeBlock::Type type) const
+    {
+        CodeBlock *block = currentCodeBlock;
+
+        while(block) {
+            if((block->type | type) == type) {
+                return block;
+            }
+
+            block = block->parent;
+        }
+
+        return block;
+    }
+
     inline QVector<ZSharedVariant*> &getParameterList()
     { return parameterList;}
 
@@ -200,7 +240,6 @@ private:
     ZCodeExecuter();
 
     ZCode *createCode(const ZCode::Action &action, const ZSharedVariantPointer &val);
-
 
     ZCodeExecuter *parent = Q_NULLPTR;
 

@@ -35,6 +35,8 @@ ignore [ \t]
 "undefined"     { return TOKEN_PREFIX::UNDEFINED;}
 "goto"          { return TOKEN_PREFIX::GOTO;}
 "return"        { return TOKEN_PREFIX::RETURN;}
+"break"         { return TOKEN_PREFIX::BREAK;}
+"containue"     { return TOKEN_PREFIX::CONTAINUE;}
 "=="            { return TOKEN_PREFIX::EQ;}
 "==="           { return TOKEN_PREFIX::STEQ;}
 "!="            { return TOKEN_PREFIX::NEQ;}

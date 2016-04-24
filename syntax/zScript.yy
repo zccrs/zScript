@@ -13,8 +13,8 @@ enum ValueType {
     Constant
 };
 
-/// if current code block belong be which is true else is false.
-int forCycieBeginCodeIndex = 0;
+/// 记录普通的for循环语句的if指令在codeList中的index
+int forCycieBeginCodeIndex = -1;
 
 Z_USE_NAMESPACE
 
@@ -34,7 +34,7 @@ Z_USE_NAMESPACE
 };
 
 /// keyword
-%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR UNDEFINED GOTO RETURN
+%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR UNDEFINED GOTO RETURN BREAK CONTAINUE
 
 /// identifier
 %token <identifier> IDENTIFIER INT STRING BOOL DOUBLE
@@ -53,7 +53,7 @@ Z_USE_NAMESPACE
 %right '?' ':'
 %left LAND LOR
 %left '&' '|' '^'
-%left EQ NEQ
+%left EQ NEQ STEQ STNEQ
 %left '>' '<' GE LE LTGT
 %left '-' '+'
 %left '*' '/' '%'
@@ -68,28 +68,21 @@ Z_USE_NAMESPACE
 
 %%
 
-start:      | start code | start '\n'
+start:      | start code {
+                  if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
+                          && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
+                      ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
+            }
+            | start '\n'
 
 code:       GOTO IDENTIFIER ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->getGotoLabel(*$2));
 
                 delete $2;
             }
-            | conditional {
-                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
-                        && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
-                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
-            }
-            | goto_label {
-                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
-                        && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
-                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
-            }
-            | expression ends {
-                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
-                        && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
-                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
-            }
+            | conditional
+            | goto_label
+            | expression ends
             | return ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstantByValue(ZVariant(INT32_MAX)));
             }
@@ -97,8 +90,20 @@ code:       GOTO IDENTIFIER ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number($1), ZVariant::Int));
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
             }
-            '=' expression {
+            '=' expression ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LeftAssign);
+            }
+            | CONTAINUE ends {
+                ZCodeExecuter::CodeBlock *block_while = ZCodeExecuter::currentCodeExecuter->getCodeBlockByType(ZCodeExecuter::CodeBlock::LoopStructure);
+
+                if(!block_while) {
+                    zError << "\"containue\" Cannot be used here";
+                    YYABORT;
+                }
+
+                int index = block_while->type == ZCodeExecuter::CodeBlock::NormalFor ? block_while->toNormalFor()->lastExpressionActionIndex : block_while->beginCodeIndex;
+
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstant(QByteArray::number(index), ZVariant::Int));
             }
             | ';'
             | '{' start '}'
@@ -688,6 +693,7 @@ branch_head:IF '(' expression ')' {
                 ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::If);
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
+                /// 存储if语句判断为假时要跳转到的指令位置
                 $$ = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last())->value;
             }
             | WHILE {
@@ -695,27 +701,56 @@ branch_head:IF '(' expression ')' {
             } '(' expression ')' {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
+                /// 存储if语句判断为假时要跳转到的指令位置
                 $$ = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last())->value;
             }
             | FOR '(' expression ends {
-                ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::While);
+                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
+                            && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
+
+                ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::NormalFor);
             } expression ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
+                /// 记录for循环的if语句的index
                 forCycieBeginCodeIndex = ZCodeExecuter::currentCodeExecuter->getCodeList().count() - 1;
             } expression ')' {
+                /// 将if语句的ValueCode的值传递到下一层，方便更改if语句判断为假时的跳转位置
                 $$ = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().value(forCycieBeginCodeIndex))->value;
-            }
-            | FOR '(' lvalue ':' expression ')' {
-                $$ = Q_NULLPTR;
 
-                ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::While);
+                int currentCodeCount = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
+
+                /// 使用lastExpressionActionIndex临时记录表达式3生成指令的个数
+                ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toNormalFor()->lastExpressionActionIndex = currentCodeCount - forCycieBeginCodeIndex;
+
+                if(currentCodeCount > 1 && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
             }
+//            | FOR '(' lvalue ':' expression ')' {
+//                $$ = Q_NULLPTR;
+
+//                ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::While);
+//            }
             | branch_head '\n'
             ;
 
 branch_body :branch_head code {
-                if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->type == ZCodeExecuter::CodeBlock::While) {
+                if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->isLoopStructure()) {
+                    zDebug << ZCodeExecuter::currentCodeExecuter->getCodeBlock()->type;
+
+                    /// 如果是普通的for循环结构
+                    if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->type == ZCodeExecuter::CodeBlock::NormalFor) {
+                        QList<ZCode*> &codeList = ZCodeExecuter::currentCodeExecuter->getCodeList();
+                        int forCycieLastExpressionInstructionsCount = ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toNormalFor()->lastExpressionActionIndex;
+                        ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toNormalFor()->lastExpressionActionIndex = codeList.count() - forCycieLastExpressionInstructionsCount;
+
+                        /// 将for循环的第三个表达式的指令移动到正确的位置
+                        while(--forCycieLastExpressionInstructionsCount) {
+                            codeList.move(forCycieBeginCodeIndex + 1, codeList.count() - 1);
+                        }
+                    }
+
                     int index = ZCodeExecuter::currentCodeExecuter->getCodeBlock()->beginCodeIndex;
 
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstant(QByteArray::number(index), ZVariant::Int));
@@ -723,6 +758,7 @@ branch_body :branch_head code {
 
                 int index = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 
+                /// index为if判断结果为假时要跳转到的位置
                 *$1 = ZCodeExecuter::createConstant(QByteArray::number(index), ZVariant::Int);
                 $$ = $1;
 
@@ -734,16 +770,20 @@ branch_else : branch_body ELSE | branch_else '\n'
 
 conditional:branch_body
             | branch_else {
+                /// 如果if判断为真时会执行此goto指令，让其跳转到else代码块后面的语句
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Action::Goto,
                                              ZCodeExecuter::createConstant("", ZVariant::Undefined));
 
                 int index = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 
+                /// 更改if判断为假时跳转到的位置
                 *$1 = ZCodeExecuter::createConstant(QByteArray::number(index), ZVariant::Int);
 
                 $1 = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last())->value;
             } code {
                  int index = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
+
+                 /// index为if为真时跳转到的位置
                 *$1 = ZCodeExecuter::createConstant(QByteArray::number(index), ZVariant::Int);
             }
 %%

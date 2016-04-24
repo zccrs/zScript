@@ -271,6 +271,8 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
         case PrefixAddSelf: {     // "++(prefix)";
             ZVariant &left_val = *virtualStack.top();
 
+//            left_val.depthCopyAssign(1 + left_val);
+
             left_val = 1 + left_val;
             break;
         }
@@ -589,7 +591,13 @@ ZCode *ZCodeExecuter::createCode(const ZCode::Action &action, const ZSharedVaria
 
 void ZCodeExecuter::beginCodeBlock(CodeBlock::Type type)
 {
-    CodeBlock *block = new CodeBlock;
+    CodeBlock *block;
+
+    if(type == CodeBlock::NormalFor) {
+        block = new NormalForCodeBlock;
+    } else {
+        block = new CodeBlock;
+    }
 
     codeBlockList << block;
 
