@@ -13,9 +13,6 @@ enum ValueType {
     Constant
 };
 
-/// 记录普通的for循环语句的if指令在codeList中的index
-int forCycieBeginCodeIndex = -1;
-
 Z_USE_NAMESPACE
 
 %}
@@ -68,12 +65,7 @@ Z_USE_NAMESPACE
 
 %%
 
-start:      | start code {
-                  if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
-                          && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
-                      ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
-            }
-            | start '\n'
+start:      | start code | start '\n'
 
 code:       GOTO IDENTIFIER ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->getGotoLabel(*$2));
@@ -82,7 +74,11 @@ code:       GOTO IDENTIFIER ends {
             }
             | conditional
             | goto_label
-            | expression ends
+            | expression ends {
+                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
+                        && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
+            }
             | return ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstantByValue(ZVariant(INT32_MAX)));
             }
@@ -92,6 +88,10 @@ code:       GOTO IDENTIFIER ends {
             }
             '=' expression ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LeftAssign);
+
+                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
+                        && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
             }
             | CONTAINUE ends {
                 ZCodeExecuter::CodeBlock *block_while = ZCodeExecuter::currentCodeExecuter->getCodeBlockByType(ZCodeExecuter::CodeBlock::LoopStructure);
@@ -101,9 +101,7 @@ code:       GOTO IDENTIFIER ends {
                     YYABORT;
                 }
 
-                int index = block_while->type == ZCodeExecuter::CodeBlock::NormalFor ? block_while->toNormalFor()->lastExpressionActionIndex : block_while->beginCodeIndex;
-
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstant(QByteArray::number(index), ZVariant::Int));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toForCodeBlock()->containueIndex);
             }
             | ';'
             | '{' start '}'
@@ -328,8 +326,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value + *last_code->value);
 
@@ -344,8 +342,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value - *last_code->value);
 
@@ -360,8 +358,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value * *last_code->value);
 
@@ -376,8 +374,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value / *last_code->value);
 
@@ -392,8 +390,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value & *last_code->value);
 
@@ -408,8 +406,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value | *last_code->value);
 
@@ -424,8 +422,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value ^ *last_code->value);
 
@@ -440,8 +438,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value % *last_code->value);
 
@@ -456,8 +454,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value > *last_code->value);
 
@@ -472,8 +470,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value < *last_code->value);
 
@@ -488,8 +486,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value == *last_code->value);
 
@@ -504,8 +502,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value != *last_code->value);
 
@@ -520,8 +518,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(pre_code->value->type() == last_code->value->type()
                                                                      && *pre_code->value == *last_code->value);
@@ -537,8 +535,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(pre_code->value->type() == last_code->value->type()
                                                                      && *pre_code->value != *last_code->value);
@@ -554,8 +552,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value <= *last_code->value);
 
@@ -570,8 +568,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value >= *last_code->value);
 
@@ -586,8 +584,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value && *last_code->value);
 
@@ -602,8 +600,8 @@ rvalue:     UNDEFINED {
                     if($1 == ValueType::Constant && $3 == ValueType::Constant) {
                         $$ = $1;
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value || *last_code->value);
 
@@ -618,7 +616,7 @@ rvalue:     UNDEFINED {
                     if($2 == ValueType::Constant) {
                         $$ = $2;
 
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(~ *last_code->value);
                     } else {
@@ -631,7 +629,7 @@ rvalue:     UNDEFINED {
                     if($2 == ValueType::Constant) {
                         $$ = $2;
 
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(! *last_code->value);
                     } else {
@@ -644,7 +642,7 @@ rvalue:     UNDEFINED {
                     if($2 == ValueType::Constant) {
                         $$ = $2;
 
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(- *last_code->value);
                     } else {
@@ -657,7 +655,7 @@ rvalue:     UNDEFINED {
                     if($2 == ValueType::Constant) {
                         $$ = $2;
 
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(+ *last_code->value);
                     } else {
@@ -694,7 +692,7 @@ branch_head:IF '(' expression ')' {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
                 /// 存储if语句判断为假时要跳转到的指令位置
-                $$ = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last())->value;
+                $$ = &ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
             }
             | WHILE {
                 ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::While);
@@ -702,7 +700,7 @@ branch_head:IF '(' expression ')' {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
                 /// 存储if语句判断为假时要跳转到的指令位置
-                $$ = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last())->value;
+                $$ = &ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
             }
             | FOR '(' expression ends {
                 if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
@@ -713,19 +711,24 @@ branch_head:IF '(' expression ')' {
             } expression ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
-                /// 记录for循环的if语句的index
-                forCycieBeginCodeIndex = ZCodeExecuter::currentCodeExecuter->getCodeList().count() - 1;
+                /// 记录for循环的if指令在codeList中的index，方便修改if指令为假时要跳转到的指令位置
+                ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toForCodeBlock()->ifInstructionIndex = ZCodeExecuter::currentCodeExecuter->getCodeList().count() - 1;
+
+                /// 开启使用临时列表储存code
+                ZCodeExecuter::currentCodeExecuter->setEnableTmpCodeList(true);
             } expression ')' {
-                /// 将if语句的ValueCode的值传递到下一层，方便更改if语句判断为假时的跳转位置
-                $$ = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().value(forCycieBeginCodeIndex))->value;
+                /// 关闭使用临时列表储存code
+                ZCodeExecuter::currentCodeExecuter->setEnableTmpCodeList(false);
 
-                int currentCodeCount = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
-
-                /// 使用lastExpressionActionIndex临时记录表达式3生成指令的个数
-                ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toNormalFor()->lastExpressionActionIndex = currentCodeCount - forCycieBeginCodeIndex;
-
-                if(currentCodeCount > 1 && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
+                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
+                        && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll) {
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
+                }
+
+                int ifInstructionIndex = ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toForCodeBlock()->ifInstructionIndex;
+
+                /// 将if语句的ValueCode的值传递到下一层，方便更改if语句判断为假时的跳转位置
+                $$ = &ZCodeExecuter::currentCodeExecuter->getCodeList().value(ifInstructionIndex)->toValueCode()->value;
             }
 //            | FOR '(' lvalue ':' expression ')' {
 //                $$ = Q_NULLPTR;
@@ -737,22 +740,23 @@ branch_head:IF '(' expression ')' {
 
 branch_body :branch_head code {
                 if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->isLoopStructure()) {
-                    zDebug << ZCodeExecuter::currentCodeExecuter->getCodeBlock()->type;
-
                     /// 如果是普通的for循环结构
                     if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->type == ZCodeExecuter::CodeBlock::NormalFor) {
                         QList<ZCode*> &codeList = ZCodeExecuter::currentCodeExecuter->getCodeList();
-                        int forCycieLastExpressionInstructionsCount = ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toNormalFor()->lastExpressionActionIndex;
-                        ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toNormalFor()->lastExpressionActionIndex = codeList.count() - forCycieLastExpressionInstructionsCount;
+                        QList<ZCode*> &tmpCodeList = ZCodeExecuter::currentCodeExecuter->getTmpCodeList();
 
-                        /// 将for循环的第三个表达式的指令移动到正确的位置
-                        while(--forCycieLastExpressionInstructionsCount) {
-                            codeList.move(forCycieBeginCodeIndex + 1, codeList.count() - 1);
+                        /// 记录在for循环中执行containue语句时要跳转到的目标位置
+                        *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toForCodeBlock()->containueIndex.data() = codeList.count();
+
+                        /// 将for循环的第三个表达式的指令从临时列表添加到codeList
+                        while(!tmpCodeList.isEmpty()) {
+                            codeList << tmpCodeList.takeAt(0);
                         }
                     }
 
                     int index = ZCodeExecuter::currentCodeExecuter->getCodeBlock()->beginCodeIndex;
 
+                    /// 产生循环
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstant(QByteArray::number(index), ZVariant::Int));
                 }
 
@@ -766,7 +770,8 @@ branch_body :branch_head code {
             }
             | branch_body '\n'
             ;
-branch_else : branch_body ELSE | branch_else '\n'
+
+branch_else:branch_body ELSE | branch_else '\n'
 
 conditional:branch_body
             | branch_else {
@@ -779,7 +784,7 @@ conditional:branch_body
                 /// 更改if判断为假时跳转到的位置
                 *$1 = ZCodeExecuter::createConstant(QByteArray::number(index), ZVariant::Int);
 
-                $1 = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last())->value;
+                $1 = &ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
             } code {
                  int index = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 

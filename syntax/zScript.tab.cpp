@@ -47,13 +47,10 @@ enum ValueType {
     Constant
 };
 
-/// 记录普通的for循环语句的if指令在codeList中的index
-int forCycieBeginCodeIndex = -1;
-
 Z_USE_NAMESPACE
 
 
-#line 57 "zScript.tab.cpp" // lalr1.cc:404
+#line 54 "zScript.tab.cpp" // lalr1.cc:404
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -67,7 +64,7 @@ Z_USE_NAMESPACE
 
 // User implementation prologue.
 
-#line 71 "zScript.tab.cpp" // lalr1.cc:412
+#line 68 "zScript.tab.cpp" // lalr1.cc:412
 
 
 #ifndef YY_
@@ -153,7 +150,7 @@ Z_USE_NAMESPACE
 
 
 namespace yy {
-#line 157 "zScript.tab.cpp" // lalr1.cc:479
+#line 154 "zScript.tab.cpp" // lalr1.cc:479
 
   /// Build a parser object.
   parser::parser ()
@@ -590,49 +587,53 @@ namespace yy {
         {
           switch (yyn)
             {
-  case 3:
-#line 71 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                  if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
-                          && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
-                      ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
-            }
-#line 601 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
   case 5:
-#line 78 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 70 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->getGotoLabel(*(yystack_[1].value.identifier)));
 
                 delete (yystack_[1].value.identifier);
             }
-#line 611 "zScript.tab.cpp" // lalr1.cc:859
+#line 598 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 8:
+#line 77 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
+                        && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
+            }
+#line 608 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 9:
-#line 86 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 82 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstantByValue(ZVariant(INT32_MAX)));
             }
-#line 619 "zScript.tab.cpp" // lalr1.cc:859
+#line 616 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 10:
-#line 89 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 85 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number((yystack_[0].value.count)), ZVariant::Int));
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
             }
-#line 628 "zScript.tab.cpp" // lalr1.cc:859
+#line 625 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 11:
-#line 93 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 89 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LeftAssign);
+
+                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
+                        && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
             }
-#line 636 "zScript.tab.cpp" // lalr1.cc:859
+#line 637 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 12:
@@ -645,25 +646,23 @@ namespace yy {
                     YYABORT;
                 }
 
-                int index = block_while->type == ZCodeExecuter::CodeBlock::NormalFor ? block_while->toNormalFor()->lastExpressionActionIndex : block_while->beginCodeIndex;
-
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstant(QByteArray::number(index), ZVariant::Int));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toForCodeBlock()->containueIndex);
             }
-#line 653 "zScript.tab.cpp" // lalr1.cc:859
+#line 652 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 17:
-#line 114 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 112 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 *ZCodeExecuter::currentCodeExecuter->getGotoLabel(*(yystack_[1].value.identifier)) = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 
                 delete (yystack_[1].value.identifier);
             }
-#line 663 "zScript.tab.cpp" // lalr1.cc:859
+#line 662 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 18:
-#line 128 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 126 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::beginCodeExecuter()->beginCodeBlock();
 
@@ -676,72 +675,72 @@ namespace yy {
                     delete (yystack_[1].value.parameterList);
                 }
             }
-#line 680 "zScript.tab.cpp" // lalr1.cc:859
+#line 679 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 19:
-#line 139 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 137 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::currentCodeExecuter->endCodeBlock();
                 ZCodeExecuter *executer = ZCodeExecuter::endCodeExecuter();
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createFunction(executer));
             }
-#line 691 "zScript.tab.cpp" // lalr1.cc:859
+#line 690 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 20:
-#line 147 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 145 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant("", ZVariant::Undefined));
             }
-#line 699 "zScript.tab.cpp" // lalr1.cc:859
+#line 698 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 22:
-#line 151 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 149 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number((yystack_[0].value.count)), ZVariant::Int));
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Join);
             }
-#line 708 "zScript.tab.cpp" // lalr1.cc:859
+#line 707 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 23:
-#line 157 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 155 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {(yylhs.value.parameterList) = Q_NULLPTR;}
-#line 714 "zScript.tab.cpp" // lalr1.cc:859
+#line 713 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 24:
-#line 158 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 156 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.parameterList) = new QVarLengthArray<QByteArray*, 10>();
                 (yylhs.value.parameterList)->append((yystack_[0].value.identifier));
             }
-#line 723 "zScript.tab.cpp" // lalr1.cc:859
+#line 722 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 25:
-#line 162 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 160 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.parameterList) = (yystack_[2].value.parameterList);
                 (yylhs.value.parameterList)->append((yystack_[0].value.identifier));
             }
-#line 732 "zScript.tab.cpp" // lalr1.cc:859
+#line 731 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 26:
-#line 168 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 166 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::currentCodeExecuter->addIdentifier(*(yystack_[0].value.identifier));
                 delete (yystack_[0].value.identifier);
             }
-#line 741 "zScript.tab.cpp" // lalr1.cc:859
+#line 740 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 27:
-#line 172 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 170 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::currentCodeExecuter->addIdentifier(*(yystack_[2].value.identifier));
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifier(*(yystack_[2].value.identifier)));
@@ -749,43 +748,43 @@ namespace yy {
 
                 delete (yystack_[2].value.identifier);
             }
-#line 753 "zScript.tab.cpp" // lalr1.cc:859
+#line 752 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 29:
-#line 182 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 180 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {(yylhs.value.count) = 2;}
-#line 759 "zScript.tab.cpp" // lalr1.cc:859
+#line 758 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 30:
-#line 183 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 181 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {(yylhs.value.count) = (yystack_[2].value.count) + 1;}
-#line 765 "zScript.tab.cpp" // lalr1.cc:859
+#line 764 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 31:
-#line 186 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 184 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {(yylhs.value.count) = 2;}
-#line 771 "zScript.tab.cpp" // lalr1.cc:859
+#line 770 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 32:
-#line 187 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 185 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {(yylhs.value.count) = (yystack_[2].value.count) + 1;}
-#line 777 "zScript.tab.cpp" // lalr1.cc:859
+#line 776 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 35:
-#line 192 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 190 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
             }
-#line 785 "zScript.tab.cpp" // lalr1.cc:859
+#line 784 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 36:
-#line 195 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 193 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
@@ -793,181 +792,181 @@ namespace yy {
 
                 delete (yystack_[0].value.identifier);
             }
-#line 797 "zScript.tab.cpp" // lalr1.cc:859
+#line 796 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 37:
-#line 202 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 200 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Constant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZSharedVariantPointer(new ZSharedVariant()));
             }
-#line 807 "zScript.tab.cpp" // lalr1.cc:859
+#line 806 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 38:
-#line 207 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 205 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LeftAssign);
             }
-#line 817 "zScript.tab.cpp" // lalr1.cc:859
+#line 816 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 39:
-#line 212 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 210 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
                 /// TODO
             }
-#line 826 "zScript.tab.cpp" // lalr1.cc:859
+#line 825 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 40:
-#line 216 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 214 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(*(yystack_[0].value.identifier), ZVariant::String));
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Get);
             }
-#line 837 "zScript.tab.cpp" // lalr1.cc:859
+#line 836 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 41:
-#line 222 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 220 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::AddAssign);
             }
-#line 847 "zScript.tab.cpp" // lalr1.cc:859
+#line 846 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 42:
-#line 227 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 225 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::SubAssign);
             }
-#line 857 "zScript.tab.cpp" // lalr1.cc:859
+#line 856 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 43:
-#line 232 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 230 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::MulAssign);
             }
-#line 867 "zScript.tab.cpp" // lalr1.cc:859
+#line 866 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 44:
-#line 237 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 235 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::DivAssign);
             }
-#line 877 "zScript.tab.cpp" // lalr1.cc:859
+#line 876 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 45:
-#line 242 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 240 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::AndAssign);
             }
-#line 887 "zScript.tab.cpp" // lalr1.cc:859
+#line 886 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 46:
-#line 247 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 245 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::OrAssign);
             }
-#line 897 "zScript.tab.cpp" // lalr1.cc:859
+#line 896 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 47:
-#line 252 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 250 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::XorAssign);
             }
-#line 907 "zScript.tab.cpp" // lalr1.cc:859
+#line 906 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 48:
-#line 257 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 255 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::ModAssign);
             }
-#line 917 "zScript.tab.cpp" // lalr1.cc:859
+#line 916 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 49:
-#line 262 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 260 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LOrAssign);
             }
-#line 927 "zScript.tab.cpp" // lalr1.cc:859
+#line 926 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 50:
-#line 267 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 265 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LAndAssign);
             }
-#line 937 "zScript.tab.cpp" // lalr1.cc:859
+#line 936 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 51:
-#line 272 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 270 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PrefixAddSelf);
             }
-#line 947 "zScript.tab.cpp" // lalr1.cc:859
+#line 946 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 52:
-#line 277 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 275 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PrefixSubSelf);
             }
-#line 957 "zScript.tab.cpp" // lalr1.cc:859
+#line 956 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 53:
-#line 284 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 282 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Constant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray(), ZVariant::Undefined));
             }
-#line 967 "zScript.tab.cpp" // lalr1.cc:859
+#line 966 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 54:
-#line 289 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 287 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Constant;
 
@@ -975,11 +974,11 @@ namespace yy {
 
                 delete (yystack_[0].value.identifier);
             }
-#line 979 "zScript.tab.cpp" // lalr1.cc:859
+#line 978 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 55:
-#line 296 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 294 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Constant;
 
@@ -987,11 +986,11 @@ namespace yy {
 
                 delete (yystack_[0].value.identifier);
             }
-#line 991 "zScript.tab.cpp" // lalr1.cc:859
+#line 990 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 56:
-#line 303 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 301 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Constant;
 
@@ -999,11 +998,11 @@ namespace yy {
 
                 delete (yystack_[0].value.identifier);
             }
-#line 1003 "zScript.tab.cpp" // lalr1.cc:859
+#line 1002 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 57:
-#line 310 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 308 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Constant;
 
@@ -1011,37 +1010,37 @@ namespace yy {
 
                 delete (yystack_[0].value.identifier);
             }
-#line 1015 "zScript.tab.cpp" // lalr1.cc:859
+#line 1014 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 58:
-#line 317 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 315 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 /// TODO
                 (yylhs.value.valueType) = ValueType::Constant;
             }
-#line 1024 "zScript.tab.cpp" // lalr1.cc:859
+#line 1023 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 59:
-#line 321 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 319 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     (yylhs.value.valueType) = ValueType::Variant;
 
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(QByteArray::number((yystack_[1].value.count)), ZVariant::Int));
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Call);
             }
-#line 1035 "zScript.tab.cpp" // lalr1.cc:859
+#line 1034 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 60:
-#line 327 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 325 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value + *last_code->value);
 
@@ -1052,17 +1051,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Add);
                     }
             }
-#line 1056 "zScript.tab.cpp" // lalr1.cc:859
+#line 1055 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 61:
-#line 343 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 341 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value - *last_code->value);
 
@@ -1073,17 +1072,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Sub);
                     }
             }
-#line 1077 "zScript.tab.cpp" // lalr1.cc:859
+#line 1076 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 62:
-#line 359 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 357 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value * *last_code->value);
 
@@ -1094,17 +1093,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Mul);
                     }
             }
-#line 1098 "zScript.tab.cpp" // lalr1.cc:859
+#line 1097 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 63:
-#line 375 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 373 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value / *last_code->value);
 
@@ -1115,17 +1114,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Div);
                     }
             }
-#line 1119 "zScript.tab.cpp" // lalr1.cc:859
+#line 1118 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 64:
-#line 391 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 389 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value & *last_code->value);
 
@@ -1136,17 +1135,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::And);
                     }
             }
-#line 1140 "zScript.tab.cpp" // lalr1.cc:859
+#line 1139 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 65:
-#line 407 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 405 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value | *last_code->value);
 
@@ -1157,17 +1156,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Or);
                     }
             }
-#line 1161 "zScript.tab.cpp" // lalr1.cc:859
+#line 1160 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 66:
-#line 423 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 421 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value ^ *last_code->value);
 
@@ -1178,17 +1177,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Xor);
                     }
             }
-#line 1182 "zScript.tab.cpp" // lalr1.cc:859
+#line 1181 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 67:
-#line 439 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 437 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value % *last_code->value);
 
@@ -1199,17 +1198,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Mod);
                     }
             }
-#line 1203 "zScript.tab.cpp" // lalr1.cc:859
+#line 1202 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 68:
-#line 455 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 453 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value > *last_code->value);
 
@@ -1220,17 +1219,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Greater);
                     }
             }
-#line 1224 "zScript.tab.cpp" // lalr1.cc:859
+#line 1223 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 69:
-#line 471 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 469 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value < *last_code->value);
 
@@ -1241,17 +1240,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Less);
                     }
             }
-#line 1245 "zScript.tab.cpp" // lalr1.cc:859
+#line 1244 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 70:
-#line 487 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 485 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value == *last_code->value);
 
@@ -1262,17 +1261,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::EQ);
                     }
             }
-#line 1266 "zScript.tab.cpp" // lalr1.cc:859
+#line 1265 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 71:
-#line 503 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 501 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value != *last_code->value);
 
@@ -1283,17 +1282,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::NEQ);
                     }
             }
-#line 1287 "zScript.tab.cpp" // lalr1.cc:859
+#line 1286 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 72:
-#line 519 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 517 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(pre_code->value->type() == last_code->value->type()
                                                                      && *pre_code->value == *last_code->value);
@@ -1305,17 +1304,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::STEQ);
                     }
             }
-#line 1309 "zScript.tab.cpp" // lalr1.cc:859
+#line 1308 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 73:
-#line 536 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 534 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(pre_code->value->type() == last_code->value->type()
                                                                      && *pre_code->value != *last_code->value);
@@ -1327,17 +1326,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::STNEQ);
                     }
             }
-#line 1331 "zScript.tab.cpp" // lalr1.cc:859
+#line 1330 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 74:
-#line 553 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 551 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value <= *last_code->value);
 
@@ -1348,17 +1347,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LE);
                     }
             }
-#line 1352 "zScript.tab.cpp" // lalr1.cc:859
+#line 1351 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 75:
-#line 569 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 567 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value >= *last_code->value);
 
@@ -1369,17 +1368,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::GE);
                     }
             }
-#line 1373 "zScript.tab.cpp" // lalr1.cc:859
+#line 1372 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 76:
-#line 585 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 583 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value && *last_code->value);
 
@@ -1390,17 +1389,17 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LAnd);
                     }
             }
-#line 1394 "zScript.tab.cpp" // lalr1.cc:859
+#line 1393 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 77:
-#line 601 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 599 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[2].value.valueType) == ValueType::Constant && (yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[2].value.valueType);
 
-                        ValueCode *pre_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast());
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value || *last_code->value);
 
@@ -1411,16 +1410,16 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LOr);
                     }
             }
-#line 1415 "zScript.tab.cpp" // lalr1.cc:859
+#line 1414 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 78:
-#line 617 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 615 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[0].value.valueType);
 
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(~ *last_code->value);
                     } else {
@@ -1429,16 +1428,16 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Contrary);
                     }
                 }
-#line 1433 "zScript.tab.cpp" // lalr1.cc:859
+#line 1432 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 79:
-#line 630 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 628 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[0].value.valueType);
 
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(! *last_code->value);
                     } else {
@@ -1447,16 +1446,16 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Not);
                     }
                 }
-#line 1451 "zScript.tab.cpp" // lalr1.cc:859
+#line 1450 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 80:
-#line 643 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 641 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[0].value.valueType);
 
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(- *last_code->value);
                     } else {
@@ -1465,16 +1464,16 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Minus);
                     }
                 }
-#line 1469 "zScript.tab.cpp" // lalr1.cc:859
+#line 1468 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 81:
-#line 656 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 654 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                     if((yystack_[0].value.valueType) == ValueType::Constant) {
                         (yylhs.value.valueType) = (yystack_[0].value.valueType);
 
-                        ValueCode *last_code = static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last());
+                        ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
                         *last_code->value = ZCodeExecuter::createConstantByValue(+ *last_code->value);
                     } else {
@@ -1483,57 +1482,57 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Abs);
                     }
                 }
-#line 1487 "zScript.tab.cpp" // lalr1.cc:859
+#line 1486 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 82:
-#line 669 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 667 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PostfixAddSelf);
             }
-#line 1497 "zScript.tab.cpp" // lalr1.cc:859
+#line 1496 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 83:
-#line 674 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 672 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PostfixSubSelf);
             }
-#line 1507 "zScript.tab.cpp" // lalr1.cc:859
+#line 1506 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 84:
-#line 679 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 677 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
             }
-#line 1515 "zScript.tab.cpp" // lalr1.cc:859
+#line 1514 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 85:
-#line 682 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 680 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     { (yylhs.value.valueType) = (yystack_[1].value.valueType);}
-#line 1521 "zScript.tab.cpp" // lalr1.cc:859
+#line 1520 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 86:
-#line 685 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 683 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {(yylhs.value.count) = 0;}
-#line 1527 "zScript.tab.cpp" // lalr1.cc:859
+#line 1526 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 87:
-#line 686 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 684 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {(yylhs.value.count) = 1;}
-#line 1533 "zScript.tab.cpp" // lalr1.cc:859
+#line 1532 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 89:
-#line 690 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 688 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.value) = Q_NULLPTR;
 
@@ -1541,32 +1540,32 @@ namespace yy {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
                 /// 存储if语句判断为假时要跳转到的指令位置
-                (yylhs.value.value) = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last())->value;
+                (yylhs.value.value) = &ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
             }
-#line 1547 "zScript.tab.cpp" // lalr1.cc:859
+#line 1546 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 90:
-#line 699 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 697 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::While);
             }
-#line 1555 "zScript.tab.cpp" // lalr1.cc:859
+#line 1554 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 91:
-#line 701 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 699 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
                 /// 存储if语句判断为假时要跳转到的指令位置
-                (yylhs.value.value) = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last())->value;
+                (yylhs.value.value) = &ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
             }
-#line 1566 "zScript.tab.cpp" // lalr1.cc:859
+#line 1565 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 92:
-#line 707 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 705 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
                             && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
@@ -1574,57 +1573,63 @@ namespace yy {
 
                 ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::NormalFor);
             }
-#line 1578 "zScript.tab.cpp" // lalr1.cc:859
+#line 1577 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 93:
-#line 713 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 711 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
-                /// 记录for循环的if语句的index
-                forCycieBeginCodeIndex = ZCodeExecuter::currentCodeExecuter->getCodeList().count() - 1;
+                /// 记录for循环的if指令在codeList中的index，方便修改if指令为假时要跳转到的指令位置
+                ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toForCodeBlock()->ifInstructionIndex = ZCodeExecuter::currentCodeExecuter->getCodeList().count() - 1;
+
+                /// 开启使用临时列表储存code
+                ZCodeExecuter::currentCodeExecuter->setEnableTmpCodeList(true);
             }
-#line 1589 "zScript.tab.cpp" // lalr1.cc:859
+#line 1591 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 94:
-#line 718 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 719 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                /// 将if语句的ValueCode的值传递到下一层，方便更改if语句判断为假时的跳转位置
-                (yylhs.value.value) = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().value(forCycieBeginCodeIndex))->value;
+                /// 关闭使用临时列表储存code
+                ZCodeExecuter::currentCodeExecuter->setEnableTmpCodeList(false);
 
-                int currentCodeCount = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
-
-                /// 使用lastExpressionActionIndex临时记录表达式3生成指令的个数
-                ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toNormalFor()->lastExpressionActionIndex = currentCodeCount - forCycieBeginCodeIndex;
-
-                if(currentCodeCount > 1 && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
+                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
+                        && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll) {
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
+                }
+
+                int ifInstructionIndex = ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toForCodeBlock()->ifInstructionIndex;
+
+                /// 将if语句的ValueCode的值传递到下一层，方便更改if语句判断为假时的跳转位置
+                (yylhs.value.value) = &ZCodeExecuter::currentCodeExecuter->getCodeList().value(ifInstructionIndex)->toValueCode()->value;
             }
-#line 1606 "zScript.tab.cpp" // lalr1.cc:859
+#line 1610 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 96:
-#line 738 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 741 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->isLoopStructure()) {
-                    zDebug << ZCodeExecuter::currentCodeExecuter->getCodeBlock()->type;
-
                     /// 如果是普通的for循环结构
                     if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->type == ZCodeExecuter::CodeBlock::NormalFor) {
                         QList<ZCode*> &codeList = ZCodeExecuter::currentCodeExecuter->getCodeList();
-                        int forCycieLastExpressionInstructionsCount = ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toNormalFor()->lastExpressionActionIndex;
-                        ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toNormalFor()->lastExpressionActionIndex = codeList.count() - forCycieLastExpressionInstructionsCount;
+                        QList<ZCode*> &tmpCodeList = ZCodeExecuter::currentCodeExecuter->getTmpCodeList();
 
-                        /// 将for循环的第三个表达式的指令移动到正确的位置
-                        while(--forCycieLastExpressionInstructionsCount) {
-                            codeList.move(forCycieBeginCodeIndex + 1, codeList.count() - 1);
+                        /// 记录在for循环中执行containue语句时要跳转到的目标位置
+                        *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toForCodeBlock()->containueIndex.data() = codeList.count();
+
+                        /// 将for循环的第三个表达式的指令从临时列表添加到codeList
+                        while(!tmpCodeList.isEmpty()) {
+                            codeList << tmpCodeList.takeAt(0);
                         }
                     }
 
                     int index = ZCodeExecuter::currentCodeExecuter->getCodeBlock()->beginCodeIndex;
 
+                    /// 产生循环
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstant(QByteArray::number(index), ZVariant::Int));
                 }
 
@@ -1636,11 +1641,11 @@ namespace yy {
 
                 ZCodeExecuter::currentCodeExecuter->endCodeBlock();
             }
-#line 1640 "zScript.tab.cpp" // lalr1.cc:859
+#line 1645 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 101:
-#line 772 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 777 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 /// 如果if判断为真时会执行此goto指令，让其跳转到else代码块后面的语句
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Action::Goto,
@@ -1651,24 +1656,24 @@ namespace yy {
                 /// 更改if判断为假时跳转到的位置
                 *(yystack_[0].value.value) = ZCodeExecuter::createConstant(QByteArray::number(index), ZVariant::Int);
 
-                (yystack_[0].value.value) = &static_cast<ValueCode*>(ZCodeExecuter::currentCodeExecuter->getCodeList().last())->value;
+                (yystack_[0].value.value) = &ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
             }
-#line 1657 "zScript.tab.cpp" // lalr1.cc:859
+#line 1662 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 102:
-#line 783 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 788 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                  int index = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 
                  /// index为if为真时跳转到的位置
                 *(yystack_[2].value.value) = ZCodeExecuter::createConstant(QByteArray::number(index), ZVariant::Int);
             }
-#line 1668 "zScript.tab.cpp" // lalr1.cc:859
+#line 1673 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
 
-#line 1672 "zScript.tab.cpp" // lalr1.cc:859
+#line 1677 "zScript.tab.cpp" // lalr1.cc:859
             default:
               break;
             }
@@ -2199,17 +2204,17 @@ namespace yy {
   const unsigned short int
   parser::yyrline_[] =
   {
-       0,    71,    71,    71,    76,    78,    83,    84,    85,    86,
-      89,    89,    96,   108,   109,   112,   112,   114,   128,   128,
-     147,   150,   151,   157,   158,   162,   168,   172,   179,   182,
-     183,   186,   187,   190,   190,   192,   195,   202,   207,   212,
-     216,   222,   227,   232,   237,   242,   247,   252,   257,   262,
-     267,   272,   277,   284,   289,   296,   303,   310,   317,   321,
-     327,   343,   359,   375,   391,   407,   423,   439,   455,   471,
-     487,   503,   519,   536,   553,   569,   585,   601,   617,   630,
-     643,   656,   669,   674,   679,   682,   685,   686,   687,   690,
-     699,   699,   707,   713,   707,   735,   738,   767,   769,   769,
-     771,   772,   772
+       0,    68,    68,    68,    68,    70,    75,    76,    77,    82,
+      85,    85,    96,   106,   107,   110,   110,   112,   126,   126,
+     145,   148,   149,   155,   156,   160,   166,   170,   177,   180,
+     181,   184,   185,   188,   188,   190,   193,   200,   205,   210,
+     214,   220,   225,   230,   235,   240,   245,   250,   255,   260,
+     265,   270,   275,   282,   287,   294,   301,   308,   315,   319,
+     325,   341,   357,   373,   389,   405,   421,   437,   453,   469,
+     485,   501,   517,   534,   551,   567,   583,   599,   615,   628,
+     641,   654,   667,   672,   677,   680,   683,   684,   685,   688,
+     697,   697,   705,   711,   705,   738,   741,   771,   774,   774,
+     776,   777,   777
   };
 
   // Print the state stack on the debug stream.
@@ -2295,8 +2300,8 @@ namespace yy {
 
 
 } // yy
-#line 2299 "zScript.tab.cpp" // lalr1.cc:1167
-#line 789 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
+#line 2304 "zScript.tab.cpp" // lalr1.cc:1167
+#line 794 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:1168
 
 
 void yy::parser::error(const location_type& loc, const std::string& msg)

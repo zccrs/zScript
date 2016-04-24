@@ -150,50 +150,58 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             break;
         case AddAssign: {
             ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.top();
 
-            *virtualStack.top() += right_val;
+            left_val.depthCopyAssign(left_val + right_val);
             break;
         }
         case SubAssign: {
             ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.top();
 
-            *virtualStack.top() -= right_val;
+            left_val.depthCopyAssign(left_val - right_val);
             break;
         }
         case MulAssign: {
             ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.top();
 
-            *virtualStack.top() *= right_val;
+            left_val.depthCopyAssign(left_val * right_val);
             break;
         }
         case DivAssign: {
             ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.top();
 
-            *virtualStack.top() /= right_val;
+            left_val.depthCopyAssign(left_val / right_val);
             break;
         }
         case AndAssign: {         // "&=";
             ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.top();
 
-            *virtualStack.top() &= right_val;
+            left_val.depthCopyAssign(left_val & right_val);
             break;
         }
         case OrAssign: {          // "|=";
             ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.top();
 
-            *virtualStack.top() |= right_val;
+            left_val.depthCopyAssign(left_val | right_val);
             break;
         }
         case XorAssign: {         // "^=";
             ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.top();
 
-            *virtualStack.top() ^= right_val;
+            left_val.depthCopyAssign(left_val ^ right_val);
             break;
         }
         case ModAssign: {         // "%=";
             ZVariant &right_val = *virtualStack.pop();
+            ZVariant &left_val = *virtualStack.top();
 
-            *virtualStack.top() %= right_val;
+            left_val.depthCopyAssign(left_val % right_val);
             break;
         }
         case Less:
@@ -258,42 +266,40 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             ZVariant &right_val = *virtualStack.pop();
             ZVariant &left_val = *virtualStack.top();
 
-            left_val = left_val && right_val;
+            left_val.depthCopyAssign(left_val && right_val);
             break;
         }
         case LOrAssign: {         // "||=";
             ZVariant &right_val = *virtualStack.pop();
             ZVariant &left_val = *virtualStack.top();
 
-            left_val = left_val || right_val;
+            left_val.depthCopyAssign(left_val || right_val);
             break;
         }
         case PrefixAddSelf: {     // "++(prefix)";
             ZVariant &left_val = *virtualStack.top();
 
-//            left_val.depthCopyAssign(1 + left_val);
-
-            left_val = 1 + left_val;
+            left_val.depthCopyAssign(1 + left_val);
             break;
         }
         case PostfixAddSelf: {   // "++(postfix)";
             ZVariant &left_val = *virtualStack.pop();
             temporaryList << left_val;
             virtualStack.push(&temporaryList.last());
-            left_val = 1 + left_val;
+            left_val.depthCopyAssign(1 + left_val);
             break;
         }
         case PrefixSubSelf: {     // "--(prefix)";
             ZVariant &left_val = *virtualStack.top();
 
-            left_val = -1 + left_val;
+            left_val.depthCopyAssign(-1 + left_val);
             break;
         }
         case PostfixSubSelf: {   // "--(postfix)";
             ZVariant &left_val = *virtualStack.pop();
             temporaryList << left_val;
             virtualStack.push(&temporaryList.last());
-            left_val = -1 + left_val;
+            left_val.depthCopyAssign(-1 + left_val);
             break;
         }
         case Get: {
@@ -348,7 +354,7 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             /// TODO
         }
         case Push: {
-            ValueCode *valueCode = static_cast<ValueCode*>(code);
+            ValueCode *valueCode = code->toValueCode();
             virtualStack.push(valueCode->value.data());
             break;
         }
@@ -362,12 +368,12 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             break;
         }
         case Goto: {
-            i = static_cast<ValueCode*>(code)->value->toInt() - 1;
+            i = code->toValueCode()->value->toInt() - 1;
             break;
         }
         case If: {
             if(!virtualStack.pop()->toBool())
-                i = static_cast<ValueCode*>(code)->value->toInt() - 1;
+                i = code->toValueCode()->value->toInt() - 1;
 
             break;
         }
@@ -594,7 +600,7 @@ void ZCodeExecuter::beginCodeBlock(CodeBlock::Type type)
     CodeBlock *block;
 
     if(type == CodeBlock::NormalFor) {
-        block = new NormalForCodeBlock;
+        block = new ForCodeBlock;
     } else {
         block = new CodeBlock;
     }
@@ -683,7 +689,11 @@ QDebug operator<<(QDebug deg, const ZCode &var)
     deg << actionName.sprintf("%-10s", actionName.toLatin1().constData());
 
     if(var.action == ZCode::Push) {
-        deg << *static_cast<const ValueCode*>(&var)->value;
+        deg << *var.toValueCode()->value.constData();
+    } else if(var.action == ZCode::Goto) {
+        deg << var.toValueCode()->value->toInt();
+    } else if(var.action == ZCode::If) {
+        deg << "if false goto:" << var.toValueCode()->value->toInt();
     }
 
     return deg;

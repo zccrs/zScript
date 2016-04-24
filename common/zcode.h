@@ -103,7 +103,7 @@ class ZCodeExecuter
 public:
     ~ZCodeExecuter();
 
-    struct NormalForCodeBlock;
+    struct ForCodeBlock;
     struct CodeBlock{
         enum Type {
             Normal = 0x01,
@@ -114,6 +114,7 @@ public:
             If = 0x10
         };
 
+        /// 代码块第一条指令的index
         int beginCodeIndex;
 
         Type type = Normal;
@@ -125,15 +126,25 @@ public:
         inline bool isLoopStructure() const
         { return (type | LoopStructure) == LoopStructure;}
 
-        inline const NormalForCodeBlock *toNormalFor() const
-        { return static_cast<const NormalForCodeBlock*>(this);}
-        inline NormalForCodeBlock *toNormalFor()
-        { return static_cast<NormalForCodeBlock*>(this);}
+        inline const ForCodeBlock *toForCodeBlock() const
+        { return static_cast<const ForCodeBlock*>(this);}
+        inline ForCodeBlock *toForCodeBlock()
+        { return static_cast<ForCodeBlock*>(this);}
     };
 
-    struct NormalForCodeBlock : public CodeBlock{
-        /// 普通for循环中第三个表达式开始的指令在codeList中的index
-        int lastExpressionActionIndex;
+    /// for循环结构的代码块
+    struct ForCodeBlock : public CodeBlock{
+        ForCodeBlock() {
+            breakIndex = new ZSharedVariant();
+            containueIndex = new ZSharedVariant();
+        }
+
+        /// for循环的if指令的index
+        int ifInstructionIndex;
+        /// 执行break语句时要goto到的指令的位置
+        ZSharedVariantPointer breakIndex;
+        /// 执行containue语句时要goto到的指令的位置
+        ZSharedVariantPointer containueIndex;
     };
 
     inline static void registerIdentifier(const QByteArray &name, ZSharedVariant *variant)
@@ -155,13 +166,16 @@ public:
     { return createConstant(value.toString().toLatin1(), value.type());}
 
     inline void     appendCode(const ZCode::Action &action)
-    { codeList << createCode(action, ZSharedVariantPointer());}
+    {if(enableTmpCodeList) tmpCodeList << createCode(action, ZSharedVariantPointer());
+        else codeList << createCode(action, ZSharedVariantPointer());}
 
     inline void appendCode(const ZCode::Action &action, ZSharedVariant *val)
-    { codeList << createCode(action, ZSharedVariantPointer(val));}
+    { if(enableTmpCodeList) tmpCodeList << createCode(action, ZSharedVariantPointer(val));
+        else codeList << createCode(action, ZSharedVariantPointer(val));}
 
     inline void appendCode(const ZCode::Action &action, const ZSharedVariantPointer &val)
-    { codeList << createCode(action, val);}
+    { if(enableTmpCodeList) tmpCodeList << createCode(action, val);
+        else codeList << createCode(action, val);}
 
     inline ZSharedVariant *getGotoLabel(const QByteArray &name)
     {
@@ -178,6 +192,9 @@ public:
 
     inline QList<ZCode*> &getCodeList()
     { return codeList;}
+
+    inline QList<ZCode*> &getTmpCodeList()
+    { return tmpCodeList;}
 
     inline ZSharedVariant *addIdentifier(const QByteArray &name)
     {
@@ -208,9 +225,9 @@ public:
     inline CodeBlock *getCodeBlock() const
     { return currentCodeBlock;}
 
-    inline CodeBlock *getCodeBlockByType(CodeBlock::Type type) const
+    inline CodeBlock *getCodeBlockByType(CodeBlock::Type type, CodeBlock *startBlock = Q_NULLPTR) const
     {
-        CodeBlock *block = currentCodeBlock;
+        CodeBlock *block = startBlock ? startBlock : currentCodeBlock;
 
         while(block) {
             if((block->type | type) == type) {
@@ -229,6 +246,10 @@ public:
     void beginCodeBlock(CodeBlock::Type type = CodeBlock::Normal);
     void endCodeBlock();
 
+    /// 设置是否将指令保存到临时列表（tmpCodeList）
+    inline void setEnableTmpCodeList(bool enable)
+    { enableTmpCodeList = enable;}
+
     static ZCodeExecuter *beginCodeExecuter();
     static ZCodeExecuter *endCodeExecuter();
 
@@ -243,7 +264,14 @@ private:
 
     ZCodeExecuter *parent = Q_NULLPTR;
 
+    /// 指令列表
     QList<ZCode*> codeList;
+    /// 临时指令列表
+    QList<ZCode*> tmpCodeList;
+
+    ///　是否启用临时指令列表
+    bool enableTmpCodeList = false;
+
     CodeBlock *currentCodeBlock = Q_NULLPTR;
     QList<CodeBlock*> codeBlockList;
     QMap<QByteArray, ZSharedVariant*> gotoLabelMap;
