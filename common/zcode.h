@@ -108,7 +108,7 @@ class ZCodeExecuter
 public:
     ~ZCodeExecuter();
 
-    struct ForCodeBlock;
+    struct LoopStruceureCodeBlock;
     struct CodeBlock{
         enum Type {
             Normal = 0x01,
@@ -134,20 +134,20 @@ public:
         inline bool isLoopStructure() const
         { return (type | LoopStructure) == LoopStructure;}
 
-        inline const ForCodeBlock *toForCodeBlock() const
-        { return static_cast<const ForCodeBlock*>(this);}
-        inline ForCodeBlock *toForCodeBlock()
-        { return static_cast<ForCodeBlock*>(this);}
+        inline const LoopStruceureCodeBlock *toForCodeBlock() const
+        { return static_cast<const LoopStruceureCodeBlock*>(this);}
+        inline LoopStruceureCodeBlock *toForCodeBlock()
+        { return static_cast<LoopStruceureCodeBlock*>(this);}
     };
 
-    /// for循环结构的代码块
-    struct ForCodeBlock : public CodeBlock{
-        ForCodeBlock() {
+    /// 循环结构的代码块
+    struct LoopStruceureCodeBlock : public CodeBlock{
+        LoopStruceureCodeBlock() {
             breakIndex = new ZSharedVariant();
             containueIndex = new ZSharedVariant();
         }
 
-        /// for循环的if指令的index
+        /// 循环中的if指令的index
         int ifInstructionIndex;
         /// 执行break语句时要goto到的指令的位置
         ZSharedVariantPointer breakIndex;
@@ -278,7 +278,7 @@ private:
         for(int i = 0; i < codeBlockList.count(); ++i) {
             CodeBlock *block = codeBlockList.at(i);
 
-            if(block->type == CodeBlock::NormalFor) {
+            if(block->isLoopStructure()) {
                 delete block->toForCodeBlock();
             } else {
                 delete block;

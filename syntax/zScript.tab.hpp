@@ -166,36 +166,38 @@ namespace yy {
         RETURN = 269,
         BREAK = 270,
         CONTAINUE = 271,
-        IDENTIFIER = 272,
-        INT = 273,
-        STRING = 274,
-        BOOL = 275,
-        DOUBLE = 276,
-        EQ = 277,
-        STEQ = 278,
-        NEQ = 279,
-        STNEQ = 280,
-        LE = 281,
-        GE = 282,
-        LAND = 283,
-        LOR = 284,
-        ADDSELF = 285,
-        SUBSELF = 286,
-        LL = 287,
-        GG = 288,
-        DIVASSIGN = 289,
-        MULASSIGN = 290,
-        ADDASSIGN = 291,
-        SUBASSIGN = 292,
-        MODASSIGN = 293,
-        ANDASSIGN = 294,
-        ORASSIGN = 295,
-        XORASSIGN = 296,
-        LANDASSIGN = 297,
-        LORASSIGN = 298,
-        COMMA = 299,
-        LTGT = 300,
-        UMINUS = 301
+        SWITCH = 272,
+        CASE = 273,
+        IDENTIFIER = 274,
+        INT = 275,
+        STRING = 276,
+        BOOL = 277,
+        DOUBLE = 278,
+        EQ = 279,
+        STEQ = 280,
+        NEQ = 281,
+        STNEQ = 282,
+        LE = 283,
+        GE = 284,
+        LAND = 285,
+        LOR = 286,
+        ADDSELF = 287,
+        SUBSELF = 288,
+        LL = 289,
+        GG = 290,
+        DIVASSIGN = 291,
+        MULASSIGN = 292,
+        ADDASSIGN = 293,
+        SUBASSIGN = 294,
+        MODASSIGN = 295,
+        ANDASSIGN = 296,
+        ORASSIGN = 297,
+        XORASSIGN = 298,
+        LANDASSIGN = 299,
+        LORASSIGN = 300,
+        COMMA = 301,
+        LTGT = 302,
+        UMINUS = 303
       };
     };
 
@@ -356,7 +358,7 @@ namespace yy {
     /// \param yyvalue   the value to check
     static bool yy_table_value_is_error_ (int yyvalue);
 
-    static const signed char yypact_ninf_;
+    static const short int yypact_ninf_;
     static const signed char yytable_ninf_;
 
     /// Convert a scanner token number \a t to a symbol number.
@@ -373,7 +375,7 @@ namespace yy {
   static const unsigned char yydefact_[];
 
   // YYPGOTO[NTERM-NUM].
-  static const signed char yypgoto_[];
+  static const short int yypgoto_[];
 
   // YYDEFGOTO[NTERM-NUM].
   static const short int yydefgoto_[];
@@ -500,12 +502,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 940,     ///< Last index in yytable_.
-      yynnts_ = 28,  ///< Number of nonterminal symbols.
+      yylast_ = 1006,     ///< Last index in yytable_.
+      yynnts_ = 30,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 73  ///< Number of tokens.
+      yyntokens_ = 75  ///< Number of tokens.
     };
 
 
@@ -514,7 +516,7 @@ namespace yy {
 
 
 } // yy
-#line 518 "zScript.tab.hpp" // lalr1.cc:377
+#line 520 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

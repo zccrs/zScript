@@ -37,6 +37,8 @@ ignore [ \t]
 "return"        { return TOKEN_PREFIX::RETURN;}
 "break"         { return TOKEN_PREFIX::BREAK;}
 "containue"     { return TOKEN_PREFIX::CONTAINUE;}
+"switch"        { return TOKEN_PREFIX::SWITCH;}
+"case"          { return TOKEN_PREFIX::CASE;}
 "=="            { return TOKEN_PREFIX::EQ;}
 "==="           { return TOKEN_PREFIX::STEQ;}
 "!="            { return TOKEN_PREFIX::NEQ;}

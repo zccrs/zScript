@@ -632,8 +632,8 @@ void ZCodeExecuter::beginCodeBlock(CodeBlock::Type type)
 {
     CodeBlock *block;
 
-    if(type == CodeBlock::NormalFor) {
-        block = new ForCodeBlock;
+    if(type == CodeBlock::NormalFor || type == CodeBlock::While) {
+        block = new LoopStruceureCodeBlock;
     } else {
         block = new CodeBlock;
     }

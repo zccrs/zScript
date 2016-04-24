@@ -31,7 +31,7 @@ Z_USE_NAMESPACE
 };
 
 /// keyword
-%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR UNDEFINED GOTO RETURN BREAK CONTAINUE
+%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR UNDEFINED GOTO RETURN BREAK CONTAINUE SWITCH CASE
 
 /// identifier
 %token <identifier> IDENTIFIER INT STRING BOOL DOUBLE
@@ -125,6 +125,8 @@ code:       GOTO IDENTIFIER ends {
             | '{' start '}'
             ;
 
+ends:       ';'|'\n';
+
 break:      BREAK {$$ = 1;}
             | break ',' BREAK {$$ = $1 + 1;}
             ;
@@ -134,8 +136,6 @@ loopEnds:   CONTAINUE {$$ = 0x8001;}
             | break ',' CONTAINUE {$$ = (0x8000 | ($1 + 1));}
             | break {$$ = $1;}
             ;
-
-ends:       ';'|'\n';
 
 goto_label: IDENTIFIER ':' {
                 *ZCodeExecuter::currentCodeExecuter->getGotoLabel(*$1) = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
