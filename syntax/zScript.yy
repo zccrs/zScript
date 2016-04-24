@@ -171,13 +171,19 @@ switch:     switch_head '{' cases '}' {
 
                 hashSwitch.reserve($3->size());
 
+                bool existDefault = false;
+
                 for(const QPair<ZSharedVariantPointer*, quint16> &c : *$3) {
                     if(c.first) {
                         hashSwitch[*c.first->constData()] = c.second;
                     } else {
                         hashSwitch[ZVariant()] = c.second;
+                        existDefault = true;
                     }
                 }
+
+                if(!existDefault)
+                    hashSwitch[ZVariant()] = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 
                 *$1->data() = QVariant::fromValue(hashSwitch);
 

@@ -415,18 +415,10 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
         case Switch: {
             const QHash<ZVariant, int> &val = qvariant_cast<QHash<ZVariant, int>>(code->toValueCode()->value->toQVariant());
 
-            int tmp = i;
-
             i = val.value(*virtualStack.pop(), -1) - 1;
 
             if(i < 0) {
-                i = val.value(ZVariant(), -1);
-
-                if(i < 0) {
-                    zWarning << "switch code block undefined default code";
-
-                    i = tmp;
-                }
+                i = val.value(ZVariant(), -1) - 1;
             }
         }
         default: break;
