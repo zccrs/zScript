@@ -127,7 +127,7 @@ namespace yy {
     #line 25 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
 
     int valueType;
-    int count;
+    quint16 count;
     QByteArray *identifier;
     ZSharedVariantPointer *value;
     QVarLengthArray<QByteArray*, 10> *parameterList;
@@ -355,7 +355,7 @@ namespace yy {
     /// \param yyvalue   the value to check
     static bool yy_table_value_is_error_ (int yyvalue);
 
-    static const signed char yypact_ninf_;
+    static const short int yypact_ninf_;
     static const signed char yytable_ninf_;
 
     /// Convert a scanner token number \a t to a symbol number.
@@ -372,7 +372,7 @@ namespace yy {
   static const unsigned char yydefact_[];
 
   // YYPGOTO[NTERM-NUM].
-  static const signed char yypgoto_[];
+  static const short int yypgoto_[];
 
   // YYDEFGOTO[NTERM-NUM].
   static const short int yydefgoto_[];
@@ -499,8 +499,8 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 1018,     ///< Last index in yytable_.
-      yynnts_ = 25,  ///< Number of nonterminal symbols.
+      yylast_ = 974,     ///< Last index in yytable_.
+      yynnts_ = 28,  ///< Number of nonterminal symbols.
       yyfinal_ = 2, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,

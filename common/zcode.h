@@ -123,6 +123,9 @@ public:
         QMap<QByteArray, ZSharedVariantPointer> identifiers;
         QMap<QByteArray, ZSharedVariantPointer> undefinedIdentifier;
 
+        /// 临时指令列表
+        QList<ZCode*> tmpCodeList;
+
         inline bool isLoopStructure() const
         { return (type | LoopStructure) == LoopStructure;}
 
@@ -166,15 +169,15 @@ public:
     { return createConstant(value.toString().toLatin1(), value.type());}
 
     inline void     appendCode(const ZCode::Action &action)
-    {if(enableTmpCodeList) tmpCodeList << createCode(action, ZSharedVariantPointer());
+    {if(enableTmpCodeList) currentCodeBlock->tmpCodeList << createCode(action, ZSharedVariantPointer());
         else codeList << createCode(action, ZSharedVariantPointer());}
 
     inline void appendCode(const ZCode::Action &action, ZSharedVariant *val)
-    { if(enableTmpCodeList) tmpCodeList << createCode(action, ZSharedVariantPointer(val));
+    { if(enableTmpCodeList) currentCodeBlock->tmpCodeList << createCode(action, ZSharedVariantPointer(val));
         else codeList << createCode(action, ZSharedVariantPointer(val));}
 
     inline void appendCode(const ZCode::Action &action, const ZSharedVariantPointer &val)
-    { if(enableTmpCodeList) tmpCodeList << createCode(action, val);
+    { if(enableTmpCodeList) currentCodeBlock->tmpCodeList << createCode(action, val);
         else codeList << createCode(action, val);}
 
     inline ZSharedVariant *getGotoLabel(const QByteArray &name)
@@ -194,7 +197,7 @@ public:
     { return codeList;}
 
     inline QList<ZCode*> &getTmpCodeList()
-    { return tmpCodeList;}
+    { return currentCodeBlock->tmpCodeList;}
 
     inline ZSharedVariant *addIdentifier(const QByteArray &name)
     {
@@ -225,9 +228,12 @@ public:
     inline CodeBlock *getCodeBlock() const
     { return currentCodeBlock;}
 
-    inline CodeBlock *getCodeBlockByType(CodeBlock::Type type, CodeBlock *startBlock = Q_NULLPTR) const
+    inline CodeBlock *getCodeBlockByType(CodeBlock::Type type, CodeBlock *startBlock) const
     {
-        CodeBlock *block = startBlock ? startBlock : currentCodeBlock;
+        if(!startBlock)
+            return startBlock;
+
+        CodeBlock *block = startBlock;
 
         while(block) {
             if((block->type | type) == type) {
@@ -266,8 +272,6 @@ private:
 
     /// 指令列表
     QList<ZCode*> codeList;
-    /// 临时指令列表
-    QList<ZCode*> tmpCodeList;
 
     ///　是否启用临时指令列表
     bool enableTmpCodeList = false;

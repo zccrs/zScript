@@ -24,7 +24,7 @@ Z_USE_NAMESPACE
 
 %union{
     int valueType;
-    int count;
+    quint16 count;
     QByteArray *identifier;
     ZSharedVariantPointer *value;
     QVarLengthArray<QByteArray*, 10> *parameterList;
@@ -59,13 +59,13 @@ Z_USE_NAMESPACE
 %left '(' ')'
 
 %type <valueType> expression lvalue rvalue
-%type <count> arguments tuple_exp tuple_lval
+%type <count> arguments tuple_exp tuple_lval break loopEnds
 %type <value> branch_head branch_body branch_else
 %type <parameterList> parameter
 
 %%
 
-start:      | start code | start '\n'
+start:      | start code | start '\n';
 
 code:       GOTO IDENTIFIER ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->getGotoLabel(*$2));
@@ -93,27 +93,55 @@ code:       GOTO IDENTIFIER ends {
                         && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
             }
-            | CONTAINUE ends {
-                ZCodeExecuter::CodeBlock *block_while = ZCodeExecuter::currentCodeExecuter->getCodeBlockByType(ZCodeExecuter::CodeBlock::LoopStructure);
+            | loopEnds ends {
+                ZCodeExecuter::CodeBlock *block_while = ZCodeExecuter::currentCodeExecuter->getCodeBlockByType(ZCodeExecuter::CodeBlock::LoopStructure, ZCodeExecuter::currentCodeExecuter->getCodeBlock());
+                quint16 tmp = ($1 & 0x7fff);
+
+                while(--tmp) {
+                    if(!block_while) {
+                        zError << "\"containue\" Cannot be used here";
+                        break;
+                        YYABORT;
+                    }
+
+                    block_while = ZCodeExecuter::currentCodeExecuter->getCodeBlockByType(ZCodeExecuter::CodeBlock::LoopStructure, block_while->parent);
+                }
 
                 if(!block_while) {
                     zError << "\"containue\" Cannot be used here";
+                    break;
                     YYABORT;
                 }
 
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toForCodeBlock()->containueIndex);
+                /// 判断是否是以break结尾
+                bool isBreak = !($1 & 0x8000);
+
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto,
+                                                               isBreak ? block_while->toForCodeBlock()->breakIndex
+                                                                       : block_while->toForCodeBlock()->containueIndex);
             }
             | ';'
             | '{' start '}'
             ;
 
-ends:       ';'|'\n'
+break:      BREAK {$$ = 1;}
+            | break ',' BREAK {$$ = $1 + 1;}
+            ;
+
+/// 循环结构的结束语句, $$的二进制首位为1代表是containue结尾的语句，否则代码break结尾的语句
+loopEnds:   CONTAINUE {$$ = 0x8001;}
+            | break ',' CONTAINUE {$$ = (0x8000 | ($1 + 1));}
+            | break {$$ = $1;}
+            ;
+
+ends:       ';'|'\n';
 
 goto_label: IDENTIFIER ':' {
                 *ZCodeExecuter::currentCodeExecuter->getGotoLabel(*$1) = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 
                 delete $1;
             }
+            ;
 
 //statement:  VAR define {
 
@@ -702,7 +730,7 @@ branch_head:IF '(' expression ')' {
                 /// 存储if语句判断为假时要跳转到的指令位置
                 $$ = &ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
             }
-            | FOR '(' expression ends {
+            | FOR '(' for_exp ends {
                 if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
                             && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll)
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
@@ -716,14 +744,9 @@ branch_head:IF '(' expression ')' {
 
                 /// 开启使用临时列表储存code
                 ZCodeExecuter::currentCodeExecuter->setEnableTmpCodeList(true);
-            } expression ')' {
+            } for_exp ')' {
                 /// 关闭使用临时列表储存code
                 ZCodeExecuter::currentCodeExecuter->setEnableTmpCodeList(false);
-
-                if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
-                        && ZCodeExecuter::currentCodeExecuter->getCodeList().last()->action != ZCode::PopAll) {
-                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
-                }
 
                 int ifInstructionIndex = ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toForCodeBlock()->ifInstructionIndex;
 
@@ -738,11 +761,14 @@ branch_head:IF '(' expression ')' {
             | branch_head '\n'
             ;
 
+for_exp:    | expression;
+
 branch_body :branch_head code {
                 if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->isLoopStructure()) {
+                    QList<ZCode*> &codeList = ZCodeExecuter::currentCodeExecuter->getCodeList();
+
                     /// 如果是普通的for循环结构
                     if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->type == ZCodeExecuter::CodeBlock::NormalFor) {
-                        QList<ZCode*> &codeList = ZCodeExecuter::currentCodeExecuter->getCodeList();
                         QList<ZCode*> &tmpCodeList = ZCodeExecuter::currentCodeExecuter->getTmpCodeList();
 
                         /// 记录在for循环中执行containue语句时要跳转到的目标位置
@@ -752,12 +778,18 @@ branch_body :branch_head code {
                         while(!tmpCodeList.isEmpty()) {
                             codeList << tmpCodeList.takeAt(0);
                         }
+
+                        /// 清空栈
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::PopAll);
                     }
 
                     int index = ZCodeExecuter::currentCodeExecuter->getCodeBlock()->beginCodeIndex;
 
                     /// 产生循环
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstant(QByteArray::number(index), ZVariant::Int));
+
+                    /// 保存执行break语句时跳转到的位置
+                    *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toForCodeBlock()->breakIndex.data() = codeList.count();
                 }
 
                 int index = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
