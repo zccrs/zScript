@@ -288,7 +288,7 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
         }
         case PostfixAddSelf: {   // "++(postfix)";
             ZVariant &left_val = *virtualStack.pop();
-            temporaryList << left_val;
+            temporaryList << ZVariant::copy(left_val);
             virtualStack.push(&temporaryList.last());
             left_val.depthCopyAssign(1 + left_val);
             break;
@@ -301,7 +301,7 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
         }
         case PostfixSubSelf: {   // "--(postfix)";
             ZVariant &left_val = *virtualStack.pop();
-            temporaryList << left_val;
+            temporaryList << ZVariant::copy(left_val);
             virtualStack.push(&temporaryList.last());
             left_val.depthCopyAssign(-1 + left_val);
             break;
