@@ -727,8 +727,8 @@ uint qHash(const ZVariant &val, uint seed)
     case ZVariant::Tuple: {
         uint hash;
 
-        for(const ZVariant *val : val->toTuple()) {
-            hash ^= qHash(*val, seed);
+        for(const ZVariant *tmp_val : val.toTuple()) {
+            hash ^= qHash(*tmp_val, seed);
         }
 
         return hash;
