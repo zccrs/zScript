@@ -1227,7 +1227,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value + *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value + *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1248,7 +1248,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value - *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value - *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1269,7 +1269,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value * *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value * *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1290,7 +1290,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value / *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value / *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1311,7 +1311,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value & *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value & *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1332,7 +1332,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value | *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value | *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1353,7 +1353,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value ^ *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value ^ *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1374,7 +1374,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value % *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value % *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1395,7 +1395,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value > *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value > *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1416,7 +1416,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value < *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value < *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1437,7 +1437,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value == *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value == *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1458,7 +1458,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value != *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value != *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1479,8 +1479,8 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(pre_code->value->type() == last_code->value->type()
-                                                                     && *pre_code->value == *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(last_code->value->type() == pre_code->value->type()
+                                                                     && *last_code->value == *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1501,8 +1501,8 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(pre_code->value->type() == last_code->value->type()
-                                                                     && *pre_code->value != *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(last_code->value->type() == pre_code->value->type()
+                                                                     && *last_code->value != *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1523,7 +1523,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value <= *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value <= *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1544,7 +1544,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value >= *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value >= *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1565,7 +1565,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value && *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value && *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1586,7 +1586,7 @@ namespace yy {
                         ValueCode *pre_code = ZCodeExecuter::currentCodeExecuter->getCodeList().takeLast()->toValueCode();
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(*pre_code->value || *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(*last_code->value || *pre_code->value);
 
                         delete pre_code;
                     } else {
@@ -1606,7 +1606,7 @@ namespace yy {
 
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(~ *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(~ *last_code->value);
                     } else {
                         (yylhs.value.valueType) = ValueType::Variant;
 
@@ -1624,7 +1624,7 @@ namespace yy {
 
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(! *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(! *last_code->value);
                     } else {
                         (yylhs.value.valueType) = ValueType::Variant;
 
@@ -1642,7 +1642,7 @@ namespace yy {
 
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(- *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(- *last_code->value);
                     } else {
                         (yylhs.value.valueType) = ValueType::Variant;
 
@@ -1660,7 +1660,7 @@ namespace yy {
 
                         ValueCode *last_code = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode();
 
-                        *last_code->value = ZCodeExecuter::createConstantByValue(+ *last_code->value);
+                        last_code->value = ZCodeExecuter::createConstantByValue(+ *last_code->value);
                     } else {
                         (yylhs.value.valueType) = ValueType::Variant;
 

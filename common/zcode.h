@@ -58,8 +58,8 @@ struct ZCode
         GE,                 // >=                           33
         LAnd,               // &&                           34
         LOr,                // ||                           35
-        LAndAssign,         // ||=                          36
-        LOrAssign,          // $$=                          37
+        LAndAssign,         // &&=                          36
+        LOrAssign,          // ||=                          37
         PrefixAddSelf,      // ++                           38
         PostfixAddSelf,     // ++                           39
         PrefixSubSelf,      // --                           40
