@@ -697,6 +697,10 @@ QDebug operator<<(QDebug deg, const ZVariant &var)
     case ZVariant::Tuple:
         deg.noquote() << var.toList();
         break;
+    case ZVariant::Int:
+    case ZVariant::Double:
+        deg.noquote() << var.toDouble();
+        break;
     default:
         deg.nospace() << var.toString();
         break;

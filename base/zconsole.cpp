@@ -17,11 +17,15 @@ void ZConsole::log(ZVariant &retVals, const QList<ZVariant> &args) const
     if(args.isEmpty())
         return;
 
-    for(int i = 0; i < args.count() - 1; ++i)
-        zStandardPrint << variantToString(args.at(i)).toStdString() << " ";
+    for(int i = 0; i < args.count() - 1; ++i) {
+        const ZVariant &val = args.at(i);
 
-    if(!args.isEmpty())
-        zStandardPrint << variantToString(args.last()).toStdString() << std::endl;
+        zStandardPrint << variantToString(val).toStdString() << " ";
+    }
+
+    const ZVariant &val = args.last();
+
+    zStandardPrint << variantToString(val).toStdString() << std::endl;
 
     return;
 }
@@ -61,6 +65,9 @@ QString ZConsole::variantToString(const ZVariant &val) const
 
         return str.append(variantToString(list.last())).append("]");
     }
+    case ZVariant::Int:
+    case ZVariant::Double:
+        return QString::number(val.toDouble());
     default:
         return val.toString();
     }
