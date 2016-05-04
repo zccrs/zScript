@@ -36,7 +36,7 @@ ignore [ \t]
 "goto"          { return TOKEN_PREFIX::GOTO;}
 "return"        { return TOKEN_PREFIX::RETURN;}
 "break"         { return TOKEN_PREFIX::BREAK;}
-"containue"     { return TOKEN_PREFIX::CONTAINUE;}
+"continue"      { return TOKEN_PREFIX::CONTINUE;}
 "switch"        { return TOKEN_PREFIX::SWITCH;}
 "case"          { return TOKEN_PREFIX::CASE;}
 "default"       { return TOKEN_PREFIX::DEFAULT;}

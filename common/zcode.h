@@ -152,7 +152,7 @@ public:
     struct LoopStructureCodeBlock : public CodeBlock {
         LoopStructureCodeBlock() {
             breakIndex = new ZSharedVariant();
-            containueIndex = new ZSharedVariant();
+            continueIndex = new ZSharedVariant();
         }
 
         /// 循环中的if指令的index
@@ -160,7 +160,7 @@ public:
         /// 执行break语句时要goto到的指令的位置
         ZSharedVariantPointer breakIndex;
         /// 执行containue语句时要goto到的指令的位置
-        ZSharedVariantPointer containueIndex;
+        ZSharedVariantPointer continueIndex;
     };
 
     /// switch结构的代码块

@@ -653,7 +653,7 @@ namespace yy {
 
                 while(--tmp) {
                     if(!block_while) {
-                        zError << "\"" + QString(isBreak ? "break" : "containue") + "\" Cannot be used here";
+                        zError << "\"" + QString(isBreak ? "break" : "continue") + "\" Cannot be used here";
                         break;
                         YYABORT;
                     }
@@ -662,7 +662,7 @@ namespace yy {
                 }
 
                 if(!block_while) {
-                    zError << "\"" + QString(isBreak ? "break" : "containue") + "\" Cannot be used here";
+                    zError << "\"" + QString(isBreak ? "break" : "continue") + "\" Cannot be used here";
                     YYABORT;
                 }
 
@@ -673,7 +673,7 @@ namespace yy {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toSwitchCodeBlock()->breakIndex);
                     }
                 } else {
-                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toLoopStructureCodeBlock()->containueIndex);
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toLoopStructureCodeBlock()->continueIndex);
                 }
 
             }
@@ -1809,8 +1809,8 @@ namespace yy {
                     if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->type == ZCodeExecuter::CodeBlock::NormalFor) {
                         QList<ZCode*> &tmpCodeList = ZCodeExecuter::currentCodeExecuter->getTmpCodeList();
 
-                        /// 记录在for循环中执行containue语句时要跳转到的目标位置
-                        *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toLoopStructureCodeBlock()->containueIndex.data() = codeList.count();
+                        /// 记录在for循环中执行continue语句时要跳转到的目标位置
+                        *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toLoopStructureCodeBlock()->continueIndex.data() = codeList.count();
 
                         /// 将for循环的第三个表达式的指令从临时列表添加到codeList
                         while(!tmpCodeList.isEmpty()) {
@@ -2415,7 +2415,7 @@ namespace yy {
   {
   "$end", "error", "$undefined", "VAR", "FUNCTION", "NEW", "DELETE",
   "THROW", "IF", "ELSE", "WHILE", "FOR", "UNDEFINED", "GOTO", "RETURN",
-  "BREAK", "CONTAINUE", "SWITCH", "CASE", "DEFAULT", "IDENTIFIER", "INT",
+  "BREAK", "CONTINUE", "SWITCH", "CASE", "DEFAULT", "IDENTIFIER", "INT",
   "STRING", "BOOL", "DOUBLE", "EQ", "STEQ", "NEQ", "STNEQ", "LE", "GE",
   "LAND", "LOR", "ADDSELF", "SUBSELF", "LL", "GG", "DIVASSIGN",
   "MULASSIGN", "ADDASSIGN", "SUBASSIGN", "MODASSIGN", "ANDASSIGN",

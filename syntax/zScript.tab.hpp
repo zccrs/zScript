@@ -167,7 +167,7 @@ namespace yy {
         GOTO = 268,
         RETURN = 269,
         BREAK = 270,
-        CONTAINUE = 271,
+        CONTINUE = 271,
         SWITCH = 272,
         CASE = 273,
         DEFAULT = 274,

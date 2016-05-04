@@ -33,7 +33,7 @@ Z_USE_NAMESPACE
 };
 
 /// keyword
-%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR UNDEFINED GOTO RETURN BREAK CONTAINUE SWITCH CASE
+%token VAR FUNCTION NEW DELETE THROW IF ELSE WHILE FOR UNDEFINED GOTO RETURN BREAK CONTINUE SWITCH CASE
 %token <count> DEFAULT
 
 /// identifier
@@ -114,7 +114,7 @@ code:       GOTO IDENTIFIER ends {
 
                 while(--tmp) {
                     if(!block_while) {
-                        zError << "\"" + QString(isBreak ? "break" : "containue") + "\" Cannot be used here";
+                        zError << "\"" + QString(isBreak ? "break" : "continue") + "\" Cannot be used here";
                         break;
                         YYABORT;
                     }
@@ -123,7 +123,7 @@ code:       GOTO IDENTIFIER ends {
                 }
 
                 if(!block_while) {
-                    zError << "\"" + QString(isBreak ? "break" : "containue") + "\" Cannot be used here";
+                    zError << "\"" + QString(isBreak ? "break" : "continue") + "\" Cannot be used here";
                     YYABORT;
                 }
 
@@ -134,7 +134,7 @@ code:       GOTO IDENTIFIER ends {
                         ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toSwitchCodeBlock()->breakIndex);
                     }
                 } else {
-                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toLoopStructureCodeBlock()->containueIndex);
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toLoopStructureCodeBlock()->continueIndex);
                 }
 
             }
@@ -149,9 +149,9 @@ break:      BREAK {$$ = 1;}
             | break ',' BREAK {$$ = $1 + 1;}
             ;
 
-/// 循环结构的结束语句, $$的二进制首位为1代表是containue结尾的语句，否则代码break结尾的语句
-loopEnds:   CONTAINUE {$$ = 0x8001;}
-            | break ',' CONTAINUE {$$ = (0x8000 | ($1 + 1));}
+/// 循环结构的结束语句, $$的二进制首位为1代表是continue结尾的语句，否则代码break结尾的语句
+loopEnds:   CONTINUE {$$ = 0x8001;}
+            | break ',' CONTINUE {$$ = (0x8000 | ($1 + 1));}
             | break {$$ = $1;}
             ;
 
@@ -871,8 +871,8 @@ branch_body :branch_head code {
                     if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->type == ZCodeExecuter::CodeBlock::NormalFor) {
                         QList<ZCode*> &tmpCodeList = ZCodeExecuter::currentCodeExecuter->getTmpCodeList();
 
-                        /// 记录在for循环中执行containue语句时要跳转到的目标位置
-                        *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toLoopStructureCodeBlock()->containueIndex.data() = codeList.count();
+                        /// 记录在for循环中执行continue语句时要跳转到的目标位置
+                        *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toLoopStructureCodeBlock()->continueIndex.data() = codeList.count();
 
                         /// 将for循环的第三个表达式的指令从临时列表添加到codeList
                         while(!tmpCodeList.isEmpty()) {
