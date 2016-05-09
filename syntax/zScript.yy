@@ -929,12 +929,6 @@ void yy::parser::error(const location_type& loc, const std::string& msg)
 
 int yyFlexLexer::yywrap()
 {
-    if(!ZCodeExecuter::yywrap) {
-        ZCodeExecuter::yywrap = true;
-
-        return 0;
-    }
-
     return 1;
 }
 

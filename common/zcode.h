@@ -177,9 +177,9 @@ public:
     {globalIdentifierHash[name] = variant;}
 
     /// from stdin get code
-    int eval();
+    int eval(std::istream &s);
     int eval(const char *fileName, bool *ok = 0);
-    int eval(const QByteArray &code, bool *ok = 0);
+    int eval(const QByteArray &code);
 
     inline ZVariant exec()
     { return ZCode::exec(codeList);}
@@ -284,7 +284,6 @@ public:
 
     static ZCodeExecuter *currentCodeExecuter;
     static YYFlexLexer *yyFlexLexer;
-    static bool yywrap;
 
 private:
     ZCodeExecuter();

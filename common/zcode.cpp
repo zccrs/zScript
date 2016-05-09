@@ -6,10 +6,11 @@
 
 #include <QDebug>
 #include <QStack>
-#include <QTemporaryFile>
 #include <QCoreApplication>
 
 #include <unistd.h>
+#include <fstream>
+#include <sstream>
 
 Z_BEGIN_NAMESPACE
 
@@ -475,7 +476,6 @@ private:
 
 ZCodeExecuter *ZCodeExecuter::currentCodeExecuter = Q_NULLPTR;
 YYFlexLexer *ZCodeExecuter::yyFlexLexer = Q_NULLPTR;
-bool ZCodeExecuter::yywrap = true;
 QHash<const QByteArray, ZSharedVariant*> ZCodeExecuter::globalIdentifierHash;
 QMap<QByteArray, ZVariant*> ZCodeExecuter::stringConstantMap;
 QMap<QByteArray, ZVariant*> ZCodeExecuter::numberConstantMap;
@@ -495,13 +495,14 @@ ZCodeExecuter::~ZCodeExecuter()
     qDeleteAll(gotoLabelMap);
 }
 
-int ZCodeExecuter::eval()
+int ZCodeExecuter::eval(std::istream &s)
 {
     beginCodeBlock();
 
     YYFlexLexer *yyFlexLexer = new YYFlexLexer;
     YYParser *yyParser = new YYParser;
 
+    yyFlexLexer->yyrestart(s);
     yyParser->set_debug_level(QByteArray(getenv("DEBUG_PARSE_LEVEL")).toInt());
 
     this->yyFlexLexer = yyFlexLexer;
@@ -529,28 +530,26 @@ int ZCodeExecuter::eval()
 
 int ZCodeExecuter::eval(const char *fileName, bool *ok)
 {
-    FILE *fd = freopen(fileName, "r", stdin);
+    std::ifstream inFile;
+
+    inFile.open(fileName, std::ios::in);
 
     if(ok)
-        *ok = bool(fd);
+        *ok = inFile.is_open();
 
-    return eval();
+    if(!inFile.is_open())
+        return -1;
+
+    return eval(inFile);
 }
 
-int ZCodeExecuter::eval(const QByteArray &code, bool *ok)
+int ZCodeExecuter::eval(const QByteArray &code)
 {
-    QTemporaryFile file;
+    std::stringstream inStr;
 
-    if(file.open()) {
-        write(file.handle(), code.constData(), code.size());
+    inStr << code.toStdString();
 
-        return eval(file.fileName().toLatin1().constData(), ok);
-    }
-
-    if(ok)
-        *ok = false;
-
-    return -1;
+    return eval(inStr);
 }
 
 ZSharedVariantPointer ZCodeExecuter::getIdentifier(const QByteArray &name)
@@ -700,8 +699,6 @@ ZCodeExecuter *ZCodeExecuter::beginCodeExecuter()
 
     if(currentCodeExecuter) {
         executer->currentCodeBlock = currentCodeExecuter->currentCodeBlock;
-
-        yywrap = false;
     }
 
     currentCodeExecuter = executer;
