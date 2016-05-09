@@ -8,6 +8,7 @@ ZConsole::ZConsole(ZObject *parent)
     : ZObject(parent)
 {
     Z_REGIST_SLOT(&ZConsole::log);
+    Z_REGIST_SLOT(&ZConsole::getLine);
 }
 
 void ZConsole::log(ZVariant &retVals, const QList<ZVariant> &args) const
@@ -28,6 +29,17 @@ void ZConsole::log(ZVariant &retVals, const QList<ZVariant> &args) const
     zStandardPrint << variantToString(val).toStdString() << std::endl;
 
     return;
+}
+
+void ZConsole::getLine(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    Q_UNUSED(args)
+
+    char ch[100];
+
+    std::cin.getline(ch, 100, '\n');
+
+    retVals = QString(ch);
 }
 
 QString ZConsole::variantToString(const ZVariant &val) const
