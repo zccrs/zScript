@@ -88,7 +88,9 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
     for(int i = 0; i < codeList.count(); ++i) {
         ZCode *code = codeList.value(i);
 
+#ifndef QT_NO_DEBUG
         zDebug << i <<*code;
+#endif
 
         switch(code->action) {
         case LeftAssign: {
@@ -425,6 +427,7 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
         default: break;
         }
 
+#ifndef QT_NO_DEBUG
         if(ENABLE_DEBUG) {
             qDebug().noquote() << "------------stack-start--------------";
 
@@ -433,6 +436,7 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
 
             qDebug().noquote() << "------------stack-end--------------";
         }
+#endif
     }
 
     if(!virtualStack.isEmpty())
