@@ -18,7 +18,7 @@ identifier [a-zA-Z_][a-zA-Z0-9_]*
 number [0-9]+
 real ({number}|0)\.[0-9]+
 operator [-+*/=!<>,;{}\(\)\[\]&\|\^%~.?:@_]
-ignore [ \t]
+ignore [ \t\n\r]
 
 %%
 {ignore}
@@ -73,27 +73,6 @@ ignore [ \t]
     yylval->identifier = new QByteArray("false");
 
     return TOKEN_PREFIX::BOOL;
-}
-
-(\n|\r|\r\n) {
-//    while(/*yyin.rdbuf()->in_avail() && */!yyin.eof() && !yyin.fail()) {
-//        char ch = yyin.peek();
-
-//        if(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {
-//            yyin.get();
-//            continue;
-//        } else if(ch == ',' || ch == '{' || ch == '}'
-//                  || ch == '(' || ch == ')'
-//                  || ch == '[' || ch == ']') {
-//            break;
-//        } else {
-//            return ';';
-//        }
-//    }
-
-//    if(/*!yyin.rdbuf()->in_avail() || */yyin.eof())
-//        return ';';
-        return '\n';
 }
 
 {operator} {

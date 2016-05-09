@@ -71,7 +71,7 @@ Z_USE_NAMESPACE
 
 %%
 
-start:      | start code | start '\n';
+start:      | start code;
 
 code:       GOTO IDENTIFIER ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->getGotoLabel(*$2));
@@ -143,7 +143,7 @@ code:       GOTO IDENTIFIER ends {
             | '{' start '}'
             ;
 
-ends:       ';'|'\n';
+ends:       ';';
 
 break:      BREAK {$$ = 1;}
             | break ',' BREAK {$$ = $1 + 1;}
@@ -161,7 +161,6 @@ switch_head:SWITCH '(' expression ')' {
 
                 ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::Switch);
             }
-            | switch_head '\n'
             ;
 
 switch:     switch_head '{' cases '}' {
@@ -194,11 +193,9 @@ switch:     switch_head '{' cases '}' {
 case:       CASE const ':' {
                 $$ = new QPair<ZSharedVariantPointer*, quint16>($2, ZCodeExecuter::currentCodeExecuter->getCodeList().count());
             }
-            | case '\n'
             ;
 
-cases:      '\n' {$$ = new QVector<QPair<ZSharedVariantPointer*, quint16>>();}
-            | case code {
+cases:      case code {
                 $$ = new QVector<QPair<ZSharedVariantPointer*, quint16>>();
                 $$->append(*$1);
 
@@ -217,7 +214,6 @@ cases:      '\n' {$$ = new QVector<QPair<ZSharedVariantPointer*, quint16>>();}
 
                 delete $2;
             }
-            | cases '\n'
             ;
 
 goto_label: IDENTIFIER ':' {
@@ -858,7 +854,6 @@ branch_head:IF '(' expression ')' {
 
 //                ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::While);
 //            }
-            | branch_head '\n'
             ;
 
 for_exp:    | expression;
@@ -900,10 +895,9 @@ branch_body :branch_head code {
 
                 ZCodeExecuter::currentCodeExecuter->endCodeBlock();
             }
-            | branch_body '\n'
             ;
 
-branch_else:branch_body ELSE | branch_else '\n'
+branch_else:branch_body ELSE;
 
 conditional:branch_body
             | branch_else {
