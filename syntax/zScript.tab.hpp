@@ -133,8 +133,9 @@ namespace yy {
     QVarLengthArray<QByteArray*, 10> *parameterList;
     QPair<ZSharedVariantPointer*, quint16> *caseKey;
     QVector<QPair<ZSharedVariantPointer*, quint16>> *cases;
+    std::string *msg;
 
-#line 138 "zScript.tab.hpp" // lalr1.cc:377
+#line 139 "zScript.tab.hpp" // lalr1.cc:377
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -198,9 +199,10 @@ namespace yy {
         XORASSIGN = 299,
         LANDASSIGN = 300,
         LORASSIGN = 301,
-        COMMA = 302,
-        LTGT = 303,
-        UMINUS = 304
+        ERROR = 302,
+        COMMA = 303,
+        LTGT = 304,
+        UMINUS = 305
       };
     };
 
@@ -508,12 +510,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 984,     ///< Last index in yytable_.
+      yylast_ = 956,     ///< Last index in yytable_.
       yynnts_ = 34,  ///< Number of nonterminal symbols.
-      yyfinal_ = 2, ///< Termination state number.
+      yyfinal_ = 3, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 75  ///< Number of tokens.
+      yyntokens_ = 76  ///< Number of tokens.
     };
 
 
@@ -522,7 +524,7 @@ namespace yy {
 
 
 } // yy
-#line 526 "zScript.tab.hpp" // lalr1.cc:377
+#line 528 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

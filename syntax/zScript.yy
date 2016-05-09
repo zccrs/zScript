@@ -32,6 +32,7 @@ Z_USE_NAMESPACE
     QVarLengthArray<QByteArray*, 10> *parameterList;
     QPair<ZSharedVariantPointer*, quint16> *caseKey;
     QVector<QPair<ZSharedVariantPointer*, quint16>> *cases;
+    std::string *msg;
 };
 
 /// keyword
@@ -45,6 +46,8 @@ Z_USE_NAMESPACE
 %token  EQ  STEQ  NEQ STNEQ LE GE LAND LOR ADDSELF SUBSELF LL GG
 ///         /=        *=        +=       -=         %=        &=       |=       ^=        ||=        &&=
 %token  DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
+
+%token <msg> ERROR
 
 %left ';'
 %left VAR IF
@@ -73,7 +76,13 @@ Z_USE_NAMESPACE
 
 %%
 
-start:      | start code;
+start:      | start code
+            | ERROR {
+                  error(@1, *$1);
+                  delete $1;
+                  YYABORT;
+            }
+            ;
 
 code:       GOTO IDENTIFIER ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->getGotoLabel(*$2));

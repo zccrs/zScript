@@ -28,6 +28,7 @@ number [0-9]+
 real ({number}|0)\.[0-9]+
 operator [-+*/=!<>,;{}\(\)\[\]&\|\^%~.?:@_]
 ignore [ \t\r]
+shell_head ^\s*#\s*!.*
 
 %%
 {ignore}
@@ -194,4 +195,15 @@ ignore [ \t\r]
 
     return TOKEN_PREFIX::DOUBLE;
 }
+
+{shell_head} {
+    if(lineCount > 1) {
+        RECORD_TOKEN_LOC;
+
+        yylval->msg = new std::string("Only at the beginning of the file");
+
+        return TOKEN_PREFIX::ERROR;
+    }
+}
+
 %%
