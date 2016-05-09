@@ -120,6 +120,10 @@ protected:
 
 extern "C++" {
 
+namespace yy {
+  class parser;
+}
+
 class yyFlexLexer : public FlexLexer {
 public:
     // arg_yyin and arg_yyout default to the cin and cout, but we
@@ -217,6 +221,9 @@ protected:
     int yy_more_len;
     int yy_more_offset;
     int yy_prev_more_offset;
+
+private:
+    friend class yy::parser;
 };
 
 }

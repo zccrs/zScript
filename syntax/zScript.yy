@@ -21,6 +21,8 @@ Z_USE_NAMESPACE
 %debug
 /// enable locations
 %locations
+/// 开启后，当调用yyerror时,它请求详细的错误消息字符串
+%error-verbose
 
 %union{
     int valueType;
@@ -919,20 +921,34 @@ conditional:branch_body
             }
 %%
 
-void yy::parser::error(const location_type& loc, const std::string& msg)
-{
-    std::cerr << "from " << loc.begin.line << " line, " << loc.begin.column << " column "
-              << "to " << loc.end.line << " line, " << loc.end.column << " column, " << msg << std::endl;
-
-    quick_exit(-1);
-}
-
 int yyFlexLexer::yywrap()
 {
     return 1;
 }
 
 #undef yyFlexLexer
+
+void yy::parser::error(const location_type& loc, const std::string& msg)
+{
+    char lineStr[1000];
+
+    ZCodeExecuter::yyFlexLexer->yyin.seekg(-(int)loc.end.column - 1, std::ios::cur);
+    ZCodeExecuter::yyFlexLexer->yyin.getline(lineStr, 1000);
+
+    std::cerr << lineStr << std::endl;
+
+    for (uint i = 0; i < loc.begin.column; ++i)
+        std::cerr << " ";
+
+    for (uint i = loc.begin.column; i < loc.end.column ; ++i)
+        std::cerr << "^";
+
+    std::cerr << std::endl;
+    std::cerr << "from " << loc.begin.line << " line " << loc.begin.column << " column, "
+              << "to " << loc.end.line << " line " << loc.end.column << " column, " << msg << std::endl;
+
+    quick_exit(-1);
+}
 
 int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)
 {

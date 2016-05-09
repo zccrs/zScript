@@ -124,7 +124,7 @@ namespace yy {
     /// Symbol semantic values.
     union semantic_type
     {
-    #line 25 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
+    #line 27 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
 
     int valueType;
     quint16 count;
@@ -401,10 +401,13 @@ namespace yy {
   static const unsigned char yyr2_[];
 
 
-#if YYDEBUG
+    /// Convert the symbol name \a n to a form suitable for a diagnostic.
+    static std::string yytnamerr_ (const char *n);
+
+
     /// For a symbol, its name in clear.
     static const char* const yytname_[];
-
+#if YYDEBUG
   // YYRLINE[YYN] -- Source line where rule number YYN was defined.
   static const unsigned short int yyrline_[];
     /// Report on the debug stream that the rule \a r is going to be reduced.
@@ -519,7 +522,7 @@ namespace yy {
 
 
 } // yy
-#line 523 "zScript.tab.hpp" // lalr1.cc:377
+#line 526 "zScript.tab.hpp" // lalr1.cc:377
 
 
 
