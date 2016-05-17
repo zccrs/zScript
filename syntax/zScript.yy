@@ -151,7 +151,11 @@ code:       GOTO IDENTIFIER ends {
             }
             | switch {}
             | ';'
-            | '{' start '}'
+            | '{' {
+                ZCodeExecuter::currentCodeExecuter->beginCodeBlock();
+            } start {
+                ZCodeExecuter::currentCodeExecuter->endCodeBlock();
+            } '}'
             ;
 
 ends:       ';';
