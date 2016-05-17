@@ -19,6 +19,13 @@ ZVariant::ZVariant(int val)
     data->type = Int;
 }
 
+ZVariant::ZVariant(uint val)
+    : data(new VariantData)
+{
+    data->variant = val;
+    data->type = UInt;
+}
+
 ZVariant::ZVariant(double val)
     : data(new VariantData)
 {
@@ -117,6 +124,9 @@ ZVariant::ZVariant(const QVariant &val)
     case QVariant::Int:
         data->type = Int;
         break;
+    case QVariant::UInt:
+        data->type = UInt;
+        break;
     case QVariant::Double:
         data->type = Double;
         break;
@@ -158,7 +168,7 @@ ZVariant::ZVariant(const QVariant &val)
 
 ZVariant::~ZVariant()
 {
-
+    delete data;
 }
 
 const char *ZVariant::typeName() const
@@ -166,6 +176,8 @@ const char *ZVariant::typeName() const
     switch (data->type) {
     case Int:
         return "int";
+    case UInt:
+        return "uint";
     case Double:
         return "double";
     case Bool:
@@ -192,63 +204,22 @@ const char *ZVariant::typeName() const
 
 int ZVariant::toInt(bool *ok) const
 {
-    if(ok)
-        *ok = true;
-
-    switch(data->type) {
-    case Int:
-        return data->variant.toInt();
-    case Double:
-        return (int)data->variant.toDouble();
-    case Bool:
-        return data->variant.toBool();
-    case String:
-    case Object:
-    case Function:
-    case Undefined:
-        if(ok)
-            *ok = false;
-        return 0;
-    default:break;
-    }
-
     return data->variant.toInt(ok);
+}
+
+uint ZVariant::toUInt(bool *ok) const
+{
+    return data->variant.toUInt(ok);
 }
 
 double ZVariant::toDouble(bool *ok) const
 {
-    if(ok)
-        *ok = true;
-
-    switch(data->type) {
-    case Int:
-        return data->variant.toInt();
-    case Double:
-        return data->variant.toDouble();
-    case Bool:
-        return data->variant.toBool();
-    case String:
-    case Object:
-    case Function:
-    case Undefined:
-        if(ok)
-            *ok = false;
-        return 0;
-    default:break;
-    }
-
     return data->variant.toDouble(ok);
 }
 
 bool ZVariant::toBool() const
 {
     switch(data->type) {
-    case Int:
-        return data->variant.toInt();
-    case Double:
-        return (int)data->variant.toDouble();
-    case Bool:
-        return data->variant.toBool();
     case String:
         return !data->variant.toString().isEmpty();
     case Object:

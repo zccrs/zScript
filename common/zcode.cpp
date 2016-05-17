@@ -378,7 +378,7 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
         }
         case Push: {
             ValueCode *valueCode = code->toValueCode();
-            virtualStack.push(valueCode->value.data());
+            virtualStack.push(valueCode->value);
             break;
         }
         case Pop: {
@@ -391,12 +391,12 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             break;
         }
         case Goto: {
-            i = code->toValueCode()->value->toInt() - 1;
+            i = code->toValueCode()->value->toUInt() - 1;
             break;
         }
         case If: {
             if(!virtualStack.pop()->toBool())
-                i = code->toValueCode()->value->toInt() - 1;
+                i = code->toValueCode()->value->toUInt() - 1;
 
             break;
         }
@@ -480,7 +480,7 @@ private:
 
 ZCodeExecuter *ZCodeExecuter::currentCodeExecuter = Q_NULLPTR;
 YYFlexLexer *ZCodeExecuter::yyFlexLexer = Q_NULLPTR;
-QHash<const QByteArray, ZSharedVariant*> ZCodeExecuter::globalIdentifierHash;
+QHash<const QByteArray, ZVariant*> ZCodeExecuter::globalIdentifierHash;
 QMap<QByteArray, ZVariant*> ZCodeExecuter::stringConstantMap;
 QMap<QByteArray, ZVariant*> ZCodeExecuter::numberConstantMap;
 ZVariant ZCodeExecuter::constTrue(true);
@@ -588,6 +588,16 @@ ZSharedVariant *ZCodeExecuter::createConstant(const QByteArray &value, ZVariant:
 
         return new ZSharedVariant(*val);
     }
+    case ZVariant::UInt: {
+        ZVariant *val = numberConstantMap.value(value);
+
+        if(!val) {
+            val = new ZVariant(value.toUInt());
+            numberConstantMap[value] = val;
+        }
+
+        return new ZSharedVariant(*val);
+    }
     case ZVariant::Double: {
         ZVariant *val = numberConstantMap.value(value);
 
@@ -618,12 +628,12 @@ ZSharedVariant *ZCodeExecuter::createConstant(const QByteArray &value, ZVariant:
     }
 }
 
-ZSharedVariantPointer ZCodeExecuter::createFunction(ZCodeExecuter *executer)
+ZSharedVariant *ZCodeExecuter::createFunction(ZCodeExecuter *executer)
 {
-    return ZSharedVariantPointer(new ZSharedVariant(ZVariant(new ZUserFunction(executer))));
+    return new ZSharedVariant(ZVariant(new ZUserFunction(executer)));
 }
 
-ZCode *ZCodeExecuter::createCode(const ZCode::Action &action, const ZSharedVariantPointer &val)
+ZCode *ZCodeExecuter::createCode(const ZCode::Action &action, ZSharedVariant *val)
 {
     if(val) {
         ValueCode *code = new ValueCode;
@@ -680,7 +690,7 @@ void ZCodeExecuter::endCodeBlock()
         }
 
         if(!block) {
-            ZSharedVariant *val = globalIdentifierHash.value(name);
+            ZVariant *val = globalIdentifierHash.value(name);
 
             if(val) {
                 *val_pointer.data() = *val;
@@ -735,11 +745,11 @@ QDebug operator<<(QDebug deg, const ZCode &var)
     deg << actionName.sprintf("%-10s", actionName.toLatin1().constData());
 
     if(var.action == ZCode::Push) {
-        deg << *var.toValueCode()->value.constData();
+        deg << *var.toValueCode()->value;
     } else if(var.action == ZCode::Goto) {
-        deg << var.toValueCode()->value->toInt();
+        deg << var.toValueCode()->value->toUInt();
     } else if(var.action == ZCode::If) {
-        deg << "if false goto:" << var.toValueCode()->value->toInt();
+        deg << "if false goto:" << var.toValueCode()->value->toUInt();
     } else if(var.action == ZCode::Switch) {
         deg << "switch value:" << *var.toValueCode()->value;
     }

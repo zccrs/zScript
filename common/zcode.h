@@ -96,7 +96,11 @@ struct ZCode
 
 struct ValueCode : public ZCode
 {
-    ZSharedVariantPointer value;
+    ~ValueCode() {
+        delete value;
+    }
+
+    ZSharedVariant *value;
 };
 
 const ValueCode *ZCode::toValueCode() const
@@ -151,29 +155,29 @@ public:
     /// 循环结构的代码块
     struct LoopStructureCodeBlock : public CodeBlock {
         LoopStructureCodeBlock() {
-            breakIndex = new ZSharedVariant();
-            continueIndex = new ZSharedVariant();
+            breakIndex = 0;
+            continueIndex = 0;
         }
 
         /// 循环中的if指令的index
-        int ifInstructionIndex;
+        uint ifInstructionIndex;
         /// 执行break语句时要goto到的指令的位置
-        ZSharedVariantPointer breakIndex;
+        uint breakIndex;
         /// 执行containue语句时要goto到的指令的位置
-        ZSharedVariantPointer continueIndex;
+        uint continueIndex;
     };
 
     /// switch结构的代码块
     struct SwitchCodeBlock : public CodeBlock {
         SwitchCodeBlock() {
-            breakIndex = new ZSharedVariant();
+            breakIndex = 0;
         }
 
         /// 执行break语句时要goto到的指令的位置
-        ZSharedVariantPointer breakIndex;
+        uint breakIndex;
     };
 
-    inline static void registerIdentifier(const QByteArray &name, ZSharedVariant *variant)
+    inline static void registerIdentifier(const QByteArray &name, ZVariant *variant)
     {globalIdentifierHash[name] = variant;}
 
     /// from stdin get code
@@ -192,14 +196,10 @@ public:
     { return createConstant(value.toString().toLatin1(), value.type());}
 
     inline void     appendCode(const ZCode::Action &action)
-    {if(enableTmpCodeList) currentCodeBlock->tmpCodeList << createCode(action, ZSharedVariantPointer());
-        else codeList << createCode(action, ZSharedVariantPointer());}
+    {if(enableTmpCodeList) currentCodeBlock->tmpCodeList << createCode(action, Q_NULLPTR);
+        else codeList << createCode(action, Q_NULLPTR);}
 
     inline void appendCode(const ZCode::Action &action, ZSharedVariant *val)
-    { if(enableTmpCodeList) currentCodeBlock->tmpCodeList << createCode(action, ZSharedVariantPointer(val));
-        else codeList << createCode(action, ZSharedVariantPointer(val));}
-
-    inline void appendCode(const ZCode::Action &action, const ZSharedVariantPointer &val)
     { if(enableTmpCodeList) currentCodeBlock->tmpCodeList << createCode(action, val);
         else codeList << createCode(action, val);}
 
@@ -246,7 +246,7 @@ public:
         currentCodeBlock->identifiers[name] = val;
     }
 
-    static ZSharedVariantPointer createFunction(ZCodeExecuter *executer);
+    static ZSharedVariant *createFunction(ZCodeExecuter *executer);
 
     inline CodeBlock *getCodeBlock() const
     { return currentCodeBlock;}
@@ -288,7 +288,7 @@ public:
 private:
     ZCodeExecuter();
 
-    ZCode *createCode(const ZCode::Action &action, const ZSharedVariantPointer &val);
+    ZCode *createCode(const ZCode::Action &action, ZSharedVariant *val);
 
     inline void deleteAllCodeBlock()
     {
@@ -336,7 +336,7 @@ private:
     /// function object parameter tmp list
     QVector<ZSharedVariant*> parameterList;
 
-    static QHash<const QByteArray, ZSharedVariant*> globalIdentifierHash;
+    static QHash<const QByteArray, ZVariant*> globalIdentifierHash;
     static QMap<QByteArray, ZVariant*> stringConstantMap;
     static QMap<QByteArray, ZVariant*> numberConstantMap;
     static ZVariant constTrue;

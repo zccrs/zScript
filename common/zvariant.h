@@ -24,6 +24,7 @@ class ZVariant
 public:
     enum Type {
         Int = QMetaType::Int,
+        UInt = QMetaType::UInt,
         Double = QMetaType::Double,
         Bool = QMetaType::Bool,
         String = QMetaType::QString,
@@ -37,8 +38,10 @@ public:
 
     typedef QList<ZVariant*> ZTuple;
 
+//    ZVariant() {}
     ZVariant(Type type = Undefined);
     ZVariant(int val);
+    ZVariant(uint val);
     ZVariant(double val);
     ZVariant(bool val);
     ZVariant(const char *val);
@@ -61,6 +64,7 @@ public:
     { return data->type;}
 
     int toInt(bool *ok = 0) const;
+    uint toUInt(bool *ok = 0) const;
     double toDouble(bool *ok = 0) const;
     bool toBool() const;
     inline QString toString() const
@@ -77,25 +81,26 @@ public:
     inline QVariant toQVariant() const
     { return data->variant;}
 
-    inline void depthCopyAssign(const ZVariant &other) const
+    inline void depthCopyAssign(const ZVariant &other)
     {
-        if(type() == Tuple) {
-            const ZTuple &tuple = toTuple();
-            const ZTuple &other_tuple = other.toTuple();
+//        if(type() == Tuple) {
+//            const ZTuple &tuple = toTuple();
+//            const ZTuple &other_tuple = other.toTuple();
 
-            int min = qMin(tuple.count(), other_tuple.count());
+//            int min = qMin(tuple.count(), other_tuple.count());
 
-            for(int i = 0; i < min; ++i) {
-                tuple.at(i)->depthCopyAssign(*other_tuple.at(i));
-            }
+//            for(int i = 0; i < min; ++i) {
+//                tuple.at(i)->depthCopyAssign(*other_tuple.at(i));
+//            }
 
-            return;
-        }
+//            return;
+//        }
 
-        VariantData *data = const_cast<VariantData*>(this->data.constData());
+//        VariantData *data = const_cast<VariantData*>(this->data.constData());
 
-        data->variant = other.data->variant;
-        data->type = other.data->type;
+//        data->variant = other.data->variant;
+//        data->type = other.data->type;
+        operator =(other);
     }
 
     inline ZVariant& operator=(const ZVariant &other)
@@ -107,10 +112,11 @@ public:
             int min = qMin(other_group.count(), this_group.count());
 
             for(int i = 0; i < min; ++i) {
-                this_group[i]->data = other_group[i]->data;
+                *this_group[i] = *other_group[i];
             }
         } else {
-            data = other.data;
+            data->type = other.data->type;
+            data->variant = other.data->variant;
         }
 
         return *this;
@@ -124,10 +130,11 @@ public:
             int min = qMin(other_group.count(), this_group.count());
 
             for(int i = 0; i < min; ++i) {
-                qSwap(this_group[i]->data, other_group[i]->data);
+                *this_group[i] = std::move(*other_group[i]);
             }
         } else {
-            qSwap(data, other.data);
+            data->type = other.data->type;
+            data->variant = std::move(other.data->variant);
         }
 
         return *this;
@@ -206,7 +213,7 @@ public:
     friend uint qHash(const ZVariant &val, uint seed);
 
 private:
-    class VariantData : public QSharedData
+    class VariantData
     {
         QVariant variant;
         ZVariant::Type type;
@@ -214,7 +221,7 @@ private:
         friend class ZVariant;
     };
 
-    QSharedDataPointer<VariantData> data;
+    VariantData *data = Q_NULLPTR;
 
     friend class ZCode;
 };

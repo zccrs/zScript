@@ -124,15 +124,15 @@ namespace yy {
     /// Symbol semantic values.
     union semantic_type
     {
-    #line 27 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
+    #line 26 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
 
     int valueType;
     quint16 count;
     QByteArray *identifier;
-    ZSharedVariantPointer *value;
+    ZSharedVariant *value;
     QVarLengthArray<QByteArray*, 10> *parameterList;
-    QPair<ZSharedVariantPointer*, quint16> *caseKey;
-    QVector<QPair<ZSharedVariantPointer*, quint16>> *cases;
+    QPair<ZSharedVariant*, quint16> *caseKey;
+    QVector<QPair<ZSharedVariant*, quint16>> *cases;
     std::string *msg;
 
 #line 139 "zScript.tab.hpp" // lalr1.cc:377

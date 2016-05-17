@@ -1,4 +1,3 @@
-
 %{
 #include "zcode.h"
 #include "lex.yy.cpp"
@@ -28,10 +27,10 @@ Z_USE_NAMESPACE
     int valueType;
     quint16 count;
     QByteArray *identifier;
-    ZSharedVariantPointer *value;
+    ZSharedVariant *value;
     QVarLengthArray<QByteArray*, 10> *parameterList;
-    QPair<ZSharedVariantPointer*, quint16> *caseKey;
-    QVector<QPair<ZSharedVariantPointer*, quint16>> *cases;
+    QPair<ZSharedVariant*, quint16> *caseKey;
+    QVector<QPair<ZSharedVariant*, quint16>> *cases;
     std::string *msg;
 };
 
@@ -140,12 +139,12 @@ code:       GOTO IDENTIFIER ends {
 
                 if(isBreak) {
                     if(block_while->isLoopStructure()) {
-                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toLoopStructureCodeBlock()->breakIndex);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, new ZSharedVariant(block_while->toLoopStructureCodeBlock()->breakIndex));
                     } else {
-                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toSwitchCodeBlock()->breakIndex);
+                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, new ZSharedVariant(block_while->toSwitchCodeBlock()->breakIndex));
                     }
                 } else {
-                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toLoopStructureCodeBlock()->continueIndex);
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, new ZSharedVariant(block_while->toLoopStructureCodeBlock()->continueIndex));
                 }
 
             }
@@ -171,15 +170,15 @@ loopEnds:   CONTINUE {$$ = 0x8001;}
             ;
 
 switch_head:SWITCH '(' expression ')' {
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Switch, ZSharedVariantPointer(new ZSharedVariant()));
-                $$ = &ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Switch, new ZSharedVariant());
+                $$ = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
 
                 ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::Switch);
             }
             ;
 
 switch:     switch_head '{' cases '}' {
-                *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toSwitchCodeBlock()->breakIndex.data() = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
+                ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toSwitchCodeBlock()->breakIndex = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 
                 QHash<ZVariant, int> hashSwitch;
 
@@ -187,9 +186,9 @@ switch:     switch_head '{' cases '}' {
 
                 bool existDefault = false;
 
-                for(const QPair<ZSharedVariantPointer*, quint16> &c : *$3) {
+                for(const QPair<ZSharedVariant*, quint16> &c : *$3) {
                     if(c.first) {
-                        hashSwitch[*c.first->constData()] = c.second;
+                        hashSwitch[*c.first] = c.second;
                     } else {
                         hashSwitch[ZVariant()] = c.second;
                         existDefault = true;
@@ -199,19 +198,19 @@ switch:     switch_head '{' cases '}' {
                 if(!existDefault)
                     hashSwitch[ZVariant()] = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 
-                *$1->data() = QVariant::fromValue(hashSwitch);
+                *$1 = QVariant::fromValue(hashSwitch);
 
                 ZCodeExecuter::currentCodeExecuter->endCodeBlock();
             }
             ;
 
 case:       CASE const ':' {
-                $$ = new QPair<ZSharedVariantPointer*, quint16>($2, ZCodeExecuter::currentCodeExecuter->getCodeList().count());
+                $$ = new QPair<ZSharedVariant*, quint16>($2, ZCodeExecuter::currentCodeExecuter->getCodeList().count());
             }
             ;
 
 cases:      case code {
-                $$ = new QVector<QPair<ZSharedVariantPointer*, quint16>>();
+                $$ = new QVector<QPair<ZSharedVariant*, quint16>>();
                 $$->append(*$1);
 
                 delete $1;
@@ -221,7 +220,7 @@ cases:      case code {
                 $2 = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
             } code {
                 $$ = $1;
-                $$->append(QPair<ZSharedVariantPointer*, quint16>(Q_NULLPTR, $2));
+                $$->append(QPair<ZSharedVariant*, quint16>(Q_NULLPTR, $2));
             }
             | cases case code {
                 $$ = $1;
@@ -292,7 +291,7 @@ define:     IDENTIFIER {
             }
             | IDENTIFIER '=' expression {
                 ZCodeExecuter::currentCodeExecuter->addIdentifier(*$1);
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifier(*$1));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifier(*$1).data());
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::RightAssign);
 
                 delete $1;
@@ -316,14 +315,14 @@ lvalue:     VAR define {
             | IDENTIFIER {
                 $$ = ValueType::Variant;
 
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifier(*$1));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifier(*$1).data());
 
                 delete $1;
             }
             | '_' {
                 $$ = ValueType::Constant;
 
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZSharedVariantPointer(new ZSharedVariant()));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant());
             }
             | lvalue '=' expression {
                 $$ = ValueType::Variant;
@@ -404,25 +403,25 @@ lvalue:     VAR define {
             ;
 
 const:      UNDEFINED {
-                $$ = new ZSharedVariantPointer(ZCodeExecuter::createConstant(QByteArray(), ZVariant::Undefined));
+                $$ = ZCodeExecuter::createConstant(QByteArray(), ZVariant::Undefined);
             }
             | INT {
-                $$ = new ZSharedVariantPointer(ZCodeExecuter::createConstant(*$1, ZVariant::Int));
+                $$ = ZCodeExecuter::createConstant(*$1, ZVariant::Int);
 
                 delete $1;
             }
             | STRING {
-                $$ = new ZSharedVariantPointer(ZCodeExecuter::createConstant(*$1, ZVariant::String));
+                $$ = ZCodeExecuter::createConstant(*$1, ZVariant::String);
 
                 delete $1;
             }
             | DOUBLE {
-                $$ = new ZSharedVariantPointer(ZCodeExecuter::createConstant(*$1, ZVariant::Double));
+                $$ = ZCodeExecuter::createConstant(*$1, ZVariant::Double);
 
                 delete $1;
             }
             | BOOL {
-                $$ = new ZSharedVariantPointer(ZCodeExecuter::createConstant(*$1, ZVariant::Bool));
+                $$ = ZCodeExecuter::createConstant(*$1, ZVariant::Bool);
 
                 delete $1;
             }
@@ -430,7 +429,7 @@ const:      UNDEFINED {
 rvalue:     const {
                 $$ = ValueType::Constant;
 
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, *$1);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, $1);
 
                 delete $1;
             }
@@ -831,7 +830,7 @@ branch_head:IF '(' expression ')' {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
                 /// 存储if语句判断为假时要跳转到的指令位置
-                $$ = &ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
+                $$ = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
             }
             | WHILE {
                 ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::While);
@@ -839,7 +838,7 @@ branch_head:IF '(' expression ')' {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::If, ZCodeExecuter::currentCodeExecuter->createConstant("", ZVariant::Undefined));
 
                 /// 存储if语句判断为假时要跳转到的指令位置
-                $$ = &ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
+                $$ = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
             }
             | FOR '(' for_exp ends {
                 if(ZCodeExecuter::currentCodeExecuter->getCodeList().count() > 1
@@ -862,7 +861,7 @@ branch_head:IF '(' expression ')' {
                 int ifInstructionIndex = ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toLoopStructureCodeBlock()->ifInstructionIndex;
 
                 /// 将if语句的ValueCode的值传递到下一层，方便更改if语句判断为假时的跳转位置
-                $$ = &ZCodeExecuter::currentCodeExecuter->getCodeList().value(ifInstructionIndex)->toValueCode()->value;
+                $$ = ZCodeExecuter::currentCodeExecuter->getCodeList().value(ifInstructionIndex)->toValueCode()->value;
             }
 //            | FOR '(' lvalue ':' expression ')' {
 //                $$ = Q_NULLPTR;
@@ -882,7 +881,7 @@ branch_body :branch_head code {
                         QList<ZCode*> &tmpCodeList = ZCodeExecuter::currentCodeExecuter->getTmpCodeList();
 
                         /// 记录在for循环中执行continue语句时要跳转到的目标位置
-                        *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toLoopStructureCodeBlock()->continueIndex.data() = codeList.count();
+                        ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toLoopStructureCodeBlock()->continueIndex = codeList.count();
 
                         /// 将for循环的第三个表达式的指令从临时列表添加到codeList
                         while(!tmpCodeList.isEmpty()) {
@@ -899,7 +898,7 @@ branch_body :branch_head code {
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstant(QByteArray::number(index), ZVariant::Int));
 
                     /// 保存执行break语句时跳转到的位置
-                    *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toLoopStructureCodeBlock()->breakIndex.data() = codeList.count();
+                    ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toLoopStructureCodeBlock()->breakIndex = codeList.count();
                 }
 
                 int index = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
@@ -925,7 +924,7 @@ conditional:branch_body
                 /// 更改if判断为假时跳转到的位置
                 *$1 = ZCodeExecuter::createConstant(QByteArray::number(index), ZVariant::Int);
 
-                $1 = &ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
+                $1 = ZCodeExecuter::currentCodeExecuter->getCodeList().last()->toValueCode()->value;
             } code {
                  int index = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 
