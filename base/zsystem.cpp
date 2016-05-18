@@ -1,10 +1,15 @@
 #include "zsystem.h"
 #include "zcode.h"
 
+#include <QThread>
+
 ZSystem::ZSystem(ZObject *parent)
     : ZObject(parent)
 {
     Z_REGIST_SLOT(&ZSystem::eval);
+    Z_REGIST_SLOT(&ZSystem::sleep);
+    Z_REGIST_SLOT(&ZSystem::msleep);
+    Z_REGIST_SLOT(&ZSystem::usleep);
 }
 
 void ZSystem::eval(ZVariant &retVals, const QList<ZVariant> &args)
@@ -19,4 +24,34 @@ void ZSystem::eval(ZVariant &retVals, const QList<ZVariant> &args)
     executer->endCodeExecuter();
 
     delete executer;
+}
+
+void ZSystem::sleep(ZVariant &retVals, const QList<ZVariant> &args)
+{
+    Q_UNUSED(retVals)
+
+    if(args.isEmpty())
+        return;
+
+    QThread::currentThread()->sleep(args.first().toInt());
+}
+
+void ZSystem::msleep(ZVariant &retVals, const QList<ZVariant> &args)
+{
+    Q_UNUSED(retVals)
+
+    if(args.isEmpty())
+        return;
+
+    QThread::currentThread()->msleep(args.first().toInt());
+}
+
+void ZSystem::usleep(ZVariant &retVals, const QList<ZVariant> &args)
+{
+    Q_UNUSED(retVals)
+
+    if(args.isEmpty())
+        return;
+
+    QThread::currentThread()->usleep(args.first().toInt());
 }

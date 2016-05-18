@@ -15,6 +15,11 @@ public:
 public slots:
     void log(ZVariant &retVals, const QList<ZVariant> &args) const;
     void getLine(ZVariant &retVals, const QList<ZVariant> &args) const;
+    void getChar(ZVariant &retVals, const QList<ZVariant> &args) const;
+    void getCh(ZVariant &retVals, const QList<ZVariant> &args) const;
+    void getKey(ZVariant &retVals, const QList<ZVariant> &args) const;
+    void kbhit(ZVariant &retVals, const QList<ZVariant> &args) const;
+    void setEcho(ZVariant &retVals, const QList<ZVariant> &args) const;
 
 private:
     QString variantToString(const ZVariant &val) const;
