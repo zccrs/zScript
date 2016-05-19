@@ -11,6 +11,7 @@ class ZConsole : public ZObject
 
 public:
     explicit ZConsole(ZObject *parent = 0);
+    ~ZConsole();
 
 public slots:
     void log(ZVariant &retVals, const QList<ZVariant> &args) const;
@@ -20,6 +21,10 @@ public slots:
     void getKey(ZVariant &retVals, const QList<ZVariant> &args) const;
     void kbhit(ZVariant &retVals, const QList<ZVariant> &args) const;
     void setEcho(ZVariant &retVals, const QList<ZVariant> &args) const;
+    void setCursorVisible(ZVariant &retVals, const QList<ZVariant> &args) const;
+    void setCursorPos(ZVariant &retVals, const QList<ZVariant> &args) const;
+    void clear(ZVariant &retVals, const QList<ZVariant> &args) const;
+    void reset(ZVariant &retVals, const QList<ZVariant> &args) const;
 
 private:
     QString variantToString(const ZVariant &val) const;

@@ -20,6 +20,15 @@ ZConsole::ZConsole(ZObject *parent)
     Z_REGIST_SLOT(&ZConsole::getKey);
     Z_REGIST_SLOT(&ZConsole::kbhit);
     Z_REGIST_SLOT(&ZConsole::setEcho);
+    Z_REGIST_SLOT(&ZConsole::setCursorVisible);
+    Z_REGIST_SLOT(&ZConsole::setCursorPos);
+    Z_REGIST_SLOT(&ZConsole::clear);
+    Z_REGIST_SLOT(&ZConsole::reset);
+}
+
+ZConsole::~ZConsole()
+{
+
 }
 
 void ZConsole::log(ZVariant &retVals, const QList<ZVariant> &args) const
@@ -152,6 +161,50 @@ void ZConsole::setEcho(ZVariant &retVals, const QList<ZVariant> &args) const
 
     tcsetattr(STDIN_FILENO, TCSANOW, &termios);
 #endif
+}
+
+void ZConsole::setCursorVisible(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    Q_UNUSED(retVals)
+
+    if (args.isEmpty())
+        return;
+
+    if (args.first().toBool())
+        printf("\033[?25h");
+    else
+        printf("\033[?25l");
+
+    fflush(stdout);
+}
+
+void ZConsole::setCursorPos(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    Q_UNUSED(retVals)
+
+    const ZVariant& x = args.value(0);
+    const ZVariant& y = args.value(1);
+
+    printf("\033[%d;%dH", y.toInt(), x.toInt());
+    fflush(stdout);
+}
+
+void ZConsole::clear(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    Q_UNUSED(retVals)
+    Q_UNUSED(args)
+
+    printf("\033[2J");
+    fflush(stdout);
+}
+
+void ZConsole::reset(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    Q_UNUSED(retVals)
+    Q_UNUSED(args)
+
+    printf("\033[0m");
+    fflush(stdout);
 }
 
 QString ZConsole::variantToString(const ZVariant &val) const
