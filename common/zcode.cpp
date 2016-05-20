@@ -73,6 +73,7 @@ QString ZCode::actionName(quint8 action)
         case Children:          return "[](get children)";
         case Append:            return "<<(append)";
         case Switch:            return "switch";
+        case InitObjectProperty:    return "init object property";
         case Unknow:            return "unknow";
     }
 
@@ -423,6 +424,20 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             if(i < 0) {
                 i = val.value(ZVariant(), -1) - 1;
             }
+        }
+        case InitObjectProperty: {
+            ZObject *obj = virtualStack.pop()->toObject();
+            int count = virtualStack.pop()->toInt();
+
+            for (int i = 0; i < count; ++i) {
+                const char *name = virtualStack.pop()->toString().toLatin1().constData();
+                const ZVariant &value = *virtualStack.pop();
+
+                obj->setProperty(name, value);
+            }
+
+            temporaryList << ZVariant(obj);
+            virtualStack.push(&temporaryList.last());
         }
         default: break;
         }

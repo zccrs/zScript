@@ -341,25 +341,24 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[153] =
+static yyconst flex_int16_t yy_accept[151] =
     {   0,
         0,    0,   54,   53,    1,    2,   44,   47,   44,   44,
-       44,   44,   44,   44,   44,   50,   50,   44,   44,   44,
-       45,   44,   44,   45,   45,   45,   45,   45,   45,   45,
-       45,   45,   45,   45,   45,   45,   45,   44,   53,   45,
-       22,   29,   36,   26,   32,   34,   30,   35,   31,   49,
-       48,   33,    0,   50,   40,   24,   20,   25,   41,   45,
-       28,   45,   45,   45,   45,   45,   45,   45,   45,   45,
-        8,   45,   46,   45,   45,   45,   45,   45,   45,   45,
-       27,   37,   52,    0,    0,   45,   23,   38,   51,   21,
-       45,   45,   45,   45,   45,   45,   45,   11,   45,   45,
+       44,   44,   44,   44,   44,   50,   44,   44,   44,   45,
+       44,   45,   45,   45,   45,   45,   45,   45,   45,   45,
+       45,   45,   45,   45,   45,   44,   53,   45,   22,   29,
+       36,   26,   32,   34,   30,   35,   31,   49,   48,   33,
+        0,   50,   40,   24,   20,   25,   41,   45,   28,   45,
+       45,   45,   45,   45,   45,   45,   45,   45,    8,   45,
+       46,   45,   45,   45,   45,   45,   45,   45,   27,   37,
+       52,    0,    0,   45,   23,   38,   51,   21,   45,   45,
+       45,   45,   45,   45,   45,   11,   45,   45,    5,   45,
 
-        5,   45,   45,   45,   45,   45,    3,   45,   39,   52,
-       45,   18,   45,   45,   45,    9,   45,   45,   13,   45,
-       45,   45,   42,   45,   45,   15,   45,   45,   45,   43,
-       45,   45,   45,    7,   45,   10,   45,   45,    6,   45,
-       14,   17,   45,   45,   19,   45,   45,   16,    4,   45,
-       12,    0
+       45,   45,   45,   45,    3,   45,   39,   52,   45,   18,
+       45,   45,   45,    9,   45,   45,   13,   45,   45,   45,
+       42,   45,   45,   15,   45,   45,   45,   43,   45,   45,
+       45,    7,   45,   10,   45,   45,    6,   45,   14,   17,
+       45,   45,   19,   45,   45,   16,    4,   45,   12,    0
     } ;
 
 static yyconst YY_CHAR yy_ec[256] =
@@ -368,16 +367,16 @@ static yyconst YY_CHAR yy_ec[256] =
         1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    2,    4,    5,    6,    1,    7,    8,    9,   10,
-       10,   11,   12,   10,   13,   14,   15,   16,   17,   17,
-       17,   17,   17,   17,   17,   17,   17,   10,   10,   18,
-       19,   20,   10,   10,   21,   21,   21,   21,   21,   21,
-       21,   21,   21,   21,   21,   21,   21,   21,   21,   21,
-       21,   21,   21,   21,   21,   21,   21,   21,   21,   21,
-       10,    1,   10,   22,   23,    1,   24,   25,   26,   27,
+       10,   11,   12,   10,   13,   14,   15,   16,   16,   16,
+       16,   16,   16,   16,   16,   16,   16,   10,   10,   17,
+       18,   19,   10,   10,   20,   20,   20,   20,   20,   20,
+       20,   20,   20,   20,   20,   20,   20,   20,   20,   20,
+       20,   20,   20,   20,   20,   20,   20,   20,   20,   20,
+       10,    1,   10,   21,   22,    1,   23,   24,   25,   26,
 
-       28,   29,   30,   31,   32,   21,   33,   34,   21,   35,
-       36,   21,   21,   37,   38,   39,   40,   41,   42,   21,
-       21,   21,   10,   43,   10,   10,    1,    1,    1,    1,
+       27,   28,   29,   30,   31,   20,   32,   33,   20,   34,
+       35,   20,   20,   36,   37,   38,   39,   40,   41,   20,
+       20,   20,   10,   42,   10,   10,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -394,111 +393,111 @@ static yyconst YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst YY_CHAR yy_meta[44] =
+static yyconst YY_CHAR yy_meta[43] =
     {   0,
         1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    3,    3,    1,    1,    1,
-        3,    1,    3,    3,    3,    3,    3,    3,    3,    3,
+        1,    1,    1,    1,    1,    3,    1,    1,    1,    3,
+        1,    3,    3,    3,    3,    3,    3,    3,    3,    3,
         3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
-        3,    3,    1
+        3,    1
     } ;
 
-static yyconst flex_uint16_t yy_base[155] =
+static yyconst flex_uint16_t yy_base[153] =
     {   0,
-        0,   38,  176,  177,  177,  177,  156,  177,  155,   37,
-      177,  154,   34,   35,   36,   43,   47,   31,  153,   46,
-        0,  152,    0,  133,   34,  141,  134,   38,  131,  137,
-      137,   62,  122,   38,  128,  138,  130,   49,   48,   66,
-      141,  177,  140,  177,  177,  177,  177,  177,  177,  177,
-      177,  177,   63,   67,  177,  177,  139,  177,  177,    0,
-      177,  129,  118,  120,   48,  116,  119,  115,  116,  111,
-        0,  107,  177,  109,  115,  109,  105,  117,  106,  110,
-      177,  122,    0,   69,   81,   82,  177,  177,   77,  177,
-      116,  111,   99,  113,  108,  107,   96,    0,  107,   96,
+        0,   37,  168,  169,  169,  169,  149,  169,  148,   36,
+      169,  147,   33,   34,   35,   41,   31,  146,   40,    0,
+      145,  126,   33,  134,  127,   37,  124,  130,  130,   56,
+      115,   33,  121,  131,  123,   44,   60,   61,  134,  169,
+      133,  169,  169,  169,  169,  169,  169,  169,  169,  169,
+      134,   57,  169,  169,  131,  169,  169,    0,  169,  121,
+      110,  112,   42,  108,  111,  107,  108,  103,    0,   99,
+      169,  101,  107,  101,   97,  109,   98,  102,  169,  114,
+        0,   62,   73,   72,  169,  169,  115,  169,  107,  102,
+       90,  104,   99,   98,   87,    0,   98,   87,    0,   82,
 
-        0,   91,   91,   93,  100,   99,    0,   92,  177,    0,
-       92,    0,   92,   82,   79,    0,   89,   77,    0,   78,
-       88,   71,    0,   83,   83,    0,   75,   75,   78,    0,
-       73,   68,   71,    0,   69,    0,   60,   60,    0,   62,
-        0,    0,   62,   68,    0,   60,   63,    0,    0,   62,
-        0,  177,   84,  120
+       82,   84,   91,   90,    0,   83,  169,    0,   83,    0,
+       83,   73,   70,    0,   80,   68,    0,   69,   79,   62,
+        0,   73,   73,    0,   62,   62,   67,    0,   62,   58,
+       61,    0,   59,    0,   50,   50,    0,   52,    0,    0,
+       51,   57,    0,   48,   54,    0,    0,   54,    0,  169,
+       76,  110
     } ;
 
-static yyconst flex_int16_t yy_def[155] =
+static yyconst flex_int16_t yy_def[153] =
     {   0,
-      152,    1,  152,  152,  152,  152,  152,  152,  152,  152,
-      152,  152,  152,  152,  152,  152,  152,  152,  152,  152,
-      153,  152,  153,  153,  153,  153,  153,  153,  153,  153,
-      153,  153,  153,  153,  153,  153,  153,  152,  152,  153,
-      152,  152,  152,  152,  152,  152,  152,  152,  152,  152,
-      152,  152,  152,  152,  152,  152,  152,  152,  152,  153,
-      152,  153,  153,  153,  153,  153,  153,  153,  153,  153,
-      153,  153,  152,  153,  153,  153,  153,  153,  153,  153,
-      152,  152,  154,  152,  152,  153,  152,  152,  152,  152,
-      153,  153,  153,  153,  153,  153,  153,  153,  153,  153,
+      150,    1,  150,  150,  150,  150,  150,  150,  150,  150,
+      150,  150,  150,  150,  150,  150,  150,  150,  150,  151,
+      150,  151,  151,  151,  151,  151,  151,  151,  151,  151,
+      151,  151,  151,  151,  151,  150,  150,  151,  150,  150,
+      150,  150,  150,  150,  150,  150,  150,  150,  150,  150,
+      150,  150,  150,  150,  150,  150,  150,  151,  150,  151,
+      151,  151,  151,  151,  151,  151,  151,  151,  151,  151,
+      150,  151,  151,  151,  151,  151,  151,  151,  150,  150,
+      152,  150,  150,  151,  150,  150,  150,  150,  151,  151,
+      151,  151,  151,  151,  151,  151,  151,  151,  151,  151,
 
-      153,  153,  153,  153,  153,  153,  153,  153,  152,  154,
-      153,  153,  153,  153,  153,  153,  153,  153,  153,  153,
-      153,  153,  153,  153,  153,  153,  153,  153,  153,  153,
-      153,  153,  153,  153,  153,  153,  153,  153,  153,  153,
-      153,  153,  153,  153,  153,  153,  153,  153,  153,  153,
-      153,    0,  152,  152
+      151,  151,  151,  151,  151,  151,  150,  152,  151,  151,
+      151,  151,  151,  151,  151,  151,  151,  151,  151,  151,
+      151,  151,  151,  151,  151,  151,  151,  151,  151,  151,
+      151,  151,  151,  151,  151,  151,  151,  151,  151,  151,
+      151,  151,  151,  151,  151,  151,  151,  151,  151,    0,
+      150,  150
     } ;
 
-static yyconst flex_uint16_t yy_nxt[221] =
+static yyconst flex_uint16_t yy_nxt[212] =
     {   0,
         4,    5,    6,    7,    8,    4,    9,   10,    8,   11,
        12,   13,   14,   11,   15,   16,   17,   18,   19,   20,
-       21,   22,   23,   21,   24,   25,   26,   27,   28,   29,
-       21,   30,   21,   21,   31,   21,   32,   33,   34,   35,
-       36,   37,   38,   39,   43,   46,   50,   48,   55,   56,
-       51,   83,   47,   49,   52,   44,   53,   63,   54,   54,
-       53,   67,   54,   54,   58,   59,   73,   81,   76,   64,
-       73,   85,   83,   68,   77,   40,   94,   69,   89,   89,
-       53,   95,   54,   54,   83,   84,   60,   85,  151,   74,
-      150,   82,   89,   89,  149,  148,  147,  146,  145,  144,
+       21,   11,   20,   22,   23,   24,   25,   26,   27,   20,
+       28,   20,   20,   29,   20,   30,   31,   32,   33,   34,
+       35,   36,   37,   41,   44,   48,   46,   53,   54,   49,
+       45,   47,   50,   42,   51,   61,   52,   56,   57,   65,
+       71,   79,   74,   81,   71,   81,   83,   62,   75,   92,
+       51,   66,   52,   38,   93,   67,   81,   83,   58,  149,
+      148,  147,   72,  146,  145,   80,  144,  143,  142,  141,
+      140,  139,  138,  137,  136,  135,   82,   84,   82,  134,
 
-      143,  142,  141,   86,  140,  139,   84,   75,  138,  137,
-      136,  135,  134,  133,  132,  131,  130,  129,   84,   86,
-      110,  128,  110,  127,  126,  125,  124,  123,  122,  121,
-      120,  119,  118,  117,  116,  115,  114,  113,  112,  111,
-      109,  108,  107,  106,  105,  104,  103,  102,  101,  100,
-       99,   98,   97,   96,   93,   92,   91,   90,   88,   87,
-       80,   79,   78,   75,   72,   71,   70,   66,   65,   62,
-       61,   57,   45,   42,   41,  152,    3,  152,  152,  152,
-      152,  152,  152,  152,  152,  152,  152,  152,  152,  152,
-      152,  152,  152,  152,  152,  152,  152,  152,  152,  152,
+      133,   73,  132,  131,  130,  129,  128,  127,   84,   82,
+      108,  126,  108,  125,  124,  123,  122,  121,  120,  119,
+      118,  117,  116,  115,  114,  113,  112,  111,  110,  109,
+       87,  107,  106,  105,  104,  103,  102,  101,  100,   99,
+       98,   97,   96,   95,   94,   91,   90,   89,   88,   87,
+       86,   85,   78,   77,   76,   73,   70,   69,   68,   64,
+       63,   60,   59,   55,   43,   40,   39,  150,    3,  150,
+      150,  150,  150,  150,  150,  150,  150,  150,  150,  150,
+      150,  150,  150,  150,  150,  150,  150,  150,  150,  150,
+      150,  150,  150,  150,  150,  150,  150,  150,  150,  150,
 
-      152,  152,  152,  152,  152,  152,  152,  152,  152,  152,
-      152,  152,  152,  152,  152,  152,  152,  152,  152,  152
+      150,  150,  150,  150,  150,  150,  150,  150,  150,  150,
+      150
     } ;
 
-static yyconst flex_int16_t yy_chk[221] =
+static yyconst flex_int16_t yy_chk[212] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    2,   10,   13,   15,   14,   18,   18,
-       15,   39,   13,   14,   15,   10,   16,   25,   16,   16,
-       17,   28,   17,   17,   20,   20,   32,   38,   34,   25,
-       32,   40,   84,   28,   34,    2,   65,   28,   53,   53,
-       54,   65,   54,   54,   85,   39,  153,   86,  150,   32,
-      147,   38,   89,   89,  146,  144,  143,  140,  138,  137,
+        1,    1,    2,   10,   13,   15,   14,   17,   17,   15,
+       13,   14,   15,   10,   16,   23,   16,   19,   19,   26,
+       30,   36,   32,   37,   30,   82,   38,   23,   32,   63,
+       52,   26,   52,    2,   63,   26,   83,   84,  151,  148,
+      145,  144,   30,  142,  141,   36,  138,  136,  135,  133,
+      131,  130,  129,  127,  126,  125,   37,   38,   82,  123,
 
-      135,  133,  132,   40,  131,  129,   84,   40,  128,  127,
-      125,  124,  122,  121,  120,  118,  117,  115,   85,   86,
-      154,  114,  154,  113,  111,  108,  106,  105,  104,  103,
-      102,  100,   99,   97,   96,   95,   94,   93,   92,   91,
-       82,   80,   79,   78,   77,   76,   75,   74,   72,   70,
-       69,   68,   67,   66,   64,   63,   62,   57,   43,   41,
-       37,   36,   35,   33,   31,   30,   29,   27,   26,   24,
-       22,   19,   12,    9,    7,    3,  152,  152,  152,  152,
-      152,  152,  152,  152,  152,  152,  152,  152,  152,  152,
-      152,  152,  152,  152,  152,  152,  152,  152,  152,  152,
+      122,   38,  120,  119,  118,  116,  115,  113,   84,   83,
+      152,  112,  152,  111,  109,  106,  104,  103,  102,  101,
+      100,   98,   97,   95,   94,   93,   92,   91,   90,   89,
+       87,   80,   78,   77,   76,   75,   74,   73,   72,   70,
+       68,   67,   66,   65,   64,   62,   61,   60,   55,   51,
+       41,   39,   35,   34,   33,   31,   29,   28,   27,   25,
+       24,   22,   21,   18,   12,    9,    7,    3,  150,  150,
+      150,  150,  150,  150,  150,  150,  150,  150,  150,  150,
+      150,  150,  150,  150,  150,  150,  150,  150,  150,  150,
+      150,  150,  150,  150,  150,  150,  150,  150,  150,  150,
 
-      152,  152,  152,  152,  152,  152,  152,  152,  152,  152,
-      152,  152,  152,  152,  152,  152,  152,  152,  152,  152
+      150,  150,  150,  150,  150,  150,  150,  150,  150,  150,
+      150
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -516,6 +515,7 @@ static yyconst flex_int16_t yy_chk[221] =
 
 #include <QByteArray>
 #include <QDebug>
+#include <QRegularExpression>
 
 #include <iostream>
 
@@ -667,7 +667,7 @@ YY_DECL
 		}
 
 	{
-#line 33 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 34 "/home/zhang/projects/zScript/lexical/zScript.ll"
 
 #line 673 "lex.yy.cpp"
 
@@ -697,13 +697,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 153 )
+				if ( yy_current_state >= 151 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 177 );
+		while ( yy_base[yy_current_state] != 169 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -729,13 +729,13 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 34 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 35 "/home/zhang/projects/zScript/lexical/zScript.ll"
 
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 36 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 37 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     ++lineCount;
     currentColumn = 0;
@@ -743,202 +743,202 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 41 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 42 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::VAR;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 42 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 43 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::FUNCTION;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 43 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 44 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::NEW;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 44 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 45 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::DELETE;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 45 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 46 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::THROW;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 46 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 47 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::IF;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 47 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 48 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::ELSE;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 48 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 49 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::WHILE;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 49 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 50 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::FOR;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 50 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 51 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::UNDEFINED;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 51 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 52 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::GOTO;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 52 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 53 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::RETURN;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 53 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 54 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::BREAK;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 54 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 55 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::CONTINUE;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 55 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 56 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::SWITCH;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 56 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 57 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::CASE;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 57 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 58 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::DEFAULT;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 58 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 59 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::EQ;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 59 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 60 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::STEQ;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 60 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 61 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::NEQ;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 61 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 62 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::STNEQ;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 62 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 63 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::LE;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 63 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 64 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::GE;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 64 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 65 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::ANDASSIGN;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 65 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 66 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::ORASSIGN;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 66 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 67 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::XORASSIGN;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 67 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 68 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::MODASSIGN;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 68 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 69 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::ADDASSIGN;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 69 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 70 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::SUBASSIGN;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 70 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 71 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::MULASSIGN;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 71 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 72 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::DIVASSIGN;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 72 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 73 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::ADDSELF;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 73 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 74 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::SUBSELF;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 74 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 75 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::LAND;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 75 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 76 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::LOR;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 76 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 77 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::LANDASSIGN;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 77 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 78 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::LORASSIGN;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 78 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 79 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::LL;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 79 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 80 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::GG;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 81 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 82 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -949,7 +949,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 89 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 90 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -960,16 +960,31 @@ YY_RULE_SETUP
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 97 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 98 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
-    return yytext[0];
+    char ch = yytext[0];
+
+    if (ch == '{') {
+        char ch[100];
+        int current_pos = yyin.tellg();
+
+        yyin.getline(ch, 100, ':');
+        yyin.seekg(current_pos, std::ios::beg);
+
+        QRegularExpression reg("^\\s*[a-zA-Z][a-zA-Z0-9_]*\\s*$");
+
+        if (reg.match(QString(ch)).hasMatch())
+            return TOKEN_PREFIX::NEW_OBJ_BEGIN;
+    }
+
+    return ch;
 }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 103 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 119 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -980,7 +995,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 111 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 127 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -1002,7 +1017,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 130 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 146 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -1026,7 +1041,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 151 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 167 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     while(!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
@@ -1045,7 +1060,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 167 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 183 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     while(!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
@@ -1064,7 +1079,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 183 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 199 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -1075,7 +1090,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 191 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 207 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -1086,7 +1101,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 199 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 215 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     if(lineCount > 1) {
         RECORD_TOKEN_LOC;
@@ -1099,10 +1114,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 209 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 225 "/home/zhang/projects/zScript/lexical/zScript.ll"
 ECHO;
 	YY_BREAK
-#line 1106 "lex.yy.cpp"
+#line 1121 "lex.yy.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1516,7 +1531,7 @@ int yyFlexLexer::yy_get_next_buffer()
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 153 )
+			if ( yy_current_state >= 151 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1544,11 +1559,11 @@ int yyFlexLexer::yy_get_next_buffer()
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 153 )
+		if ( yy_current_state >= 151 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 152);
+	yy_is_jam = (yy_current_state == 150);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -2060,7 +2075,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 209 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 225 "/home/zhang/projects/zScript/lexical/zScript.ll"
 
 
 

@@ -5,6 +5,7 @@
 
 #include <QByteArray>
 #include <QDebug>
+#include <QRegularExpression>
 
 #include <iostream>
 
@@ -23,9 +24,9 @@ int currentColumn = 0;
     currentColumn = yyloc->end.column;
 %}
 
-identifier [a-zA-Z_][a-zA-Z0-9_]*
+identifier [a-zA-Z][a-zA-Z0-9_]*
 number [0-9]+
-real ({number}|0)\.[0-9]+
+real {number}\.{number}+
 operator [-+*/=!<>,;{}\(\)\[\]&\|\^%~.?:@_]
 ignore [ \t\r]
 shell_head ^\s*#\s*!.*
@@ -97,7 +98,22 @@ shell_head ^\s*#\s*!.*
 {operator} {
     RECORD_TOKEN_LOC;
 
-    return yytext[0];
+    char ch = yytext[0];
+
+    if (ch == '{') {
+        char ch[100];
+        int current_pos = yyin.tellg();
+
+        yyin.getline(ch, 100, ':');
+        yyin.seekg(current_pos, std::ios::beg);
+
+        QRegularExpression reg("^\\s*[a-zA-Z][a-zA-Z0-9_]*\\s*$");
+
+        if (reg.match(QString(ch)).hasMatch())
+            return TOKEN_PREFIX::NEW_OBJ_BEGIN;
+    }
+
+    return ch;
 }
 
 {identifier} {

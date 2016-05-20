@@ -1,4 +1,3 @@
-
 %{
 #include "zcode.h"
 #include "lex.yy.cpp"
@@ -49,6 +48,8 @@ Z_USE_NAMESPACE
 
 %token <msg> ERROR
 
+%token NEW_OBJ_BEGIN
+
 %left ';'
 %left VAR IF
 %left ','
@@ -68,7 +69,7 @@ Z_USE_NAMESPACE
 %left '(' ')'
 
 %type <valueType> expression lvalue rvalue
-%type <count> arguments tuple_exp tuple_lval break loopEnds
+%type <count> arguments tuple_exp tuple_lval break loopEnds object_pro
 %type <value> branch_head branch_body branch_else const switch_head
 %type <parameterList> parameter
 %type <cases> cases
@@ -817,11 +818,40 @@ rvalue:     const {
                 $$ = ValueType::Variant;
             }
             | '(' expression ')' { $$ = $2;}
+            | object {
+                $$ = ValueType::Variant;
+            }
             ;
 
 arguments:  {$$ = 0;}
             | expression {$$ = 1;}
             | tuple_exp
+            ;
+
+object_pro: IDENTIFIER ':' expression {
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant(QString(*$1)));
+
+                delete $1;
+
+                $$ = 1;
+            }
+            | object_pro ',' IDENTIFIER ':' expression {
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant(QString(*$3)));
+
+                delete $3;
+
+                $$ = $1 = 1;
+            }
+            ;
+
+object:     NEW_OBJ_BEGIN '}' {
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant(new ZObject()));
+            }
+            | NEW_OBJ_BEGIN object_pro '}' {
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant($2));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant(new ZObject()));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::InitObjectProperty);
+            }
             ;
 
 branch_head:IF '(' expression ')' {

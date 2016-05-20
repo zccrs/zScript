@@ -124,7 +124,7 @@ namespace yy {
     /// Symbol semantic values.
     union semantic_type
     {
-    #line 27 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
+    #line 26 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:377
 
     int valueType;
     quint16 count;
@@ -200,9 +200,10 @@ namespace yy {
         LANDASSIGN = 300,
         LORASSIGN = 301,
         ERROR = 302,
-        COMMA = 303,
-        LTGT = 304,
-        UMINUS = 305
+        NEW_OBJ_BEGIN = 303,
+        COMMA = 304,
+        LTGT = 305,
+        UMINUS = 306
       };
     };
 
@@ -510,12 +511,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 894,     ///< Last index in yytable_.
-      yynnts_ = 36,  ///< Number of nonterminal symbols.
+      yylast_ = 895,     ///< Last index in yytable_.
+      yynnts_ = 38,  ///< Number of nonterminal symbols.
       yyfinal_ = 3, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 76  ///< Number of tokens.
+      yyntokens_ = 77  ///< Number of tokens.
     };
 
 
@@ -524,7 +525,7 @@ namespace yy {
 
 
 } // yy
-#line 528 "zScript.tab.hpp" // lalr1.cc:377
+#line 529 "zScript.tab.hpp" // lalr1.cc:377
 
 
 

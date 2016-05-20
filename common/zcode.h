@@ -76,7 +76,8 @@ struct ZCode
         Children,           // get children(X[])            51
         Append,             // << add children to last      52
         Switch,             // switch                       53
-        Unknow              //                              54
+        InitObjectProperty, // init object property         54
+        Unknow              //                              55
     };
 
     static QString actionName(quint8 action);
