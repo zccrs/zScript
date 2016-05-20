@@ -14,6 +14,8 @@ ZConsole::ZConsole(ZObject *parent)
     : ZObject(parent)
 {
     Z_REGIST_SLOT(&ZConsole::log);
+    Z_REGIST_SLOT(&ZConsole::print);
+    Z_REGIST_SLOT(&ZConsole::printLine);
     Z_REGIST_SLOT(&ZConsole::getLine);
     Z_REGIST_SLOT(&ZConsole::getChar);
     Z_REGIST_SLOT(&ZConsole::getCh);
@@ -22,8 +24,13 @@ ZConsole::ZConsole(ZObject *parent)
     Z_REGIST_SLOT(&ZConsole::setEcho);
     Z_REGIST_SLOT(&ZConsole::setCursorVisible);
     Z_REGIST_SLOT(&ZConsole::setCursorPos);
+    Z_REGIST_SLOT(&ZConsole::upCursor);
+    Z_REGIST_SLOT(&ZConsole::downCursor);
+    Z_REGIST_SLOT(&ZConsole::leftCursor);
+    Z_REGIST_SLOT(&ZConsole::rightCursor);
     Z_REGIST_SLOT(&ZConsole::clear);
     Z_REGIST_SLOT(&ZConsole::reset);
+    Z_REGIST_SLOT(&ZConsole::setColor);
 }
 
 ZConsole::~ZConsole()
@@ -32,6 +39,11 @@ ZConsole::~ZConsole()
 }
 
 void ZConsole::log(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    printLine(retVals, args);
+}
+
+void ZConsole::print(ZVariant &retVals, const QList<ZVariant> &args) const
 {
     Q_UNUSED(retVals)
 
@@ -46,9 +58,14 @@ void ZConsole::log(ZVariant &retVals, const QList<ZVariant> &args) const
 
     const ZVariant &val = args.last();
 
-    zStandardPrint << variantToString(val).toStdString() << std::endl;
+    zStandardPrint << variantToString(val).toStdString();
+}
 
-    return;
+void ZConsole::printLine(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    print(retVals, args);
+
+    zStandardPrint << std::endl;
 }
 
 void ZConsole::getLine(ZVariant &retVals, const QList<ZVariant> &args) const
@@ -57,6 +74,7 @@ void ZConsole::getLine(ZVariant &retVals, const QList<ZVariant> &args) const
 
     char ch[100];
 
+    print(retVals, args);
     std::cin.getline(ch, 100, '\n');
 
     retVals = QString(ch);
@@ -66,6 +84,7 @@ void ZConsole::getChar(ZVariant &retVals, const QList<ZVariant> &args) const
 {
     Q_UNUSED(args)
 
+    print(retVals, args);
     retVals = QString(std::cin.get());
 }
 
@@ -189,6 +208,58 @@ void ZConsole::setCursorPos(ZVariant &retVals, const QList<ZVariant> &args) cons
     fflush(stdout);
 }
 
+void ZConsole::upCursor(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    Q_UNUSED(retVals)
+
+    int n = 1;
+
+    if (!args.isEmpty())
+        n = args.first().toInt();
+
+    printf("\033[%dA", n);
+    fflush(stdout);
+}
+
+void ZConsole::downCursor(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    Q_UNUSED(retVals)
+
+    int n = 1;
+
+    if (!args.isEmpty())
+        n = args.first().toInt();
+
+    printf("\033[%dB", n);
+    fflush(stdout);
+}
+
+void ZConsole::leftCursor(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    Q_UNUSED(retVals)
+
+    int n = 1;
+
+    if (!args.isEmpty())
+        n = args.first().toInt();
+
+    printf("\033[%dD", n);
+    fflush(stdout);
+}
+
+void ZConsole::rightCursor(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    Q_UNUSED(retVals)
+
+    int n = 1;
+
+    if (!args.isEmpty())
+        n = args.first().toInt();
+
+    printf("\033[%dC", n);
+    fflush(stdout);
+}
+
 void ZConsole::clear(ZVariant &retVals, const QList<ZVariant> &args) const
 {
     Q_UNUSED(retVals)
@@ -198,12 +269,36 @@ void ZConsole::clear(ZVariant &retVals, const QList<ZVariant> &args) const
     fflush(stdout);
 }
 
+void ZConsole::clearLine(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    Q_UNUSED(retVals)
+    Q_UNUSED(args)
+
+    printf("\033[K");
+    fflush(stdout);
+}
+
 void ZConsole::reset(ZVariant &retVals, const QList<ZVariant> &args) const
 {
     Q_UNUSED(retVals)
     Q_UNUSED(args)
 
     printf("\033[0m");
+    fflush(stdout);
+}
+
+void ZConsole::setColor(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    if (args.isEmpty())
+        return;
+
+    Q_UNUSED(retVals)
+
+    if (args.count() == 1)
+        printf("\033[;%dm", args.first().toInt());
+    else
+        printf("\033[%d;%dm", args.first().toInt(), args.at(1).toInt());
+
     fflush(stdout);
 }
 
