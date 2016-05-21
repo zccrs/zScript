@@ -901,7 +901,8 @@ branch_head:IF '(' expression ')' {
 //            }
             ;
 
-for_exp:    | expression;
+for_exps:   expression | for_exps ',' expression;
+for_exp:    | for_exps;
 
 branch_body :branch_head code {
                 if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->isLoopStructure()) {
