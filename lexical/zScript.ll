@@ -4,8 +4,8 @@
 #include "ztool.h"
 
 #include <QByteArray>
+#include <QQueue>
 #include <QDebug>
-#include <QRegularExpression>
 
 #include <iostream>
 
@@ -14,6 +14,10 @@ yy::parser::location_type *yyloc = Q_NULLPTR;
 
 int lineCount = 1;
 int currentColumn = 0;
+
+QQueue<int> tokenQueue;
+QQueue<yy::parser::semantic_type> tokenValQueue;
+QQueue<yy::parser::location_type> tokenLocQueue;
 
 #define TOKEN_PREFIX yy::parser::token
 #define RECORD_TOKEN_LOC \
@@ -101,15 +105,22 @@ shell_head ^\s*#\s*!.*
     char ch = yytext[0];
 
     if (ch == '{') {
-        char ch[100];
-        int current_pos = yyin.tellg();
+        int token = yylex();
 
-        yyin.getline(ch, 100, ':');
-        yyin.seekg(current_pos, std::ios::beg);
+        tokenQueue << token;
+        tokenValQueue << *yylval;
+        tokenLocQueue << *yyloc;
 
-        QRegularExpression reg("^\\s*[a-zA-Z][a-zA-Z0-9_]*\\s*$");
+        if (token != TOKEN_PREFIX::IDENTIFIER)
+            return ch;
 
-        if (reg.match(QString(ch)).hasMatch())
+        token = yylex();
+
+        tokenQueue << token;
+        tokenValQueue << *yylval;
+        tokenLocQueue << *yyloc;
+
+        if (token == ':')
             return TOKEN_PREFIX::NEW_OBJ_BEGIN;
     }
 
@@ -178,20 +189,26 @@ shell_head ^\s*#\s*!.*
             yyin.get();
         }
     }
+
+    ++lineCount;
 }
 
 "/*" {
-    while(!yyin.eof() && !yyin.fail()) {
+    while (!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
 
-        if(ch == '*') {
+        if (ch == '*') {
             if(yyin.eof() || yyin.fail())
                 break;
 
             char ch_next = yyin.get();
 
-            if(ch_next == '/')
+            if (ch_next == '/')
                 break;
+            else if (ch_next == '\n')
+                ++lineCount;
+        } else if (ch == '\n') {
+            ++lineCount;
         }
     }
 }

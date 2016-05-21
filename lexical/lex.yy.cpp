@@ -514,8 +514,8 @@ static yyconst flex_int16_t yy_chk[212] =
 #include "ztool.h"
 
 #include <QByteArray>
+#include <QQueue>
 #include <QDebug>
-#include <QRegularExpression>
 
 #include <iostream>
 
@@ -525,6 +525,10 @@ yy::parser::location_type *yyloc = Q_NULLPTR;
 int lineCount = 1;
 int currentColumn = 0;
 
+QQueue<int> tokenQueue;
+QQueue<yy::parser::semantic_type> tokenValQueue;
+QQueue<yy::parser::location_type> tokenLocQueue;
+
 #define TOKEN_PREFIX yy::parser::token
 #define RECORD_TOKEN_LOC \
     yyloc->begin.line = lineCount;\
@@ -532,7 +536,7 @@ int currentColumn = 0;
     yyloc->end.line = lineCount;\
     yyloc->end.column = strlen(yytext) + currentColumn;\
     currentColumn = yyloc->end.column;
-#line 536 "lex.yy.cpp"
+#line 540 "lex.yy.cpp"
 
 #define INITIAL 0
 
@@ -667,9 +671,9 @@ YY_DECL
 		}
 
 	{
-#line 34 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 38 "/home/zhang/projects/zScript/lexical/zScript.ll"
 
-#line 673 "lex.yy.cpp"
+#line 677 "lex.yy.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -729,13 +733,13 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 35 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 39 "/home/zhang/projects/zScript/lexical/zScript.ll"
 
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 37 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 41 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     ++lineCount;
     currentColumn = 0;
@@ -743,202 +747,202 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 42 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 46 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::VAR;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 43 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 47 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::FUNCTION;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 44 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 48 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::NEW;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 45 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 49 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::DELETE;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 46 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 50 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::THROW;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 47 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 51 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::IF;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 48 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 52 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::ELSE;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 49 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 53 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::WHILE;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 50 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 54 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::FOR;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 51 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 55 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::UNDEFINED;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 52 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 56 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::GOTO;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 53 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 57 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::RETURN;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 54 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 58 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::BREAK;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 55 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 59 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::CONTINUE;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 56 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 60 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::SWITCH;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 57 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 61 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::CASE;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 58 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 62 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::DEFAULT;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 59 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 63 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::EQ;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 60 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 64 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::STEQ;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 61 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 65 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::NEQ;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 62 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 66 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::STNEQ;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 63 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 67 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::LE;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 64 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 68 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::GE;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 65 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 69 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::ANDASSIGN;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 66 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 70 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::ORASSIGN;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 67 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 71 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::XORASSIGN;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 68 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 72 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::MODASSIGN;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 69 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 73 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::ADDASSIGN;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 70 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 74 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::SUBASSIGN;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 71 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 75 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::MULASSIGN;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 72 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 76 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::DIVASSIGN;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 73 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 77 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::ADDSELF;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 74 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 78 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::SUBSELF;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 75 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 79 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::LAND;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 76 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 80 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::LOR;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 77 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 81 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::LANDASSIGN;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 78 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 82 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::LORASSIGN;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 79 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 83 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::LL;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 80 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 84 "/home/zhang/projects/zScript/lexical/zScript.ll"
 { RECORD_TOKEN_LOC; return TOKEN_PREFIX::GG;}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 82 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 86 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -949,7 +953,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 90 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 94 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -960,22 +964,29 @@ YY_RULE_SETUP
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 98 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 102 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
     char ch = yytext[0];
 
     if (ch == '{') {
-        char ch[100];
-        int current_pos = yyin.tellg();
+        int token = yylex();
 
-        yyin.getline(ch, 100, ':');
-        yyin.seekg(current_pos, std::ios::beg);
+        tokenQueue << token;
+        tokenValQueue << *yylval;
+        tokenLocQueue << *yyloc;
 
-        QRegularExpression reg("^\\s*[a-zA-Z][a-zA-Z0-9_]*\\s*$");
+        if (token != TOKEN_PREFIX::IDENTIFIER)
+            return ch;
 
-        if (reg.match(QString(ch)).hasMatch())
+        token = yylex();
+
+        tokenQueue << token;
+        tokenValQueue << *yylval;
+        tokenLocQueue << *yyloc;
+
+        if (token == ':')
             return TOKEN_PREFIX::NEW_OBJ_BEGIN;
     }
 
@@ -984,7 +995,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 119 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 130 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -995,7 +1006,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 127 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 138 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -1017,7 +1028,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 146 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 157 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -1041,7 +1052,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 167 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 178 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     while(!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
@@ -1056,30 +1067,36 @@ YY_RULE_SETUP
             yyin.get();
         }
     }
+
+    ++lineCount;
 }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 183 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 196 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
-    while(!yyin.eof() && !yyin.fail()) {
+    while (!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
 
-        if(ch == '*') {
+        if (ch == '*') {
             if(yyin.eof() || yyin.fail())
                 break;
 
             char ch_next = yyin.get();
 
-            if(ch_next == '/')
+            if (ch_next == '/')
                 break;
+            else if (ch_next == '\n')
+                ++lineCount;
+        } else if (ch == '\n') {
+            ++lineCount;
         }
     }
 }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 199 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 216 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -1090,7 +1107,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 207 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 224 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -1101,7 +1118,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 215 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 232 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     if(lineCount > 1) {
         RECORD_TOKEN_LOC;
@@ -1114,10 +1131,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 225 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 242 "/home/zhang/projects/zScript/lexical/zScript.ll"
 ECHO;
 	YY_BREAK
-#line 1121 "lex.yy.cpp"
+#line 1138 "lex.yy.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2075,7 +2092,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 225 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 242 "/home/zhang/projects/zScript/lexical/zScript.ll"
 
 
 

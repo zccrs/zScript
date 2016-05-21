@@ -2727,8 +2727,15 @@ void yy::parser::error(const location_type& loc, const std::string& msg)
 
 int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)
 {
-    yylval = lval;
-    yyloc = location;
+    if (tokenQueue.isEmpty()) {
+        yylval = lval;
+        yyloc = location;
 
-    return ZCodeExecuter::yyFlexLexer->yylex();
+        return ZCodeExecuter::yyFlexLexer->yylex();
+    } else {
+        *lval = tokenValQueue.dequeue();
+        *location = tokenLocQueue.dequeue();
+
+        return tokenQueue.dequeue();
+    }
 }
