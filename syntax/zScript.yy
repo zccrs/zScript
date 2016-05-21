@@ -55,7 +55,6 @@ Z_USE_NAMESPACE
 %left ','
 %right '=' DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
 %left COMMA
-%left '.'
 %right '?' ':'
 %left LAND LOR
 %left '&' '|' '^'
@@ -65,6 +64,7 @@ Z_USE_NAMESPACE
 %left '*' '/' '%'
 %left UMINUS ADDSELF SUBSELF '!' '~'
 //%left PROMOTION
+%left '.'
 %left '[' ']'
 %left '(' ')'
 
