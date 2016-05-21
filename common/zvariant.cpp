@@ -203,6 +203,7 @@ int ZVariant::toInt(bool *ok) const
     case Bool:
         return data->variant.toBool();
     case String:
+        return data->variant.toString().toInt(ok);
     case Object:
     case Function:
     case Undefined:
@@ -228,6 +229,7 @@ double ZVariant::toDouble(bool *ok) const
     case Bool:
         return data->variant.toBool();
     case String:
+        return data->variant.toString().toDouble(ok);
     case Object:
     case Function:
     case Undefined:
