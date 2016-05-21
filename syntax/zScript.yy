@@ -447,6 +447,12 @@ rvalue:     const {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant("1", ZVariant::Int));
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::JoinToList);
             }
+            | '[' ']' {
+                $$ = ValueType::Variant;
+
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant("0", ZVariant::Int));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::JoinToList);
+            }
             | NEW IDENTIFIER {
                 /// TODO
                 $$ = ValueType::Constant;

@@ -315,6 +315,13 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             ZVariant &left_val = *virtualStack.pop();
             ZObject *obj = left_val.toObject();
 
+            if (!obj) {
+                temporaryList << ZVariant();
+                virtualStack.push(&temporaryList.last());
+
+                break;
+            }
+
             temporaryList << obj->property(right_val.toString().toLatin1().constData());
 
             if(!temporaryList.last().toQVariant().isValid()) {
@@ -424,6 +431,7 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             if(i < 0) {
                 i = val.value(ZVariant(), -1) - 1;
             }
+            break;
         }
         case InitObjectProperty: {
             ZObject *obj = virtualStack.pop()->toObject();
@@ -438,6 +446,7 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
 
             temporaryList << ZVariant(obj);
             virtualStack.push(&temporaryList.last());
+            break;
         }
         default: break;
         }

@@ -294,10 +294,13 @@ void ZConsole::setColor(ZVariant &retVals, const QList<ZVariant> &args) const
 
     Q_UNUSED(retVals)
 
-    if (args.count() == 1)
+    if (args.count() == 1) {
         printf("\033[;%dm", args.first().toInt());
-    else
+    } else if (args.count() == 2) {
         printf("\033[%d;%dm", args.first().toInt(), args.at(1).toInt());
+    } else {
+        printf("\033[%d;%d;%dm", args.first().toInt(), args.at(1).toInt(), args.at(2).toInt());
+    }
 
     fflush(stdout);
 }
