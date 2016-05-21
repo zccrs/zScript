@@ -31,6 +31,7 @@ ZConsole::ZConsole(ZObject *parent)
     Z_REGIST_SLOT(&ZConsole::clear);
     Z_REGIST_SLOT(&ZConsole::reset);
     Z_REGIST_SLOT(&ZConsole::setColor);
+    Z_REGIST_SLOT(&ZConsole::flushInput);
     Z_REGIST_SLOT(&ZConsole::flushOutput);
 }
 
@@ -304,6 +305,14 @@ void ZConsole::setColor(ZVariant &retVals, const QList<ZVariant> &args) const
     }
 
     fflush(stdout);
+}
+
+void ZConsole::flushInput(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    Q_UNUSED(retVals)
+    Q_UNUSED(args)
+
+    fflush(stdin);
 }
 
 void ZConsole::flushOutput(ZVariant &retVals, const QList<ZVariant> &args) const

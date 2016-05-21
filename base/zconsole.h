@@ -33,6 +33,7 @@ public slots:
     void clearLine(ZVariant &retVals, const QList<ZVariant> &args) const;
     void reset(ZVariant &retVals, const QList<ZVariant> &args) const;
     void setColor(ZVariant &retVals, const QList<ZVariant> &args) const;
+    void flushInput(ZVariant &retVals, const QList<ZVariant> &args) const;
     void flushOutput(ZVariant &retVals, const QList<ZVariant> &args) const;
 
 private:

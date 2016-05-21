@@ -12,6 +12,7 @@ ZSystem::ZSystem(ZObject *parent)
     Z_REGIST_SLOT(&ZSystem::msleep);
     Z_REGIST_SLOT(&ZSystem::usleep);
     Z_REGIST_SLOT(&ZSystem::random);
+    Z_REGIST_SLOT(&ZSystem::msecsSinceStartOfDay);
 
     const QTime &time = QTime::currentTime();
 
@@ -82,4 +83,11 @@ void ZSystem::random(ZVariant &retVals, const QList<ZVariant> &args) const
     const QTime &time = QTime::currentTime();
 
     qsrand(time.msec() + time.second() * 1000 * retVals.toInt());
+}
+
+void ZSystem::msecsSinceStartOfDay(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    Q_UNUSED(args)
+
+    retVals = QTime::currentTime().msecsSinceStartOfDay();
 }
