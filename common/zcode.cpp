@@ -73,7 +73,7 @@ QString ZCode::actionName(quint8 action)
         case Children:          return "[](get children)";
         case Append:            return "<<(append)";
         case Switch:            return "switch";
-        case InitObjectProperty:    return "init object property";
+        case InitObjectProperty:return "init object property";
         case Unknow:            return "unknow";
     }
 
@@ -83,8 +83,10 @@ QString ZCode::actionName(quint8 action)
 ZVariant ZCode::exec(const QList<ZCode *> &codeList)
 {
     QList<ZVariant> temporaryList;
+    QList<ZPropertyVariant> temporaryPropertyList;
 
     temporaryList.reserve(10);
+    temporaryList.reserve(2);
 
     for(int i = 0; i < codeList.count(); ++i) {
         ZCode *code = codeList.value(i);
@@ -322,13 +324,10 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
                 break;
             }
 
-            temporaryList << obj->property(right_val.toString().toLatin1().constData());
+            const QByteArray &propertyName = right_val.toString().toLatin1();
+            temporaryPropertyList << ZPropertyVariant(obj->property(propertyName.constData()), obj, propertyName);
 
-            if(!temporaryList.last().toQVariant().isValid()) {
-                zError << "no such property exists: " << right_val.toString();
-            }
-
-            virtualStack.push(&temporaryList.last());
+            virtualStack.push(&temporaryPropertyList.last());
             break;
         }
         case JoinToTuple: {     /// join to ZTuple
@@ -396,6 +395,7 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
         case PopAll: {
             virtualStack.clear();
             temporaryList.clear();
+            temporaryPropertyList.clear();
             break;
         }
         case Goto: {
@@ -434,7 +434,7 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             break;
         }
         case InitObjectProperty: {
-            ZObject *obj = virtualStack.pop()->toObject();
+            ZObject *obj = new ZObject;
             int count = virtualStack.pop()->toInt();
 
             for (int i = 0; i < count; ++i) {

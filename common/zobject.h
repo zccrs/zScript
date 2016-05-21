@@ -4,6 +4,7 @@
 #include "zvariant.h"
 
 #include <QObject>
+#include <QPointer>
 
 Z_BEGIN_NAMESPACE
 
@@ -44,6 +45,20 @@ public:
 
 signals:
     void callFun(ZVariant &retVals, const QList<ZVariant> &args) const;
+};
+
+class ZPropertyVariant : public ZVariant
+{
+public:
+    explicit ZPropertyVariant(const ZVariant &other, ZObject *object, const QByteArray &name);
+
+    void depthCopyAssign(const ZVariant &other) const Q_DECL_OVERRIDE;
+    ZVariant& operator=(const ZVariant &other) Q_DECL_OVERRIDE;
+    ZVariant& operator=(ZVariant &&other) Q_DECL_OVERRIDE;
+
+private:
+    QPointer<ZObject> object;
+    QByteArray propertyName;
 };
 
 Z_END_NAMESPACE

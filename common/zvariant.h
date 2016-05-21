@@ -77,7 +77,7 @@ public:
     inline QVariant toQVariant() const
     { return data->variant;}
 
-    inline void depthCopyAssign(const ZVariant &other) const
+    virtual void depthCopyAssign(const ZVariant &other) const
     {
         if(type() == Tuple) {
             const ZTuple &tuple = toTuple();
@@ -98,7 +98,7 @@ public:
         data->type = other.data->type;
     }
 
-    inline ZVariant& operator=(const ZVariant &other)
+    virtual ZVariant& operator=(const ZVariant &other)
     {
         if(type() == Tuple) {
             const ZTuple &other_group = other.toTuple();
@@ -115,7 +115,8 @@ public:
 
         return *this;
     }
-    inline ZVariant& operator=(ZVariant &&other)
+
+    virtual ZVariant& operator=(ZVariant &&other)
     {
         if(type() == Tuple) {
             const ZTuple &other_group = other.toTuple();
@@ -179,12 +180,12 @@ public:
     }
     inline ZVariant operator<<(const ZVariant &value)
     {
-        switch (data->type) {
+        switch (data.constData()->type) {
         case List:
-            data->variant = QVariant::fromValue(toList() += value);
+            const_cast<VariantData*>(data.constData())->variant = QVariant::fromValue(toList() += value);
             break;
         case String:
-            data->variant = toString().append(value.toString());
+            const_cast<VariantData*>(data.constData())->variant = toString().append(value.toString());
             break;
         default:
             break;

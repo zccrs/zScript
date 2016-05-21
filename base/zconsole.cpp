@@ -31,6 +31,7 @@ ZConsole::ZConsole(ZObject *parent)
     Z_REGIST_SLOT(&ZConsole::clear);
     Z_REGIST_SLOT(&ZConsole::reset);
     Z_REGIST_SLOT(&ZConsole::setColor);
+    Z_REGIST_SLOT(&ZConsole::flushOutput);
 }
 
 ZConsole::~ZConsole()
@@ -305,13 +306,21 @@ void ZConsole::setColor(ZVariant &retVals, const QList<ZVariant> &args) const
     fflush(stdout);
 }
 
+void ZConsole::flushOutput(ZVariant &retVals, const QList<ZVariant> &args) const
+{
+    Q_UNUSED(retVals)
+    Q_UNUSED(args)
+
+    fflush(stdout);
+}
+
 QString ZConsole::variantToString(const ZVariant &val) const
 {
     switch (val.type()) {
     case ZVariant::Object:
-        return "[Object]";
+        return "[Object:0x" + QString::number((qintptr)val.toObject(), 16) + "]";
     case ZVariant::Function:
-        return "[Function]";
+        return "[Function:0x" + QString::number((qintptr)val.toObject(), 16) + "]";;
     case ZVariant::Undefined:
         return "undefined";
     case ZVariant::Tuple: {

@@ -326,6 +326,12 @@ lvalue:     VAR define {
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZSharedVariantPointer(new ZSharedVariant()));
             }
+            | expression '.' IDENTIFIER {
+                $$ = ValueType::Variant;
+
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(*$3, ZVariant::String));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Get);
+            }
             | lvalue '=' expression {
                 $$ = ValueType::Variant;
 
@@ -335,12 +341,6 @@ lvalue:     VAR define {
                 $$ = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Children);
-            }
-            | expression '.' IDENTIFIER {
-                $$ = ValueType::Variant;
-
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(*$3, ZVariant::String));
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Get);
             }
             | lvalue ADDASSIGN expression {
                 $$ = ValueType::Variant;
@@ -846,16 +846,16 @@ object_pro: IDENTIFIER ':' expression {
 
                 delete $3;
 
-                $$ = $1 = 1;
+                $$ = $1 + 1;
             }
             ;
 
 object:     NEW_OBJ_BEGIN '}' {
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant(new ZObject()));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant(0));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::InitObjectProperty);
             }
             | NEW_OBJ_BEGIN object_pro '}' {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant($2));
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant(new ZObject()));
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::InitObjectProperty);
             }
             ;

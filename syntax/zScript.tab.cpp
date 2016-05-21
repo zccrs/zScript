@@ -1028,28 +1028,28 @@ namespace yy {
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LeftAssign);
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(*(yystack_[0].value.identifier), ZVariant::String));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Get);
             }
-#line 1034 "zScript.tab.cpp" // lalr1.cc:859
+#line 1035 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 53:
-#line 334 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 335 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+    {
+                (yylhs.value.valueType) = ValueType::Variant;
+
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::LeftAssign);
+            }
+#line 1045 "zScript.tab.cpp" // lalr1.cc:859
+    break;
+
+  case 54:
+#line 340 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 (yylhs.value.valueType) = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Children);
-            }
-#line 1044 "zScript.tab.cpp" // lalr1.cc:859
-    break;
-
-  case 54:
-#line 339 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
-    {
-                (yylhs.value.valueType) = ValueType::Variant;
-
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(*(yystack_[0].value.identifier), ZVariant::String));
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Get);
             }
 #line 1055 "zScript.tab.cpp" // lalr1.cc:859
     break;
@@ -1822,7 +1822,7 @@ namespace yy {
 
                 delete (yystack_[2].value.identifier);
 
-                (yylhs.value.count) = (yystack_[4].value.count) = 1;
+                (yylhs.value.count) = (yystack_[4].value.count) + 1;
             }
 #line 1828 "zScript.tab.cpp" // lalr1.cc:859
     break;
@@ -1830,16 +1830,16 @@ namespace yy {
   case 111:
 #line 853 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant(new ZObject()));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant(0));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::InitObjectProperty);
             }
-#line 1836 "zScript.tab.cpp" // lalr1.cc:859
+#line 1837 "zScript.tab.cpp" // lalr1.cc:859
     break;
 
   case 112:
-#line 856 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
+#line 857 "/home/zhang/projects/zScript/syntax/zScript.yy" // lalr1.cc:859
     {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant((yystack_[1].value.count)));
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant(new ZObject()));
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::InitObjectProperty);
             }
 #line 1846 "zScript.tab.cpp" // lalr1.cc:859
@@ -2296,12 +2296,12 @@ namespace yy {
        0,   119,   122,     0,     5,     0,     0,     0,     0,     0,
      112,    73,    74,     0,    32,   104,    16,    20,    22,     0,
        0,     0,    47,     0,    88,    90,    89,    91,    92,    93,
-      94,    95,    54,    82,    83,    84,    86,    87,    79,    78,
+      94,    95,    52,    82,    83,    84,    86,    87,    79,    78,
       80,    81,    85,     0,   108,   107,     0,   102,    58,    57,
-      55,    56,    62,    59,    60,    61,    64,    63,    47,    52,
+      55,    56,    62,    59,    60,    61,    64,    63,    47,    53,
      127,    41,    42,   113,     0,     0,   116,    46,    45,    24,
      109,     0,    39,     0,     0,     0,    27,     0,    25,     0,
-       0,    53,    77,   115,   120,     0,     0,     2,    17,    26,
+       0,    54,    77,   115,   120,     0,     0,     2,    17,    26,
       28,    30,    11,     0,   110,     0,     0,   117,    33,    29,
      121,     0,   118
   };
@@ -2581,7 +2581,7 @@ namespace yy {
        3,     1,     3,     1,     4,     4,     3,     2,     0,     5,
        3,     2,     0,     7,     1,     2,     2,     0,     1,     3,
        1,     3,     3,     3,     3,     3,     3,     1,     1,     2,
-       1,     1,     3,     4,     3,     3,     3,     3,     3,     3,
+       1,     1,     3,     3,     4,     3,     3,     3,     3,     3,
        3,     3,     3,     3,     3,     2,     2,     1,     1,     1,
        1,     1,     1,     3,     3,     2,     2,     4,     3,     3,
        3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
@@ -2626,13 +2626,13 @@ namespace yy {
      165,   169,   170,   171,   174,   182,   209,   214,   220,   220,
      227,   235,   250,   250,   269,   272,   273,   279,   280,   284,
      290,   294,   301,   304,   305,   308,   309,   312,   312,   314,
-     317,   324,   329,   334,   339,   345,   350,   355,   360,   365,
+     317,   324,   329,   335,   340,   345,   350,   355,   360,   365,
      370,   375,   380,   385,   390,   395,   400,   407,   410,   415,
      420,   425,   431,   438,   444,   450,   456,   460,   466,   482,
      498,   514,   530,   546,   562,   578,   594,   610,   626,   642,
      658,   675,   692,   708,   724,   740,   756,   769,   782,   795,
      808,   813,   818,   823,   826,   827,   832,   833,   834,   837,
-     844,   853,   856,   863,   872,   872,   880,   886,   880,   910,
+     844,   853,   857,   863,   872,   872,   880,   886,   880,   910,
      910,   911,   911,   913,   952,   954,   955,   955
   };
 

@@ -89,7 +89,7 @@ struct ZCode
     static QStack<ZVariant*> virtualStack;
 
     inline bool isValueCode() const
-    {return action == Push || action == Goto || action == If;}
+    {return action == Push || action == Goto || action == If || action == Switch;}
 
     inline const ValueCode *toValueCode() const;
     inline ValueCode *toValueCode();
