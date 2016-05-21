@@ -160,9 +160,17 @@ shell_head ^\s*#\s*!.*
     yylval->identifier = new QByteArray();
 
     QByteArray &str = *yylval->identifier;
+    char ch = 0;
 
     while(!yyin.eof() && !yyin.fail()) {
-        char ch = yyin.get();
+        if (ch == '\\') {
+            str.append(yyin.get());
+
+            if (yyin.eof() || yyin.fail())
+                break;
+        }
+
+        ch = yyin.get();
 
         if(ch == yytext[0])
             break;

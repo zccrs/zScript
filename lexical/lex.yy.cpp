@@ -1035,9 +1035,17 @@ YY_RULE_SETUP
     yylval->identifier = new QByteArray();
 
     QByteArray &str = *yylval->identifier;
+    char ch = 0;
 
     while(!yyin.eof() && !yyin.fail()) {
-        char ch = yyin.get();
+        if (ch == '\\') {
+            str.append(yyin.get());
+
+            if (yyin.eof() || yyin.fail())
+                break;
+        }
+
+        ch = yyin.get();
 
         if(ch == yytext[0])
             break;
@@ -1052,7 +1060,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 178 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 186 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     while(!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
@@ -1073,7 +1081,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 196 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 204 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     while (!yyin.eof() && !yyin.fail()) {
         char ch = yyin.get();
@@ -1096,7 +1104,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 216 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 224 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -1107,7 +1115,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 224 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 232 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     RECORD_TOKEN_LOC;
 
@@ -1118,7 +1126,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 232 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 240 "/home/zhang/projects/zScript/lexical/zScript.ll"
 {
     if(lineCount > 1) {
         RECORD_TOKEN_LOC;
@@ -1131,10 +1139,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 242 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 250 "/home/zhang/projects/zScript/lexical/zScript.ll"
 ECHO;
 	YY_BREAK
-#line 1138 "lex.yy.cpp"
+#line 1146 "lex.yy.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2092,7 +2100,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 242 "/home/zhang/projects/zScript/lexical/zScript.ll"
+#line 250 "/home/zhang/projects/zScript/lexical/zScript.ll"
 
 
 
