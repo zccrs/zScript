@@ -111,6 +111,9 @@ shell_head ^\s*#\s*!.*
         tokenValQueue << *yylval;
         tokenLocQueue << *yyloc;
 
+        if (token == '}')
+            return TOKEN_PREFIX::NEW_OBJ_BEGIN;
+
         if (token != TOKEN_PREFIX::IDENTIFIER)
             return ch;
 
