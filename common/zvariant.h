@@ -215,13 +215,6 @@ private:
     class VariantData : public QSharedData
     {
     public:
-        ~VariantData()
-        {
-            if (type == Tuple) {
-                qDeleteAll(qvariant_cast<ZTuple>(variant));
-            }
-        }
-
         QVariant variant;
         ZVariant::Type type;
     };

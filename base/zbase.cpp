@@ -393,6 +393,14 @@ namespace List {
 
         return string.mid(separator.count());
     }
+
+    ZVariant clear(const QList<ZVariant> &args)
+    {
+        QList<ZVariant> list = args.first().toList();
+
+        list.clear();
+        args.first().depthCopyAssign(list);
+    }
 }// end namespace List
 
 void init()
@@ -441,5 +449,6 @@ void init()
     REGISTER_FUNCTION(ZVariant::List, List::removeOne);
     REGISTER_FUNCTION(ZVariant::List, List::replace);
     REGISTER_FUNCTION(ZVariant::List, List::join);
+    REGISTER_FUNCTION(ZVariant::List, List::clear);
 }
 }// end namespace ZBase
