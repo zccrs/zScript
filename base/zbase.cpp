@@ -400,6 +400,18 @@ namespace List {
 
         list.clear();
         args.first().depthCopyAssign(list);
+
+        return ZVariant();
+    }
+
+    ZVariant last(const QList<ZVariant> &args)
+    {
+        return args.first().toList().last();
+    }
+
+    ZVariant first(const QList<ZVariant> &args)
+    {
+        return args.first().toList().first();
     }
 }// end namespace List
 
@@ -450,5 +462,7 @@ void init()
     REGISTER_FUNCTION(ZVariant::List, List::replace);
     REGISTER_FUNCTION(ZVariant::List, List::join);
     REGISTER_FUNCTION(ZVariant::List, List::clear);
+    REGISTER_FUNCTION(ZVariant::List, List::last);
+    REGISTER_FUNCTION(ZVariant::List, List::first);
 }
 }// end namespace ZBase
