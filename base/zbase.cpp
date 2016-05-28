@@ -391,7 +391,7 @@ namespace List {
             string.append(separator).append(item.toString());
         }
 
-        return string.mid(string.count());
+        return string.mid(separator.count());
     }
 }// end namespace List
 
