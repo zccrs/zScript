@@ -1,5 +1,6 @@
 #include "zcode.h"
 #include "zobject.h"
+#include "zobjectpool.h"
 
 #include "zScript.tab.hpp"
 #include "FlexLexer.h"
@@ -315,19 +316,34 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
         case Get: {
             ZVariant &right_val = *virtualStack.pop();
             ZVariant &left_val = *virtualStack.pop();
-            ZObject *obj = left_val.toObject();
-
-            if (!obj) {
-                temporaryList << ZVariant();
-                virtualStack.push(&temporaryList.last());
-
-                break;
-            }
 
             const QByteArray &propertyName = right_val.toString().toLatin1();
-            temporaryPropertyList << ZPropertyVariant(obj->property(propertyName.constData()), obj, propertyName);
 
-            virtualStack.push(&temporaryPropertyList.last());
+            if (left_val.isObject()) {
+                ZObject *obj = left_val.toObject();
+
+                if (obj) {
+                    temporaryPropertyList << ZPropertyVariant(obj->property(propertyName.constData()), obj, propertyName);
+                    virtualStack.push(&temporaryPropertyList.last());
+
+                    break;
+                }
+
+                temporaryList << ZVariant();
+            } else {
+                ZFunction *function = ZCodeExecuter::getFunctionForVariantType(left_val.type(), propertyName);
+
+                if (function) {
+                    function->setProperty("target", true);
+
+                    virtualStack << &left_val;
+                    temporaryList << ZVariant(function);
+                } else {
+                    temporaryList << ZVariant();
+                }
+            }
+
+            virtualStack.push(&temporaryList.last());
             break;
         }
         case JoinToTuple: {     /// join to ZTuple
@@ -376,6 +392,9 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             ZFunction *fun = virtualStack.pop()->toFunction();
 
             if(fun) {
+                if (fun->property("target").toBool())
+                    args.prepend(*virtualStack.pop());
+
                 temporaryList << fun->call(args);
                 virtualStack.push(&temporaryList.last());
             }
@@ -505,6 +524,7 @@ private:
 ZCodeExecuter *ZCodeExecuter::currentCodeExecuter = Q_NULLPTR;
 YYFlexLexer *ZCodeExecuter::yyFlexLexer = Q_NULLPTR;
 QHash<const QByteArray, ZSharedVariant*> ZCodeExecuter::globalIdentifierHash;
+QHash<ZVariant::Type, QHash<const QByteArray, ZFunction*>> ZCodeExecuter::globalFunctionHash;
 QMap<QByteArray, ZVariant*> ZCodeExecuter::stringConstantMap;
 QMap<QByteArray, ZVariant*> ZCodeExecuter::numberConstantMap;
 ZVariant ZCodeExecuter::constTrue(true);

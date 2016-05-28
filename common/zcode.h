@@ -176,6 +176,18 @@ public:
 
     inline static void registerIdentifier(const QByteArray &name, ZSharedVariant *variant)
     {globalIdentifierHash[name] = variant;}
+    inline static void registerFunction(ZVariant::Type type, const QByteArray &name, ZFunction *function)
+    {
+        QHash<const QByteArray, ZFunction*> &hash = globalFunctionHash[type];
+
+        hash[name] = function;
+    }
+    inline static ZFunction *getFunctionForVariantType(ZVariant::Type type, const QByteArray &name)
+    {
+        const QHash<const QByteArray, ZFunction*> &hash = globalFunctionHash.value(type);
+
+        return hash.value(name);
+    }
 
     /// from stdin get code
     int eval(std::istream &s);
@@ -337,7 +349,10 @@ private:
     /// function object parameter tmp list
     QVector<ZSharedVariant*> parameterList;
 
+    /// 储存标识符对应的全局对象
     static QHash<const QByteArray, ZSharedVariant*> globalIdentifierHash;
+    /// 存储标识符对应的全局函数（用于处理特定数据类型的函数）
+    static QHash<ZVariant::Type, QHash<const QByteArray, ZFunction*>> globalFunctionHash;
     static QMap<QByteArray, ZVariant*> stringConstantMap;
     static QMap<QByteArray, ZVariant*> numberConstantMap;
     static ZVariant constTrue;

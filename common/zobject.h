@@ -6,6 +6,8 @@
 #include <QObject>
 #include <QPointer>
 
+#include <functional>
+
 Z_BEGIN_NAMESPACE
 
 #define Z_REGIST_SLOT(Fun) \
@@ -45,6 +47,25 @@ public:
 
 signals:
     void callFun(ZVariant &retVals, const QList<ZVariant> &args) const;
+};
+
+class ZMethod : public ZFunction
+{
+public:
+    inline explicit ZMethod(const std::function<ZVariant(const QList<ZVariant>&)> &fun, ZObject *parent = 0)
+        : ZFunction(parent)
+        , function(fun)
+    {
+
+    }
+
+    ZVariant call(const QList<ZVariant> &args) const Q_DECL_OVERRIDE
+    {
+        return function(args);
+    }
+
+private:
+    std::function<ZVariant(const QList<ZVariant>&)> function;
 };
 
 class ZPropertyVariant : public ZVariant
