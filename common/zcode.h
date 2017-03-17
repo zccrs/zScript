@@ -76,7 +76,8 @@ struct ZCode
         Children,           // get children(X[])            51
         Append,             // << add children to last      52
         Switch,             // switch                       53
-        Unknow              //                              54
+        InitObjectProperty, // init object property         54
+        Unknow              //                              55
     };
 
     static QString actionName(quint8 action);
@@ -88,7 +89,7 @@ struct ZCode
     static QStack<ZVariant*> virtualStack;
 
     inline bool isValueCode() const
-    {return action == Push || action == Goto || action == If;}
+    {return action == Push || action == Goto || action == If || action == Switch;}
 
     inline const ValueCode *toValueCode() const;
     inline ValueCode *toValueCode();
@@ -175,11 +176,23 @@ public:
 
     inline static void registerIdentifier(const QByteArray &name, ZSharedVariant *variant)
     {globalIdentifierHash[name] = variant;}
+    inline static void registerFunction(ZVariant::Type type, const QByteArray &name, ZFunction *function)
+    {
+        QHash<const QByteArray, ZFunction*> &hash = globalFunctionHash[type];
+
+        hash[name] = function;
+    }
+    inline static ZFunction *getFunctionForVariantType(ZVariant::Type type, const QByteArray &name)
+    {
+        const QHash<const QByteArray, ZFunction*> &hash = globalFunctionHash.value(type);
+
+        return hash.value(name);
+    }
 
     /// from stdin get code
-    int eval();
+    int eval(std::istream &s);
     int eval(const char *fileName, bool *ok = 0);
-    int eval(const QByteArray &code, bool *ok = 0);
+    int eval(const QByteArray &code);
 
     inline ZVariant exec()
     { return ZCode::exec(codeList);}
@@ -284,7 +297,6 @@ public:
 
     static ZCodeExecuter *currentCodeExecuter;
     static YYFlexLexer *yyFlexLexer;
-    static bool yywrap;
 
 private:
     ZCodeExecuter();
@@ -337,7 +349,10 @@ private:
     /// function object parameter tmp list
     QVector<ZSharedVariant*> parameterList;
 
+    /// 储存标识符对应的全局对象
     static QHash<const QByteArray, ZSharedVariant*> globalIdentifierHash;
+    /// 存储标识符对应的全局函数（用于处理特定数据类型的函数）
+    static QHash<ZVariant::Type, QHash<const QByteArray, ZFunction*>> globalFunctionHash;
     static QMap<QByteArray, ZVariant*> stringConstantMap;
     static QMap<QByteArray, ZVariant*> numberConstantMap;
     static ZVariant constTrue;

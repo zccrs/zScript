@@ -1,15 +1,17 @@
 #include "zcode.h"
 #include "zobject.h"
+#include "zobjectpool.h"
 
 #include "zScript.tab.hpp"
 #include "FlexLexer.h"
 
 #include <QDebug>
 #include <QStack>
-#include <QTemporaryFile>
 #include <QCoreApplication>
 
 #include <unistd.h>
+#include <fstream>
+#include <sstream>
 
 Z_BEGIN_NAMESPACE
 
@@ -72,6 +74,7 @@ QString ZCode::actionName(quint8 action)
         case Children:          return "[](get children)";
         case Append:            return "<<(append)";
         case Switch:            return "switch";
+        case InitObjectProperty:return "init object property";
         case Unknow:            return "unknow";
     }
 
@@ -81,13 +84,17 @@ QString ZCode::actionName(quint8 action)
 ZVariant ZCode::exec(const QList<ZCode *> &codeList)
 {
     QList<ZVariant> temporaryList;
+    QList<ZPropertyVariant> temporaryPropertyList;
 
     temporaryList.reserve(10);
+    temporaryList.reserve(2);
 
     for(int i = 0; i < codeList.count(); ++i) {
         ZCode *code = codeList.value(i);
 
+#ifndef QT_NO_DEBUG
         zDebug << i <<*code;
+#endif
 
         switch(code->action) {
         case LeftAssign: {
@@ -309,12 +316,31 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
         case Get: {
             ZVariant &right_val = *virtualStack.pop();
             ZVariant &left_val = *virtualStack.pop();
-            ZObject *obj = left_val.toObject();
 
-            temporaryList << obj->property(right_val.toString().toLatin1().constData());
+            const QByteArray &propertyName = right_val.toString().toLatin1();
 
-            if(!temporaryList.last().toQVariant().isValid()) {
-                zError << "no such property exists: " << right_val.toString();
+            if (left_val.isObject()) {
+                ZObject *obj = left_val.toObject();
+
+                if (obj) {
+                    temporaryPropertyList << ZPropertyVariant(obj->property(propertyName.constData()), obj, propertyName);
+                    virtualStack.push(&temporaryPropertyList.last());
+
+                    break;
+                }
+
+                temporaryList << ZVariant();
+            } else {
+                ZFunction *function = ZCodeExecuter::getFunctionForVariantType(left_val.type(), propertyName);
+
+                if (function) {
+                    function->setProperty("target", true);
+
+                    virtualStack << &left_val;
+                    temporaryList << ZVariant(function);
+                } else {
+                    temporaryList << ZVariant();
+                }
             }
 
             virtualStack.push(&temporaryList.last());
@@ -366,6 +392,9 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             ZFunction *fun = virtualStack.pop()->toFunction();
 
             if(fun) {
+                if (fun->property("target").toBool())
+                    args.prepend(*virtualStack.pop());
+
                 temporaryList << fun->call(args);
                 virtualStack.push(&temporaryList.last());
             }
@@ -385,6 +414,7 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
         case PopAll: {
             virtualStack.clear();
             temporaryList.clear();
+            temporaryPropertyList.clear();
             break;
         }
         case Goto: {
@@ -420,10 +450,27 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             if(i < 0) {
                 i = val.value(ZVariant(), -1) - 1;
             }
+            break;
+        }
+        case InitObjectProperty: {
+            ZObject *obj = new ZObject;
+            int count = virtualStack.pop()->toInt();
+
+            for (int i = 0; i < count; ++i) {
+                const char *name = virtualStack.pop()->toString().toLatin1().constData();
+                const ZVariant &value = *virtualStack.pop();
+
+                obj->setProperty(name, value);
+            }
+
+            temporaryList << ZVariant(obj);
+            virtualStack.push(&temporaryList.last());
+            break;
         }
         default: break;
         }
 
+#ifndef QT_NO_DEBUG
         if(ENABLE_DEBUG) {
             qDebug().noquote() << "------------stack-start--------------";
 
@@ -432,6 +479,7 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
 
             qDebug().noquote() << "------------stack-end--------------";
         }
+#endif
     }
 
     if(!virtualStack.isEmpty())
@@ -475,8 +523,8 @@ private:
 
 ZCodeExecuter *ZCodeExecuter::currentCodeExecuter = Q_NULLPTR;
 YYFlexLexer *ZCodeExecuter::yyFlexLexer = Q_NULLPTR;
-bool ZCodeExecuter::yywrap = true;
 QHash<const QByteArray, ZSharedVariant*> ZCodeExecuter::globalIdentifierHash;
+QHash<ZVariant::Type, QHash<const QByteArray, ZFunction*>> ZCodeExecuter::globalFunctionHash;
 QMap<QByteArray, ZVariant*> ZCodeExecuter::stringConstantMap;
 QMap<QByteArray, ZVariant*> ZCodeExecuter::numberConstantMap;
 ZVariant ZCodeExecuter::constTrue(true);
@@ -495,13 +543,14 @@ ZCodeExecuter::~ZCodeExecuter()
     qDeleteAll(gotoLabelMap);
 }
 
-int ZCodeExecuter::eval()
+int ZCodeExecuter::eval(std::istream &s)
 {
     beginCodeBlock();
 
     YYFlexLexer *yyFlexLexer = new YYFlexLexer;
     YYParser *yyParser = new YYParser;
 
+    yyFlexLexer->yyrestart(s);
     yyParser->set_debug_level(QByteArray(getenv("DEBUG_PARSE_LEVEL")).toInt());
 
     this->yyFlexLexer = yyFlexLexer;
@@ -529,28 +578,26 @@ int ZCodeExecuter::eval()
 
 int ZCodeExecuter::eval(const char *fileName, bool *ok)
 {
-    FILE *fd = freopen(fileName, "r", stdin);
+    std::ifstream inFile;
+
+    inFile.open(fileName, std::ios::in);
 
     if(ok)
-        *ok = bool(fd);
+        *ok = inFile.is_open();
 
-    return eval();
+    if(!inFile.is_open())
+        return -1;
+
+    return eval(inFile);
 }
 
-int ZCodeExecuter::eval(const QByteArray &code, bool *ok)
+int ZCodeExecuter::eval(const QByteArray &code)
 {
-    QTemporaryFile file;
+    std::stringstream inStr;
 
-    if(file.open()) {
-        write(file.handle(), code.constData(), code.size());
+    inStr << code.toStdString();
 
-        return eval(file.fileName().toLatin1().constData(), ok);
-    }
-
-    if(ok)
-        *ok = false;
-
-    return -1;
+    return eval(inStr);
 }
 
 ZSharedVariantPointer ZCodeExecuter::getIdentifier(const QByteArray &name)
@@ -700,8 +747,6 @@ ZCodeExecuter *ZCodeExecuter::beginCodeExecuter()
 
     if(currentCodeExecuter) {
         executer->currentCodeBlock = currentCodeExecuter->currentCodeBlock;
-
-        yywrap = false;
     }
 
     currentCodeExecuter = executer;

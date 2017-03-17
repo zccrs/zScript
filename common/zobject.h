@@ -4,6 +4,9 @@
 #include "zvariant.h"
 
 #include <QObject>
+#include <QPointer>
+
+#include <functional>
 
 Z_BEGIN_NAMESPACE
 
@@ -44,6 +47,39 @@ public:
 
 signals:
     void callFun(ZVariant &retVals, const QList<ZVariant> &args) const;
+};
+
+class ZMethod : public ZFunction
+{
+public:
+    inline explicit ZMethod(const std::function<ZVariant(const QList<ZVariant>&)> &fun, ZObject *parent = 0)
+        : ZFunction(parent)
+        , function(fun)
+    {
+
+    }
+
+    ZVariant call(const QList<ZVariant> &args) const Q_DECL_OVERRIDE
+    {
+        return function(args);
+    }
+
+private:
+    std::function<ZVariant(const QList<ZVariant>&)> function;
+};
+
+class ZPropertyVariant : public ZVariant
+{
+public:
+    explicit ZPropertyVariant(const ZVariant &other, ZObject *object, const QByteArray &name);
+
+    void depthCopyAssign(const ZVariant &other) const Q_DECL_OVERRIDE;
+    ZVariant& operator=(const ZVariant &other) Q_DECL_OVERRIDE;
+    ZVariant& operator=(ZVariant &&other) Q_DECL_OVERRIDE;
+
+private:
+    QPointer<ZObject> object;
+    QByteArray propertyName;
 };
 
 Z_END_NAMESPACE

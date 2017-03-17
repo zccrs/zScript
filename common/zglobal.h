@@ -1,7 +1,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define ENABLE_DEBUG QByteArray(getenv("ENABLE_ZDEBUG")).toInt() > 0
+#define ENABLE_DEBUG QByteArray(getenv("ENABLE_DEBUG")).toInt() > 0
 
 #define zDebug \
     if(ENABLE_DEBUG)\

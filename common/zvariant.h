@@ -55,29 +55,34 @@ public:
     ZVariant(const QVariant &val);
     ~ZVariant();
 
+    inline bool isObject() const
+    {
+        return m_data->type == Object || m_data->type == Function;
+    }
+
     const char *typeName() const;
 
     inline Type type() const
-    { return data->type;}
+    { return m_data->type;}
 
     int toInt(bool *ok = 0) const;
     double toDouble(bool *ok = 0) const;
     bool toBool() const;
     inline QString toString() const
-    { return data->variant.toString();}
+    { return m_data->variant.toString();}
     QList<ZVariant> toList() const;
     inline ZTuple toTuple() const
     { if(type() == Tuple)
-            return qvariant_cast<ZTuple>(data->variant);
+            return qvariant_cast<ZTuple>(m_data->variant);
 
         return ZTuple() << const_cast<ZVariant*>(this);
     }
     ZObject *toObject() const;
     ZFunction *toFunction() const;
     inline QVariant toQVariant() const
-    { return data->variant;}
+    { return m_data->variant;}
 
-    inline void depthCopyAssign(const ZVariant &other) const
+    virtual void depthCopyAssign(const ZVariant &other) const
     {
         if(type() == Tuple) {
             const ZTuple &tuple = toTuple();
@@ -92,13 +97,13 @@ public:
             return;
         }
 
-        VariantData *data = const_cast<VariantData*>(this->data.constData());
+        VariantData *data = const_cast<VariantData*>(this->m_data.constData());
 
-        data->variant = other.data->variant;
-        data->type = other.data->type;
+        data->variant = other.m_data->variant;
+        data->type = other.m_data->type;
     }
 
-    inline ZVariant& operator=(const ZVariant &other)
+    virtual ZVariant& operator=(const ZVariant &other)
     {
         if(type() == Tuple) {
             const ZTuple &other_group = other.toTuple();
@@ -107,15 +112,16 @@ public:
             int min = qMin(other_group.count(), this_group.count());
 
             for(int i = 0; i < min; ++i) {
-                this_group[i]->data = other_group[i]->data;
+                this_group[i]->m_data = other_group[i]->m_data;
             }
         } else {
-            data = other.data;
+            m_data = other.m_data;
         }
 
         return *this;
     }
-    inline ZVariant& operator=(ZVariant &&other)
+
+    virtual ZVariant& operator=(ZVariant &&other)
     {
         if(type() == Tuple) {
             const ZTuple &other_group = other.toTuple();
@@ -124,27 +130,27 @@ public:
             int min = qMin(other_group.count(), this_group.count());
 
             for(int i = 0; i < min; ++i) {
-                qSwap(this_group[i]->data, other_group[i]->data);
+                qSwap(this_group[i]->m_data, other_group[i]->m_data);
             }
         } else {
-            qSwap(data, other.data);
+            qSwap(m_data, other.m_data);
         }
 
         return *this;
     }
 
     inline bool operator==(const ZVariant &v) const
-    { return data->variant == v.data->variant; }
+    { return m_data->variant == v.m_data->variant; }
     inline bool operator!=(const ZVariant &v) const
-    { return data->variant != v.data->variant; }
+    { return m_data->variant != v.m_data->variant; }
     inline bool operator<(const ZVariant &v) const
-    { return data->variant < v.data->variant; }
+    { return m_data->variant < v.m_data->variant; }
     inline bool operator<=(const ZVariant &v) const
-    { return data->variant <= v.data->variant; }
+    { return m_data->variant <= v.m_data->variant; }
     inline bool operator>(const ZVariant &v) const
-    { return data->variant > v.data->variant; }
+    { return m_data->variant > v.m_data->variant; }
     inline bool operator>=(const ZVariant &v) const
-    { return data->variant >= v.data->variant; }
+    { return m_data->variant >= v.m_data->variant; }
     inline bool operator&&(const ZVariant &v) const
     { return toBool() && v.toBool();}
     inline bool operator||(const ZVariant &v) const
@@ -153,7 +159,7 @@ public:
     { return !toBool();}
     inline ZVariant operator-() const
     {
-        switch(data->type) {
+        switch(m_data->type) {
         case Double:
             return -toDouble();
         case Int:
@@ -166,7 +172,7 @@ public:
     }
     inline ZVariant operator+() const
     {
-        switch(data->type) {
+        switch(m_data->type) {
         case Double:
             return qAbs(toDouble());
         case Int:
@@ -179,12 +185,12 @@ public:
     }
     inline ZVariant operator<<(const ZVariant &value)
     {
-        switch (data->type) {
+        switch (m_data.constData()->type) {
         case List:
-            data->variant = QVariant::fromValue(toList() += value);
+            const_cast<VariantData*>(m_data.constData())->variant = QVariant::fromValue(toList() += value);
             break;
         case String:
-            data->variant = toString().append(value.toString());
+            const_cast<VariantData*>(m_data.constData())->variant = toString().append(value.toString());
             break;
         default:
             break;
@@ -196,9 +202,9 @@ public:
 
     inline static ZVariant copy(const ZVariant &value)
     {
-        ZVariant val(value.data->type);
+        ZVariant val(value.m_data->type);
 
-        val.data->variant = value.data->variant;
+        val.m_data->variant = value.m_data->variant;
 
         return val;
     }
@@ -208,15 +214,25 @@ public:
 private:
     class VariantData : public QSharedData
     {
+    public:
         QVariant variant;
         ZVariant::Type type;
-
-        friend class ZVariant;
     };
 
-    QSharedDataPointer<VariantData> data;
+    QSharedDataPointer<VariantData> m_data;
 
     friend class ZCode;
+
+public:
+    inline const VariantData *data() const
+    {
+        return m_data.constData();
+    }
+
+    inline VariantData *data()
+    {
+        return m_data.data();
+    }
 };
 
 /// int

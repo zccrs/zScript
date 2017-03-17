@@ -2,7 +2,7 @@
 #define BASE_H
 
 namespace ZBase {
-void initGlobalIdentifier();
+void init();
 }
 
 #endif // BASE_H

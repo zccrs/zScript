@@ -1,7 +1,8 @@
-
 %{
 #include "zcode.h"
+#define protected public
 #include "lex.yy.cpp"
+#undef protected
 
 /// enable debug
 #define YYDEBUG 1
@@ -21,6 +22,8 @@ Z_USE_NAMESPACE
 %debug
 /// enable locations
 %locations
+/// 开启后，当调用yyerror时,它请求详细的错误消息字符串
+%error-verbose
 
 %union{
     int valueType;
@@ -30,6 +33,7 @@ Z_USE_NAMESPACE
     QVarLengthArray<QByteArray*, 10> *parameterList;
     QPair<ZSharedVariantPointer*, quint16> *caseKey;
     QVector<QPair<ZSharedVariantPointer*, quint16>> *cases;
+    std::string *msg;
 };
 
 /// keyword
@@ -44,12 +48,15 @@ Z_USE_NAMESPACE
 ///         /=        *=        +=       -=         %=        &=       |=       ^=        ||=        &&=
 %token  DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
 
+%token <msg> ERROR
+
+%token NEW_OBJ_BEGIN
+
 %left ';'
 %left VAR IF
 %left ','
 %right '=' DIVASSIGN MULASSIGN ADDASSIGN SUBASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN LANDASSIGN LORASSIGN
 %left COMMA
-%left '.'
 %right '?' ':'
 %left LAND LOR
 %left '&' '|' '^'
@@ -59,11 +66,12 @@ Z_USE_NAMESPACE
 %left '*' '/' '%'
 %left UMINUS ADDSELF SUBSELF '!' '~'
 //%left PROMOTION
+%left '.'
 %left '[' ']'
 %left '(' ')'
 
 %type <valueType> expression lvalue rvalue
-%type <count> arguments tuple_exp tuple_lval break loopEnds
+%type <count> arguments tuple_exp tuple_lval break loopEnds object_pro
 %type <value> branch_head branch_body branch_else const switch_head
 %type <parameterList> parameter
 %type <cases> cases
@@ -71,7 +79,13 @@ Z_USE_NAMESPACE
 
 %%
 
-start:      | start code | start '\n';
+start:      | start code
+            | ERROR {
+                  error(@1, *$1);
+                  delete $1;
+                  YYABORT;
+            }
+            ;
 
 code:       GOTO IDENTIFIER ends {
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->getGotoLabel(*$2));
@@ -140,10 +154,14 @@ code:       GOTO IDENTIFIER ends {
             }
             | switch {}
             | ';'
-            | '{' start '}'
+            | '{' {
+                ZCodeExecuter::currentCodeExecuter->beginCodeBlock();
+            } start {
+                ZCodeExecuter::currentCodeExecuter->endCodeBlock();
+            } '}'
             ;
 
-ends:       ';'|'\n';
+ends:       ';';
 
 break:      BREAK {$$ = 1;}
             | break ',' BREAK {$$ = $1 + 1;}
@@ -161,7 +179,6 @@ switch_head:SWITCH '(' expression ')' {
 
                 ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::Switch);
             }
-            | switch_head '\n'
             ;
 
 switch:     switch_head '{' cases '}' {
@@ -194,11 +211,9 @@ switch:     switch_head '{' cases '}' {
 case:       CASE const ':' {
                 $$ = new QPair<ZSharedVariantPointer*, quint16>($2, ZCodeExecuter::currentCodeExecuter->getCodeList().count());
             }
-            | case '\n'
             ;
 
-cases:      '\n' {$$ = new QVector<QPair<ZSharedVariantPointer*, quint16>>();}
-            | case code {
+cases:      case code {
                 $$ = new QVector<QPair<ZSharedVariantPointer*, quint16>>();
                 $$->append(*$1);
 
@@ -217,7 +232,6 @@ cases:      '\n' {$$ = new QVector<QPair<ZSharedVariantPointer*, quint16>>();}
 
                 delete $2;
             }
-            | cases '\n'
             ;
 
 goto_label: IDENTIFIER ':' {
@@ -314,6 +328,12 @@ lvalue:     VAR define {
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZSharedVariantPointer(new ZSharedVariant()));
             }
+            | expression '.' IDENTIFIER {
+                $$ = ValueType::Variant;
+
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(*$3, ZVariant::String));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Get);
+            }
             | lvalue '=' expression {
                 $$ = ValueType::Variant;
 
@@ -323,12 +343,6 @@ lvalue:     VAR define {
                 $$ = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Children);
-            }
-            | expression '.' IDENTIFIER {
-                $$ = ValueType::Variant;
-
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant(*$3, ZVariant::String));
-                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Get);
             }
             | lvalue ADDASSIGN expression {
                 $$ = ValueType::Variant;
@@ -433,6 +447,12 @@ rvalue:     const {
                 $$ = ValueType::Variant;
 
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant("1", ZVariant::Int));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::JoinToList);
+            }
+            | '[' ']' {
+                $$ = ValueType::Variant;
+
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::createConstant("0", ZVariant::Int));
                 ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::JoinToList);
             }
             | NEW IDENTIFIER {
@@ -806,11 +826,40 @@ rvalue:     const {
                 $$ = ValueType::Variant;
             }
             | '(' expression ')' { $$ = $2;}
+            | object {
+                $$ = ValueType::Variant;
+            }
             ;
 
 arguments:  {$$ = 0;}
             | expression {$$ = 1;}
             | tuple_exp
+            ;
+
+object_pro: IDENTIFIER ':' expression {
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant(QString(*$1)));
+
+                delete $1;
+
+                $$ = 1;
+            }
+            | object_pro ',' IDENTIFIER ':' expression {
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant(QString(*$3)));
+
+                delete $3;
+
+                $$ = $1 + 1;
+            }
+            ;
+
+object:     NEW_OBJ_BEGIN '}' {
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant(0));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::InitObjectProperty);
+            }
+            | NEW_OBJ_BEGIN object_pro '}' {
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, new ZSharedVariant($2));
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::InitObjectProperty);
+            }
             ;
 
 branch_head:IF '(' expression ')' {
@@ -858,10 +907,10 @@ branch_head:IF '(' expression ')' {
 
 //                ZCodeExecuter::currentCodeExecuter->beginCodeBlock(ZCodeExecuter::CodeBlock::While);
 //            }
-            | branch_head '\n'
             ;
 
-for_exp:    | expression;
+for_exps:   expression | for_exps ',' expression;
+for_exp:    | for_exps;
 
 branch_body :branch_head code {
                 if(ZCodeExecuter::currentCodeExecuter->getCodeBlock()->isLoopStructure()) {
@@ -900,10 +949,9 @@ branch_body :branch_head code {
 
                 ZCodeExecuter::currentCodeExecuter->endCodeBlock();
             }
-            | branch_body '\n'
             ;
 
-branch_else:branch_body ELSE | branch_else '\n'
+branch_else:branch_body ELSE;
 
 conditional:branch_body
             | branch_else {
@@ -925,31 +973,46 @@ conditional:branch_body
             }
 %%
 
-void yy::parser::error(const location_type& loc, const std::string& msg)
-{
-    std::cerr << "from " << loc.begin.line << " line, " << loc.begin.column << " column "
-              << "to " << loc.end.line << " line, " << loc.end.column << " column, " << msg << std::endl;
-
-    quick_exit(-1);
-}
-
 int yyFlexLexer::yywrap()
 {
-    if(!ZCodeExecuter::yywrap) {
-        ZCodeExecuter::yywrap = true;
-
-        return 0;
-    }
-
     return 1;
 }
 
 #undef yyFlexLexer
 
+void yy::parser::error(const location_type& loc, const std::string& msg)
+{
+    char lineStr[1000];
+
+    ZCodeExecuter::yyFlexLexer->yyin.seekg(-(int)loc.end.column - 1, std::ios::cur);
+    ZCodeExecuter::yyFlexLexer->yyin.getline(lineStr, 1000);
+
+    std::cerr << lineStr << std::endl;
+
+    for (uint i = 0; i < loc.begin.column; ++i)
+        std::cerr << " ";
+
+    for (uint i = loc.begin.column; i < loc.end.column ; ++i)
+        std::cerr << "^";
+
+    std::cerr << std::endl;
+    std::cerr << "from " << loc.begin.line << " line " << loc.begin.column << " column, "
+              << "to " << loc.end.line << " line " << loc.end.column << " column, " << msg << std::endl;
+
+    quick_exit(-1);
+}
+
 int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)
 {
-    yylval = lval;
-    yyloc = location;
+    if (tokenQueue.isEmpty()) {
+        yylval = lval;
+        yyloc = location;
 
-    return ZCodeExecuter::yyFlexLexer->yylex();
+        return ZCodeExecuter::yyFlexLexer->yylex();
+    } else {
+        *lval = tokenValQueue.dequeue();
+        *location = tokenLocQueue.dequeue();
+
+        return tokenQueue.dequeue();
+    }
 }

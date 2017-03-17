@@ -7,67 +7,67 @@ Z_BEGIN_NAMESPACE
 
 /// ZVariant
 ZVariant::ZVariant(ZVariant::Type type)
-    : data(new VariantData)
+    : m_data(new VariantData)
 {
-    data->type = type;
+    m_data->type = type;
 }
 
 ZVariant::ZVariant(int val)
-    : data(new VariantData)
+    : m_data(new VariantData)
 {
-    data->variant = val;
-    data->type = Int;
+    m_data->variant = val;
+    m_data->type = Int;
 }
 
 ZVariant::ZVariant(double val)
-    : data(new VariantData)
+    : m_data(new VariantData)
 {
-    data->variant = val;
-    data->type = Double;
+    m_data->variant = val;
+    m_data->type = Double;
 }
 
 ZVariant::ZVariant(bool val)
-    : data(new VariantData)
+    : m_data(new VariantData)
 {
-    data->variant = val;
-    data->type = Bool;
+    m_data->variant = val;
+    m_data->type = Bool;
 }
 
 ZVariant::ZVariant(const char *val)
-    : data(new VariantData)
+    : m_data(new VariantData)
 {
-    data->variant = val;
-    data->type = String;
+    m_data->variant = val;
+    m_data->type = String;
 }
 
 ZVariant::ZVariant(const ZVariant &other)
-    : data(other.data)
+    : m_data(other.m_data)
 {
 
 }
 
 ZVariant::ZVariant(ZVariant &&other)
 {
-    qSwap(data, other.data);
+    qSwap(m_data, other.m_data);
 }
 
 ZVariant::ZVariant(const QString &val)
-    : data(new VariantData)
+    : m_data(new VariantData)
 {
-    data->variant = val;
-    data->type = String;
+    m_data->variant = val;
+    m_data->type = String;
 }
 
 ZVariant::ZVariant(QLatin1String val)
-    : data(new VariantData)
+    : m_data(new VariantData)
 {
-    data->variant = val;
-    data->type = String;
+    m_data->variant = val;
+    m_data->type = String;
 }
 
 template <typename T>
 ZVariant::ZVariant(const QList<T> &val)
-    : data(new VariantData)
+    : m_data(new VariantData)
 {
     QList<ZVariant> list;
 
@@ -76,82 +76,82 @@ ZVariant::ZVariant(const QList<T> &val)
     for(const T &v : val)
         list << ZVariant(v);
 
-    data->variant = QVariant::fromValue(list);
-    data->type = List;
+    m_data->variant = QVariant::fromValue(list);
+    m_data->type = List;
 }
 
 ZVariant::ZVariant(const QList<ZVariant> &val)
-    : data(new VariantData)
+    : m_data(new VariantData)
 {
-    data->variant = QVariant::fromValue(val);
-    data->type = List;
+    m_data->variant = QVariant::fromValue(val);
+    m_data->type = List;
 }
 
 ZVariant::ZVariant(const ZVariant::ZTuple &group)
-    : data(new VariantData)
+    : m_data(new VariantData)
 {
-    data->variant = QVariant::fromValue(group);
-    data->type = Tuple;
+    m_data->variant = QVariant::fromValue(group);
+    m_data->type = Tuple;
 }
 
 ZVariant::ZVariant(ZObject * const object)
-    : data(new VariantData)
+    : m_data(new VariantData)
 {
-    data->variant = QVariant::fromValue(object);
-    data->type = Object;
+    m_data->variant = QVariant::fromValue(object);
+    m_data->type = Object;
 }
 
 ZVariant::ZVariant(ZFunction * const function)
-    : data(new VariantData)
+    : m_data(new VariantData)
 {
-    data->variant = QVariant::fromValue(function);
-    data->type = Function;
+    m_data->variant = QVariant::fromValue(function);
+    m_data->type = Function;
 }
 
 ZVariant::ZVariant(const QVariant &val)
-    : data(new VariantData)
+    : m_data(new VariantData)
 {
-    data->variant = val;
+    m_data->variant = val;
 
     switch (val.type()) {
     case QVariant::Int:
-        data->type = Int;
+        m_data->type = Int;
         break;
     case QVariant::Double:
-        data->type = Double;
+        m_data->type = Double;
         break;
     case QVariant::Bool:
-        data->type = Bool;
+        m_data->type = Bool;
         break;
     case QVariant::ByteArray:
     case QVariant::String:
-        data->type = String;
+        m_data->type = String;
         break;
     case QVariant::List:
-        data->type = List;
+        m_data->type = List;
         break;
     case QVariant::Invalid:
-        data->type = Undefined;
+        m_data->type = Undefined;
         break;
     case QMetaType::PointerToQObject:
-        data->type = Object;
+        m_data->type = Object;
         break;
     case QVariant::UserType:{
         if(QString(val.typeName()) == "ZObject*") {
-            data->type = Object;
+            m_data->type = Object;
         } else if(QString(val.typeName()) == "ZFunction*") {
-            data->type = Function;
+            m_data->type = Function;
         } else if(QString(val.typeName()) == "ZVariant") {
-            data = qvariant_cast<ZVariant>(val).data;
+            m_data = qvariant_cast<ZVariant>(val).m_data;
         } else {
 //            zWarning << "Unknow Type:" << val.typeName();
-            data->type = Unknow;
-            data->variant = val;
+            m_data->type = Unknow;
+            m_data->variant = val;
         }
         break;
     }
     default:
-        data->type = Undefined;
+        m_data->type = Undefined;
         break;
     }
 }
@@ -163,7 +163,7 @@ ZVariant::~ZVariant()
 
 const char *ZVariant::typeName() const
 {
-    switch (data->type) {
+    switch (m_data->type) {
     case Int:
         return "int";
     case Double:
@@ -187,7 +187,7 @@ const char *ZVariant::typeName() const
         break;
     }
 
-    return data->variant.typeName();
+    return m_data->variant.typeName();
 }
 
 int ZVariant::toInt(bool *ok) const
@@ -195,14 +195,15 @@ int ZVariant::toInt(bool *ok) const
     if(ok)
         *ok = true;
 
-    switch(data->type) {
+    switch(m_data->type) {
     case Int:
-        return data->variant.toInt();
+        return m_data->variant.toInt();
     case Double:
-        return (int)data->variant.toDouble();
+        return (int)m_data->variant.toDouble();
     case Bool:
-        return data->variant.toBool();
+        return m_data->variant.toBool();
     case String:
+        return m_data->variant.toString().toInt(ok);
     case Object:
     case Function:
     case Undefined:
@@ -212,7 +213,7 @@ int ZVariant::toInt(bool *ok) const
     default:break;
     }
 
-    return data->variant.toInt(ok);
+    return m_data->variant.toInt(ok);
 }
 
 double ZVariant::toDouble(bool *ok) const
@@ -220,14 +221,15 @@ double ZVariant::toDouble(bool *ok) const
     if(ok)
         *ok = true;
 
-    switch(data->type) {
+    switch(m_data->type) {
     case Int:
-        return data->variant.toInt();
+        return m_data->variant.toInt();
     case Double:
-        return data->variant.toDouble();
+        return m_data->variant.toDouble();
     case Bool:
-        return data->variant.toBool();
+        return m_data->variant.toBool();
     case String:
+        return m_data->variant.toString().toDouble(ok);
     case Object:
     case Function:
     case Undefined:
@@ -237,20 +239,20 @@ double ZVariant::toDouble(bool *ok) const
     default:break;
     }
 
-    return data->variant.toDouble(ok);
+    return m_data->variant.toDouble(ok);
 }
 
 bool ZVariant::toBool() const
 {
-    switch(data->type) {
+    switch(m_data->type) {
     case Int:
-        return data->variant.toInt();
+        return m_data->variant.toInt();
     case Double:
-        return (int)data->variant.toDouble();
+        return (int)m_data->variant.toDouble();
     case Bool:
-        return data->variant.toBool();
+        return m_data->variant.toBool();
     case String:
-        return !data->variant.toString().isEmpty();
+        return !m_data->variant.toString().isEmpty();
     case Object:
     case Function:
         return (bool)toObject();
@@ -259,7 +261,7 @@ bool ZVariant::toBool() const
     default: break;
     }
 
-    return data->variant.toBool();
+    return m_data->variant.toBool();
 }
 
 QList<ZVariant> ZVariant::toList() const
@@ -274,12 +276,12 @@ QList<ZVariant> ZVariant::toList() const
         return list;
     }
 
-    return qvariant_cast<QList<ZVariant>>(data->variant);
+    return qvariant_cast<QList<ZVariant>>(m_data->variant);
 }
 
 ZObject *ZVariant::toObject() const
 {
-    return qvariant_cast<ZObject*>(data->variant);
+    return qvariant_cast<ZObject*>(m_data->variant);
 }
 
 ZFunction *ZVariant::toFunction() const
@@ -289,7 +291,7 @@ ZFunction *ZVariant::toFunction() const
 
 ZVariant ZVariant::operator[](const ZVariant &value) const
 {
-    switch (data->type) {
+    switch (m_data->type) {
     case List: {
         bool ok = false;
 

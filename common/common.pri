@@ -3,7 +3,8 @@ HEADERS += \
     $$PWD/zobject.h \
     $$PWD/zcode.h \
     $$PWD/zglobal.h \
-    $$PWD/ztool.h
+    $$PWD/ztool.h \
+    $$PWD/zobjectpool.h
 
 INCLUDEPATH += $$PWD
 

@@ -19,3 +19,34 @@ ZVariant ZFunction::call(const QList<ZVariant> &args) const
 
     return retVal;
 }
+
+ZPropertyVariant::ZPropertyVariant(const ZVariant &other, ZObject *object, const QByteArray &name)
+    : ZVariant(other)
+{
+    this->object = object;
+    propertyName = name;
+}
+
+void ZPropertyVariant::depthCopyAssign(const ZVariant &other) const
+{
+    if (object)
+        object->setProperty(propertyName, other);
+
+    ZVariant::depthCopyAssign(other);
+}
+
+ZVariant &ZPropertyVariant::operator=(const ZVariant &other)
+{
+    if (object)
+        object->setProperty(propertyName, other);
+
+    return ZVariant::operator=(other);
+}
+
+ZVariant &ZPropertyVariant::operator=(ZVariant &&other)
+{
+    if (object)
+        object->setProperty(propertyName, other);
+
+    return ZVariant::operator=(other);
+}
