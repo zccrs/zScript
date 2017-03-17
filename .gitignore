@@ -1,6 +1,10 @@
 # bison tmp file
 
 syntax/zScript.output
+lexical/FlexLexer.h
+lexical/lex.yy.cpp
+syntax/zScript.tab.cpp
+syntax/zScript.tab.hpp
 
 # C++ objects and libs
 

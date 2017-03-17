@@ -1,6 +1,8 @@
 %{
 #include "zcode.h"
+#define protected public
 #include "lex.yy.cpp"
+#undef protected
 
 /// enable debug
 #define YYDEBUG 1
