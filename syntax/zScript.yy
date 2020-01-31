@@ -70,7 +70,7 @@ Z_USE_NAMESPACE
 %left '[' ']'
 %left '(' ')'
 
-%type <valueType> expression lvalue rvalue
+%type <valueType> expression lvalue rvalue tuple_item
 %type <count> arguments tuple_exp tuple_lval break loopEnds object_pro
 %type <value> branch_head branch_body branch_else const switch_head
 %type <parameterList> parameter
@@ -303,8 +303,25 @@ define:     IDENTIFIER {
             | define ',' define
             ;
 
-tuple_lval: lvalue ',' lvalue %prec COMMA {$$ = 2;}
-            | tuple_lval ',' lvalue {$$ = $1 + 1;}
+tuple_item: VAR IDENTIFIER {
+                ZCodeExecuter::currentCodeExecuter->addIdentifier(*$2);
+                $$ = ValueType::Variant;
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifier(*$2));
+                delete $2;
+            }
+            | IDENTIFIER {
+                $$ = ValueType::Variant;
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZCodeExecuter::currentCodeExecuter->getIdentifier(*$1));
+                delete $1;
+            }
+            | '_' {
+                $$ = ValueType::Constant;
+                ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Push, ZSharedVariantPointer(new ZSharedVariant()));
+            }
+            ;
+
+tuple_lval: tuple_item ',' tuple_item {$$ = 2;}
+            | tuple_lval ',' tuple_item {$$ = $1 + 1;}
             ;
 
 tuple_exp:  expression ',' expression %prec COMMA {$$ = 2;}
