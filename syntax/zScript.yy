@@ -998,8 +998,6 @@ void yy::parser::error(const location_type& loc, const std::string& msg)
     std::cerr << std::endl;
     std::cerr << "from " << loc.begin.line << " line " << loc.begin.column << " column, "
               << "to " << loc.end.line << " line " << loc.end.column << " column, " << msg << std::endl;
-
-    exit(-1);
 }
 
 int yylex(yy::parser::semantic_type *lval, yy::parser::location_type *location)

@@ -561,9 +561,7 @@ int ZCodeExecuter::eval(std::istream &s)
     yyParser->set_debug_level(QByteArray(getenv("DEBUG_PARSE_LEVEL")).toInt());
 
     this->yyFlexLexer = yyFlexLexer;
-
-    yyParser->parse();
-
+    int result = yyParser->parse();
     this->yyFlexLexer = Q_NULLPTR;
 
     delete yyFlexLexer;
@@ -574,11 +572,14 @@ int ZCodeExecuter::eval(std::istream &s)
     deleteAllCodeBlock();
     gotoLabelMap.clear();
 
-    bool ok;
-    int result = exec().toInt(&ok);
+    // 如果语法解析成功
+    if (result == 0) {
+        bool ok;
+        result = exec().toInt(&ok);
 
-    if(!ok)
-        return 0;
+        if (!ok)
+            return -1;
+    }
 
     return result;
 }
