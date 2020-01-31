@@ -738,7 +738,6 @@ void ZCodeExecuter::endCodeBlock()
                 *val_pointer.data() = *val;
             } else {
                 zError << "undefined reference:" << name;
-                zErrorQuit;
             }
         }
     }
