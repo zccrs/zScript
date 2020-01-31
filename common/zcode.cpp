@@ -354,7 +354,14 @@ ZVariant ZCode::exec(const QList<ZCode *> &codeList)
             tuple.reserve(argsCount);
 
             for(int i = 0; i< argsCount; ++i) {
-                tuple.insert(0, virtualStack.pop());
+                // 栈中的数据都是保存在了temporaryList中
+                // 此函数返回时其中的数据就全部被销毁了，Tuple
+                // 中存储的是指针，指针指向的是temporaryList中的数据
+                // 此exec可能是被其他函数调用的，因此Tuple中
+                // 存储的可能是栈变量，函数执行结束后被其他作用
+                // 域调用则访问到了无效指针，因此这里要new一个
+                // 新的ZVariant
+                tuple.prepend(new ZVariant(*virtualStack.pop()));
             }
 
             temporaryList << std::move(tuple);

@@ -48,7 +48,7 @@ ZVariant::ZVariant(const ZVariant &other)
 
 ZVariant::ZVariant(ZVariant &&other)
 {
-    qSwap(m_data, other.m_data);
+    m_data.swap(other.m_data);
 }
 
 ZVariant::ZVariant(const QString &val)
@@ -681,6 +681,7 @@ ZVariant operator ~(const ZVariant &var)
 
 Z_END_NAMESPACE
 
+QT_BEGIN_NAMESPACE
 QDebug operator<<(QDebug deg, const ZVariant &var)
 {
     deg.nospace() << "Variant(" << var.typeName() << ", ";
@@ -713,7 +714,6 @@ QDebug operator<<(QDebug deg, const ZVariant &var)
     return deg;
 }
 
-QT_BEGIN_NAMESPACE
 uint qHash(const ZVariant &val, uint seed)
 {
     switch (val.type()) {

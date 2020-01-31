@@ -99,7 +99,19 @@ public:
 
         VariantData *data = const_cast<VariantData*>(this->m_data.constData());
 
-        data->variant = other.m_data->variant;
+        if (other.type() == Tuple) {
+            // 元组类型由于存储的是指针，因此也要深度复制
+            ZTuple tuple;
+
+            for (const ZVariant *i : other.toTuple()) {
+                tuple << new ZVariant(*i);
+            }
+
+            data->variant = QVariant::fromValue(tuple);
+        } else {
+            data->variant = other.m_data->variant;
+        }
+
         data->type = other.m_data->type;
     }
 
@@ -130,10 +142,10 @@ public:
             int min = qMin(other_group.count(), this_group.count());
 
             for(int i = 0; i < min; ++i) {
-                qSwap(this_group[i]->m_data, other_group[i]->m_data);
+                this_group[i]->m_data.swap(other_group[i]->m_data);
             }
         } else {
-            qSwap(m_data, other.m_data);
+            m_data.swap(other.m_data);
         }
 
         return *this;
@@ -215,6 +227,13 @@ private:
     class VariantData : public QSharedData
     {
     public:
+        ~VariantData() {
+            if (type == Tuple) {
+                // 销毁列表中的数据
+                qDeleteAll(qvariant_cast<ZTuple>(variant));
+            }
+        }
+
         QVariant variant;
         ZVariant::Type type;
     };
@@ -353,7 +372,7 @@ public:
 Z_END_NAMESPACE
 
 QT_BEGIN_NAMESPACE
-Q_CORE_EXPORT QDebug operator<<(QDebug deg, const ZVariant &var);
+QDebug operator<<(QDebug deg, const ZVariant &var);
 QT_END_NAMESPACE
 
 Q_DECLARE_METATYPE(ZVariant)
