@@ -116,36 +116,40 @@ code:       GOTO IDENTIFIER ends {
             | loopEnds ends {
                 /// 判断是否是以break结尾
                 bool isBreak = !($1 & 0x8000);
-
-                ZCodeExecuter::CodeBlock::Type type = ZCodeExecuter::CodeBlock::LoopStructure;
-
-                if(isBreak)
-                    type = ZCodeExecuter::CodeBlock::Type(type | ZCodeExecuter::CodeBlock::Switch | ZCodeExecuter::CodeBlock::Normal);
-
+                auto type = ZCodeExecuter::CodeBlock::Type(ZCodeExecuter::CodeBlock::LoopStructure | ZCodeExecuter::CodeBlock::Switch | ZCodeExecuter::CodeBlock::Normal);
                 ZCodeExecuter::CodeBlock *block_while = ZCodeExecuter::currentCodeExecuter->getCodeBlockByType(type, ZCodeExecuter::currentCodeExecuter->getCodeBlock());
                 /// break的个数
-                quint16 tmp = ($1 & 0x7fff);
+                qint16 break_count = ($1 & 0x7fff) - !isBreak;
 
-                while(--tmp) {
-                    if(!block_while) {
-                        error(@1, ("\"" + QString(isBreak ? "break" : "continue") + "\" Cannot be used here").toStdString());
+                while ((--break_count) > 0) {
+                    if (!block_while) {
+                        error(@1, ("\"break\" Can't be used here"));
                         YYABORT;
                     }
 
                     block_while = ZCodeExecuter::currentCodeExecuter->getCodeBlockByType(type, block_while->parent);
                 }
 
-                if(!block_while) {
-                    error(@1, ("\"" + QString(isBreak ? "break" : "continue") + "\" Cannot be used here").toStdString());
+                if (!block_while) {
+                    error(@1, ("Can't be used here"));
                     YYABORT;
                 }
 
-                if(isBreak) {
+                if (isBreak) {
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->breakIndex);
                 } else {
+                    /// break_count小于0时说明只存在coutinue语句，因此需要从当前code block查找
+                    block_while = ZCodeExecuter::currentCodeExecuter->getCodeBlockByType(ZCodeExecuter::CodeBlock::LoopStructure,
+                                                                                         break_count < 0 ? ZCodeExecuter::currentCodeExecuter->getCodeBlock()
+                                                                                                         : block_while->parent);
+
+                    if (!block_while) {
+                        error(@1, "\"continue\" Can't be used here");
+                        YYABORT;
+                    }
+
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toLoopStructureCodeBlock()->continueIndex);
                 }
-
             }
             | switch {}
             | ';'
