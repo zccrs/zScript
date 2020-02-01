@@ -40,7 +40,7 @@ Break语句用于switch结构中，用于终止当前switch结构的执行。
 zScript提供了两种形式的if语句。
 ##### 1.单if子句的if语句。该if语句的一般形式为：
 
-	if(表达式) {
+	if (表达式) {
 		语句组
 	}
 该语句的含义是：只有表达式的值为非零值时，才执行其内部的语句组。例如：
@@ -67,28 +67,27 @@ zScript提供了两种形式的if语句。
 #### switch语句
 Switch语句与if语句一样，也可以实现分支选择。但if语句是判断一个表达式的值是否为假，决定是否执行某个分支；而switch语句是计算一个表达式的值，根据计算结果，从哈希表查询从哪个分支开始执行代码。Switch语句的一般形式为：
 
-	switch( 表达式 )
-	{
-		case 常量1：
-		语句组1
-		case 常量2：
-		语句组2
+	switch( 表达式 ) {
+		case 常量1：{
+			语句组1
+		}
+		case 常量2：{
+			语句组2
+		}
 		...
-		case 常量n：
-		语句组n
-		default:
-		语句组 n + 1
+		case 常量n：{
+			语句组n
+		}
+		default: {
+			语句组 n + 1
+		}
 	}
 switch语句的执行过程：
 * 1.求解“表达式”的值；
 * 2.如果“表达式”的值与某个case后面的“常量”的值相同，则从这里开始顺序执行语句。结果switch执行有两种形式：一是遇到break语句为止；二是未遇到break语句，则程序依次执行完所有语句组。
 * 3.如果“表达式”的值与任何一个case后面的“常量”的值都不相同，当有default子句时，则执行default后面的语句，如果没有default子句，则结束switch。
 
-**注：与C++语言不通的是，case后可跟任意常量，不仅限于整数。**
-
-其中break的一般形式为
-
-	break;
+**注：与C++语言不通的是，case后可跟任意常量，不仅限于整数。case语句后的代码需使用“{}”包裹**
 ### 循环控制语句
 #### while语句
 while语句的一般形式为
@@ -277,3 +276,78 @@ return语句在实现上其实仅支持返回一个值，能“多值返回”�
 
 	[Error]: undefined reference: a
 
+值得注意的是，多个连续的“{}”代码块之间至少要包含一句普通代码。如：
+
+	if (true) {
+    	{
+        	console.log(1);
+    	}
+	}
+
+这段代码无法通过语法检查，可在两个代码块间添加空语句避免这种情况，如：
+
+	if (true) {
+		;
+    	{
+        	console.log(1);
+    	}
+	}
+
+### break语句
+break语句用于结束当前作用域，可用于 while for switch-case "{}" 等语句产生的作用域中。如：
+
+	{
+		console.log(1);
+		break;
+		console.log(2);
+	}
+
+	console.log(3);
+
+此段代码执行结果为：
+
+    1
+    3
+
+break可以多个连用来结束多层作用域。如：
+
+	while (true) {
+    	console.log(1);
+
+    	{
+        	console.log(2);
+        	break, break;
+        	console.log(3);
+    	}
+
+    	console.log(4);
+	}
+
+	console.log(5);
+
+此段代码的执行结果为：
+
+	1
+	2
+	5
+
+break, break, ... 的组合形式还可以配合 continue 一起使用，不过，continue 只能是列表中的最后一个。如：
+
+	for (var i = 0; i < 2; ++i) {
+    	console.log(1);
+    	{
+        	console.log(2);
+        	break, continue;
+        	console.log(3);
+    	}
+
+    	console.log(4);
+	}
+
+
+此段代码的执行结果为:
+
+    1
+    2
+    1
+    2
