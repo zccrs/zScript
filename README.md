@@ -1,3 +1,36 @@
+# 编译&运行
+#### Linux(Debian)
+先安装编译依赖：
+
+	sudo apt install qt5-default flex bison g++ make
+
+克隆代码：
+
+	git clone https://github.com/zccrs/zScript
+
+
+编译：
+
+	cd zScript
+	mkdir build && cd build
+	qmake ..
+	make
+
+运行：
+
+	./zScript ../demo/snake.zs
+
+#### Windows
+先安装编译依赖：
+
+	到 http://download.qt.io/official_releases/qt/ 下载并安装最新版的Qt
+
+克隆代码：
+
+	git clone https://github.com/zccrs/zScript
+
+打开项目并编译，可在“项目” --> “Build&Run” --> “Run” --> “Command line arguments:” 中添加命令行参数来执行要执行的代码文件。
+
 # zScript
 ### 变量的定义
 变量使用关键字“var”进行定义。
