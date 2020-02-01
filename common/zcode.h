@@ -111,7 +111,6 @@ public:
     ~ZCodeExecuter();
 
     struct LoopStructureCodeBlock;
-    struct SwitchCodeBlock;
     struct CodeBlock{
         enum Type {
             Normal = 0x01,
@@ -135,6 +134,13 @@ public:
         /// 临时指令列表
         QList<ZCode*> tmpCodeList;
 
+        /// 执行break语句时要goto到的指令的位置
+        ZSharedVariantPointer breakIndex;
+
+        CodeBlock() {
+            breakIndex = new ZSharedVariant();
+        }
+
         inline bool isLoopStructure() const
         { return (type | LoopStructure) == LoopStructure;}
 
@@ -142,36 +148,19 @@ public:
         { return static_cast<const LoopStructureCodeBlock*>(this);}
         inline LoopStructureCodeBlock *toLoopStructureCodeBlock()
         { return static_cast<LoopStructureCodeBlock*>(this);}
-
-        inline const SwitchCodeBlock *toSwitchCodeBlock() const
-        { return static_cast<const SwitchCodeBlock*>(this);}
-        inline SwitchCodeBlock *toSwitchCodeBlock()
-        { return static_cast<SwitchCodeBlock*>(this);}
     };
 
     /// 循环结构的代码块
     struct LoopStructureCodeBlock : public CodeBlock {
-        LoopStructureCodeBlock() {
-            breakIndex = new ZSharedVariant();
+        LoopStructureCodeBlock()
+            : CodeBlock() {
             continueIndex = new ZSharedVariant();
         }
 
         /// 循环中的if指令的index
         int ifInstructionIndex;
-        /// 执行break语句时要goto到的指令的位置
-        ZSharedVariantPointer breakIndex;
         /// 执行containue语句时要goto到的指令的位置
         ZSharedVariantPointer continueIndex;
-    };
-
-    /// switch结构的代码块
-    struct SwitchCodeBlock : public CodeBlock {
-        SwitchCodeBlock() {
-            breakIndex = new ZSharedVariant();
-        }
-
-        /// 执行break语句时要goto到的指令的位置
-        ZSharedVariantPointer breakIndex;
     };
 
     inline static void registerIdentifier(const QByteArray &name, ZSharedVariant *variant)
@@ -266,13 +255,14 @@ public:
 
     inline CodeBlock *getCodeBlockByType(CodeBlock::Type type, CodeBlock *startBlock) const
     {
-        if(!startBlock)
+        if (!startBlock)
             return startBlock;
 
         CodeBlock *block = startBlock;
 
-        while(block) {
-            if((block->type | type) == type) {
+        while (block) {
+            // 无breakIndex的block认为是无效的，可忽略的
+            if (block->breakIndex && (block->type | type) == type) {
                 return block;
             }
 
@@ -305,13 +295,11 @@ private:
 
     inline void deleteAllCodeBlock()
     {
-        for(int i = 0; i < codeBlockList.count(); ++i) {
+        for (int i = 0; i < codeBlockList.count(); ++i) {
             CodeBlock *block = codeBlockList.at(i);
 
-            if(block->isLoopStructure()) {
+            if (block->isLoopStructure()) {
                 delete block->toLoopStructureCodeBlock();
-            } else if(block->type == CodeBlock::Switch) {
-                delete block->toSwitchCodeBlock();
             } else {
                 delete block;
             }

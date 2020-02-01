@@ -120,16 +120,15 @@ code:       GOTO IDENTIFIER ends {
                 ZCodeExecuter::CodeBlock::Type type = ZCodeExecuter::CodeBlock::LoopStructure;
 
                 if(isBreak)
-                    type = ZCodeExecuter::CodeBlock::Type(type | ZCodeExecuter::CodeBlock::Switch);
+                    type = ZCodeExecuter::CodeBlock::Type(type | ZCodeExecuter::CodeBlock::Switch | ZCodeExecuter::CodeBlock::Normal);
 
                 ZCodeExecuter::CodeBlock *block_while = ZCodeExecuter::currentCodeExecuter->getCodeBlockByType(type, ZCodeExecuter::currentCodeExecuter->getCodeBlock());
-
+                /// break的个数
                 quint16 tmp = ($1 & 0x7fff);
 
                 while(--tmp) {
                     if(!block_while) {
-                        zError << "\"" + QString(isBreak ? "break" : "continue") + "\" Cannot be used here";
-                        break;
+                        error(@1, ("\"" + QString(isBreak ? "break" : "continue") + "\" Cannot be used here").toStdString());
                         YYABORT;
                     }
 
@@ -137,16 +136,12 @@ code:       GOTO IDENTIFIER ends {
                 }
 
                 if(!block_while) {
-                    zError << "\"" + QString(isBreak ? "break" : "continue") + "\" Cannot be used here";
+                    error(@1, ("\"" + QString(isBreak ? "break" : "continue") + "\" Cannot be used here").toStdString());
                     YYABORT;
                 }
 
                 if(isBreak) {
-                    if(block_while->isLoopStructure()) {
-                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toLoopStructureCodeBlock()->breakIndex);
-                    } else {
-                        ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toSwitchCodeBlock()->breakIndex);
-                    }
+                    ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->breakIndex);
                 } else {
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, block_while->toLoopStructureCodeBlock()->continueIndex);
                 }
@@ -155,8 +150,19 @@ code:       GOTO IDENTIFIER ends {
             | switch {}
             | ';'
             | '{' {
-                ZCodeExecuter::currentCodeExecuter->beginCodeBlock();
+                /// For While If Switch-case 语句本身已经添加了对应的CodeBlock，此处的CodeBlock应当不做任何实际作用，也不应该占用break语句
+                if (ZCodeExecuter::currentCodeExecuter->getCodeBlock()->type == ZCodeExecuter::CodeBlock::Normal
+                        || ZCodeExecuter::currentCodeExecuter->getCodeBlock()->type == ZCodeExecuter::CodeBlock::Function) {
+                    ZCodeExecuter::currentCodeExecuter->beginCodeBlock();
+                } else {
+                    ZCodeExecuter::currentCodeExecuter->beginCodeBlock();
+                    ZCodeExecuter::currentCodeExecuter->getCodeBlock()->breakIndex.reset();
+                }
             } start {
+                if (auto break_index = ZCodeExecuter::currentCodeExecuter->getCodeBlock()->breakIndex.data()) {
+                    *break_index = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
+                }
+
                 ZCodeExecuter::currentCodeExecuter->endCodeBlock();
             } '}'
             ;
@@ -182,7 +188,7 @@ switch_head:SWITCH '(' expression ')' {
             ;
 
 switch:     switch_head '{' cases '}' {
-                *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toSwitchCodeBlock()->breakIndex.data() = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
+                *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->breakIndex.data() = ZCodeExecuter::currentCodeExecuter->getCodeList().count();
 
                 QHash<ZVariant, int> hashSwitch;
 
@@ -250,7 +256,7 @@ goto_label: IDENTIFIER ':' {
 //            ;
 
 function:   '(' parameter ')' {
-                ZCodeExecuter::beginCodeExecuter()->beginCodeBlock();
+                ZCodeExecuter::beginCodeExecuter()->beginCodeBlock(ZCodeExecuter::CodeBlock::Function);
 
                 if($2) {
                     for(QByteArray *id : *$2) {
@@ -955,7 +961,7 @@ branch_body :branch_head code {
                     ZCodeExecuter::currentCodeExecuter->appendCode(ZCode::Goto, ZCodeExecuter::currentCodeExecuter->createConstant(QByteArray::number(index), ZVariant::Int));
 
                     /// 保存执行break语句时跳转到的位置
-                    *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->toLoopStructureCodeBlock()->breakIndex.data() = codeList.count();
+                    *ZCodeExecuter::currentCodeExecuter->getCodeBlock()->breakIndex.data() = codeList.count();
                 }
 
                 int index = ZCodeExecuter::currentCodeExecuter->getCodeList().count();

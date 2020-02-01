@@ -552,7 +552,7 @@ ZCodeExecuter::~ZCodeExecuter()
 
 int ZCodeExecuter::eval(std::istream &s)
 {
-    beginCodeBlock();
+    beginCodeBlock(CodeBlock::Function);
 
     YYFlexLexer *yyFlexLexer = new YYFlexLexer;
     YYParser *yyParser = new YYParser;
@@ -697,10 +697,8 @@ void ZCodeExecuter::beginCodeBlock(CodeBlock::Type type)
 {
     CodeBlock *block;
 
-    if(type == CodeBlock::NormalFor || type == CodeBlock::While) {
+    if (type == CodeBlock::NormalFor || type == CodeBlock::While) {
         block = new LoopStructureCodeBlock;
-    } else if(type == CodeBlock::Switch) {
-        block = new SwitchCodeBlock;
     } else {
         block = new CodeBlock;
     }
